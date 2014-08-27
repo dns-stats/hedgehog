@@ -1,0 +1,167 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_rssac_process_unique_source_data.sh
+#
+
+eval $(@BIN@/hedgehog_conf_read.sh)
+
+REQUIRED_API_VERSION=DB_VERSION
+DB_NAME=$hhconfig_database_name
+DEFAULT_DAY=`date --date="- 7 day" +%Y-%m-%d`
+START=${DEFAULT_DAY}
+FORCE_SUM_DEL=0
+DELETE_RAW=0
+
+
+usage () {
+    echo
+    echo "Process the raw unique source data into a summary table for a specified 24 hour period"
+    echo
+    echo "Usage: $0 options"
+    echo
+    echo "Supported options:"
+    echo "  -s Date on which to compress data (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
+	echo "  -f Force overwrite of existing summary data"
+	echo "  -D Also delete the raw data (default: no delete)"
+    echo "  -h Show this help"
+}
+
+while getopts ":s:fDh" opt; do
+    case $opt in
+        s  ) START=$OPTARG ;;
+        f  ) FORCE_SUM_DEL=1 ;;
+        D  ) DELETE_RAW=1 ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
+DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+
+# Validate the start date
+date "+%Y-%m-%d" -d ${START} >/dev/null 2>&1
+is_valid=$?
+if [ ${is_valid} -ne 0 ] ; then
+	echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+	exit 1
+fi
+
+echo "Processing unique_source data for ${START}"
+
+# Confirm force flag as this should be exceptional
+if [ ${FORCE_SUM_DEL} -eq 1 ] ; then
+	 echo
+	 echo "You have specified the -f flag to force an overwrite of existing summary data"
+	 echo -n "Are you sure you want to continue? y/N: "
+	 read c
+	 if [ "$c" != "y" ] && [ "$c" != "Y" ]
+	 then
+	   echo "Script halted by user - script exiting."
+	   exit 1
+	 fi
+fi
+
+SQ="'"
+SERVER_IDS=`echo "SELECT id FROM dsc.server;" | psql -td $DB_NAME `
+UNIQUE_SOURCE_RAW_PLOT_NAME="unique_sources_raw"
+UNIQUE_SOURCE_SUM_PLOT_NAME="unique_sources"
+UNIQUE_SOURCE_RAW_PLOT_ID=`echo "SELECT id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_RAW_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
+UNIQUE_SOURCE_SUM_PLOT_ID=`echo "SELECT id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_SUM_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
+
+DELETE_SUMMARY_SQL=""
+DELETE_RAW_SQL=""
+IPV4_key="IPv4"
+IPV6_key="IPv6"
+IPV6_ag_key="IPv6/64"
+IPV4_value=0
+IPV6_value=0
+IPV6_ag_value=0
+
+for SERVER_ID in $SERVER_IDS ;do
+
+	# Set up the table name
+    SERVER_NAME=`psql -td $DB_NAME -c "SELECT name FROM dsc.server WHERE id=${SERVER_ID};" | tr -d [[:space:]]`
+	NODE_COUNT=`echo "SELECT count(*) FROM dsc.node where server_id=${SERVER_ID};" | psql -td $DB_NAME `
+    NODE_IDS=`echo "SELECT id FROM dsc.node where server_id=${SERVER_ID} order by id;" | psql -td $DB_NAME `
+	MONTH=`date --date="${START}" +%m`
+	YEAR=`date --date="${START}" +%Y`
+	# Could do this work directly on dsc.data instead
+	UNIQUE_SOURCE_RAW_TABLE_NAME="dsc.data_${SERVER_NAME}_${UNIQUE_SOURCE_RAW_PLOT_NAME}_${YEAR}_${MONTH}"
+	UNIQUE_SOURCE_SUM_TABLE_NAME="dsc.data_${SERVER_NAME}_${UNIQUE_SOURCE_SUM_PLOT_NAME}_${YEAR}_${MONTH}"
+	echo "Found $NODE_COUNT nodes for server $SERVER_NAME" 
+
+
+   for NODE_ID in $NODE_IDS ; do
+	
+		echo "Processing node id $NODE_ID"
+		# First up, check that there isn't an entry in the summary table for this node. 
+		# Note that if there is actually data when the transaction occurs then the insert will fail and the transaction will rollback.
+		SUMMARY_TABLE_ENTRY=`echo "SELECT count(*) FROM ${UNIQUE_SOURCE_SUM_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;" | psql -td $DB_NAME `
+		if [ ${SUMMARY_TABLE_ENTRY} != "0" ] ; then
+			if [ ${FORCE_SUM_DEL} -eq 1 ] ; then
+				echo "Summary data already exists for node id = ${NODE_ID}... Force flag was used overwriting summary data!"
+				DELETE_SUMMARY_SQL="DELETE FROM ${UNIQUE_SOURCE_SUM_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;"
+			else
+				echo "Summary data already exists for node id = ${NODE_ID}... skipping"
+				continue;
+			fi
+		fi
+		
+		# Now lets get the summary numbers from the raw table if they exist. Reset the counters to 0 first.
+		IPV4_value=0
+		IPV6_value=0
+		IPV6_ag_value=0
+		IPv4_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV4_key}';" | psql -td $DB_NAME `
+		IPv6_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV6_key}';" | psql -td $DB_NAME `
+		IPv6_ag_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV6_ag_key}';" | psql -td $DB_NAME `
+		if [ ! -z ${IPv4_SUMMARY_RESULT} ] ; then IPV4_value=${IPv4_SUMMARY_RESULT} ; fi
+		if [ ! -z ${IPv6_SUMMARY_RESULT} ] ; then IPV6_value=${IPv6_SUMMARY_RESULT} ; fi
+		if [ ! -z ${IPv6_ag_SUMMARY_RESULT} ] ; then IPV6_ag_value=${IPv6_ag_SUMMARY_RESULT} ; fi
+								
+		# Time to delete the raw data if that is what we were told to do						
+		if [ ${DELETE_RAW} -eq 1 ] ; then
+			echo "Deleting raw data for for node id = ${NODE_ID}"
+			DELETE_RAW_SQL="DELETE FROM ${UNIQUE_SOURCE_RAW_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;"
+		fi
+													
+		psql $DB_NAME <<EOF
+BEGIN;
+set client_min_messages to WARNING;
+${DELETE_SUMMARY_SQL}
+INSERT INTO ${UNIQUE_SOURCE_SUM_TABLE_NAME} (starttime, server_id, node_id, plot_id, key1, key2, value) VALUES (TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', ${SERVER_ID}, ${NODE_ID}, ${UNIQUE_SOURCE_SUM_PLOT_ID}, ${SQ}${IPV4_key}${SQ}, 1, ${IPV4_value});
+INSERT INTO ${UNIQUE_SOURCE_SUM_TABLE_NAME} (starttime, server_id, node_id, plot_id, key1, key2, value) VALUES (TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', ${SERVER_ID}, ${NODE_ID}, ${UNIQUE_SOURCE_SUM_PLOT_ID}, ${SQ}${IPV6_key}${SQ}, 1, ${IPV6_value});
+INSERT INTO ${UNIQUE_SOURCE_SUM_TABLE_NAME} (starttime, server_id, node_id, plot_id, key1, key2, value) VALUES (TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', ${SERVER_ID}, ${NODE_ID}, ${UNIQUE_SOURCE_SUM_PLOT_ID}, ${SQ}${IPV6_ag_key}${SQ}, 1, ${IPV6_ag_value});
+${DELETE_RAW_SQL}
+COMMIT;
+EOF
+	done
+done
+echo "`date`: $0 COMPLETED"
+exit 0

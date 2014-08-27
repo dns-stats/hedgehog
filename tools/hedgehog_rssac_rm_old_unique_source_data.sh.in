@@ -1,0 +1,91 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_rssac_rm_old_unique_source_data.sh
+#
+
+#TODO(asap): This script must truncate entire tables in order to reclaim disk space
+#TODO: Add option to select all servers or just one server
+
+eval $(@BIN@/hedgehog_conf_read.sh)
+
+REQUIRED_API_VERSION=DB_VERSION
+DB_NAME=$hhconfig_database_name
+DEFAULT_DAY=`date --date="- 14 day" +%Y-%m-%d`
+START=${DEFAULT_DAY}
+FORCE_SUM_DEL=0
+DELETE_RAW=0
+
+
+usage () {
+    echo
+    echo "Delete the raw unique source data on and before a given date"
+    echo
+    echo "Usage: $0 options"
+    echo
+    echo "Supported options:"
+    echo "  -s Date from which to delete all unique source data (default is 14 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
+    echo "  -h Show this help"
+}
+
+while getopts ":d:s:h" opt; do
+    case $opt in
+        s  ) START=$OPTARG ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
+DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+
+# Validate the start date
+date "+%Y-%m-%d" -d ${START} >/dev/null 2>&1
+is_valid=$?
+if [ ${is_valid} -ne 0 ] ; then
+	echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+	exit 1
+fi
+
+echo "Deleting unique_source data on and before ${START}"
+
+SQ="'"
+UNIQUE_SOURCE_RAW_PLOT_NAME="unique_sources_raw"
+UNIQUE_SOURCE_RAW_PLOT_ID=`echo "SELECT id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_RAW_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
+
+DELETE_RAW_SQL="DELETE FROM dsc.data WHERE plot_id = ${UNIQUE_SOURCE_RAW_PLOT_ID} AND starttime <= TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;"
+									
+psql $DB_NAME <<EOF
+BEGIN;
+set client_min_messages to WARNING;
+${DELETE_RAW_SQL}
+COMMIT;
+EOF
+
+echo "`date`: $0 COMPLETED"
+exit 0

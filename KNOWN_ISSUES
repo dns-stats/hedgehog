@@ -1,0 +1,37 @@
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0a1
+-----------------------------
+* Currently, the database and web front end must run on the same server.
+
+* The full list of possible plots are displayed via the drop down menu in the 
+  GUI, regardless of whether there is data in the database for the plot
+
+* Flash is required to view interactive plots in a browser.
+
+* Support for RSSAC reports is added for XML imports only, however extended 
+  RCODES cannot be collected by the existing DSC collector so only base RCODES
+  are collected and displayed. If the DSC collector is extended then further 
+  work must be done in Hedgehog to also support extended RCODES
+
+* The Unique Sources plot is not available until after the RSSAC report has 
+  been generated for the date in question.
+
+* If a user touches any controls while a query is waiting to return
+  then the 'generate graph' button becomes enabled again and a second
+  plot can be generated that will then over write the first. 
+

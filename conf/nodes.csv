@@ -1,0 +1,20 @@
+######################### NODES CONFIGURATION FILE ###################
+# Format is:     server-name, node-name, node-region
+# Each field can contain alphanumeric characters and hypens (-) only
+# 
+# server-name  - This must be unique and it must match the name used in the
+#                data directory path for uploaded files.
+# node-name    - This must be unique for a given server and it must match the name
+#                used in the data directory path for uploaded files.
+# node-group   - This is used in the node grouping tabs in the Hedgehog front end.
+#                It should be unique for a given server. It is optional and if not
+#                specified the node is added to a group called 'Other'.
+# 
+# Example input:
+Server-A,Node-1,Region-1
+Server-A,Node-2,Region-1
+Server-A,Node-3,Region-2
+Server-A,Node-4,Region-3
+Server-B,Node-1,Region-1
+Server-B,Node-2,Region-2
+Server-C,Node-5,Region-4

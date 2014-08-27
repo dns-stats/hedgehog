@@ -1,0 +1,118 @@
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+<VirtualHost *:80>
+
+	#ServerName www.example.com
+	ServerAdmin webmaster@localhost
+	
+	Alias /hedgehog @HH_WEB_SOURCE@
+	<Directory @HH_WEB_SOURCE@>
+	    RSourceOnStartup @HH_WEB_SOURCE@/R/startup.R
+	    Options None
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	    DefaultType text/html
+	    DirectoryIndex hedgehog.html
+	</Directory>
+
+	<Directory @HH_WEB_SOURCE@/brew>
+	    Options None
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	    SetHandler r-script
+	    RHandler brew::brew
+	</Directory>
+
+	<Directory @HH_WEB_SOURCE@/images>
+	    Options None
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	    SetHandler default-handler
+	</Directory>
+
+	<Directory @HH_WEB_SOURCE@/plots>
+	    Options None
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	    SetHandler default-handler
+	</Directory>
+
+	<Directory @HH_WEB_SOURCE@/js>
+	    Options None
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	    SetHandler default-handler
+	</Directory>
+
+	<Directory @HH_WEB_SOURCE@/R>
+	    Options None
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	    SetHandler r-script
+	</Directory>
+
+	<Directory @HH_WEB_SOURCE@/stylesheets>
+	    Options None
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	    SetHandler default-handler
+	</Directory>
+	
+	Alias /plotcache @HH_PLOTCACHE@
+	<Directory @HH_PLOTCACHE@>
+	    Options None
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	    SetHandler default-handler
+	</Directory>
+
+	Alias /rssac @HH_RSSAC@
+	<Directory @HH_RSSAC@>
+	    Options Indexes
+	    AllowOverride None
+	    order allow,deny
+	    allow from all
+	</Directory>	
+
+	# Prints out a nice report about R running within Apache
+	# Do not use this in production by default
+	#<Location /RApacheInfo>
+	#    SetHandler r-info
+	#</Location>
+
+	# Uncomment to allow data to be uploaded by clients with valid certificates
+	# Alias /data @HH_DATA_DIR@
+	# <Directory @HH_DATA_DIR@>
+	#    DAV On
+	#    SSLRequireSSL
+	#    SSLVerifyClient require
+	#    SSLVerifyDepth 1
+	#    Options +Indexes
+	# </Directory>
+</VirtualHost>

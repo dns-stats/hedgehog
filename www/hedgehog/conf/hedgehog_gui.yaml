@@ -1,0 +1,31 @@
+
+## 
+## Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+## 
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+## 
+## http://www.apache.org/licenses/LICENSE-2.0
+## 
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+##
+
+##
+## Developed by Sinodun IT (www.sinodun.com)
+##
+
+# TODO(asap): Install this under <>/etc/
+
+--- ## YAML config for hedgehog GUI.
+www:
+  default_plot_type           : interactive # static = png plots, interactive = googlevis plots
+  presentation_delay_in_hours : 0           # number of hours behind now for which the GUI will display data  
+  use_plot_caching            : 1           # 1 = true: use cached plots when possible, 0 = false: never use cached plots
+  caching_delay_in_hours      : 1           # if cache=1 then only plots with an end time earlier than this this number of hours ago
+                                            # are cached. More recent plots are not cached as data may still be being imported
+...

@@ -1,0 +1,98 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_datafiles_rm_empty_xml_dirs.bash
+#
+
+eval $(@BIN@/hedgehog_conf_read.sh)
+DATE=`date --date="- 7 day" +%Y-%m-%d`
+INCOMING="incoming"
+
+usage () {
+	echo
+	echo "Remove empty incoming xml directories older than a certain date (default is all the processed directories older than 7 days ago)"
+	echo 
+	echo "Usage: $0 options"
+	echo
+	echo "Supported options:"
+	echo "	-d Date before which to remove empty xml directories (default: 7 days ago, format YYYY-MM-DD)"
+	echo "	-h Show this help."
+}
+
+while getopts ":d:h" opt; do
+    case $opt in
+        d  ) DATE=$OPTARG ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
+[ -z $DATE ] && usage && exit 1
+
+# Validate the start date
+date "+%Y-%m-%d" -d $DATE >/dev/null 2>&1
+is_valid=$?
+if [ ${is_valid} -ne 0 ] ; then
+	echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+	exit 1
+fi
+
+# Date converted in seconds to be compared with processed directories date
+DATE_SECONDS=`date --utc --date "$DATE" +%s`
+
+cd $hhconfig_directories_data
+
+for SERVER in * ; do
+	test -L $SERVER && continue;
+	test -d $SERVER || continue;
+	cd $hhconfig_directories_data/$SERVER
+	for NODE in * ; do
+		test -L $NODE && continue;
+		test -d $NODE || continue;
+		test -L $NODE/$DONE && continue;
+        test -d $NODE/$DONE || continue;
+        cd $hhconfig_directories_data/$SERVER/$NODE/$INCOMING
+		for MYDATE in * ; do
+			test -L $MYDATE && continue;
+			test -d $MYDATE || continue;
+			date "+%Y-%m-%d" -d $MYDATE >/dev/null 2>&1
+			is_valid=$?
+			if [ ${is_valid} -ne 0 ] ; then
+				continue;
+			fi
+			# Check if directory is older than DATE
+			MYDATE_SECONDS=`date --utc --date "$MYDATE" +%s`
+			[ $MYDATE_SECONDS -ge $DATE_SECONDS ] && continue;
+			# Remove empty directories
+			my_count=`ls -1 $MYDATE | wc -l`
+			[ $my_count -eq 0 ] && rm -rf $MYDATE
+		done
+		cd $hhconfig_directories_data/$SERVER
+	done
+	cd $hhconfig_directories_data
+done

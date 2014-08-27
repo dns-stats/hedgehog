@@ -1,0 +1,421 @@
+<%
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# Debug mode set to 1, set to 0 to disable
+hh_debug <<- 0
+
+# TODO(refactor): preparing and executing DB queries should be wrapped better and in a dbQuery.R file
+# TODO: use either tabs or spaces for indentation - we have both at the moment
+
+# Initialise the static/interactive default type
+initPltType <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In initPltType')
+    }
+
+    %><%=gui_config$www$default_plot_type%><%
+}
+
+# Initialise the Plot drop down menu contents
+initPlotDDHtml <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In initPlotDDHtml')
+    }
+
+	# TODO: These queries should only return plots that are configured for display
+	# Especially as not everyone will want the RSSAC plots showing
+    if (!(prepStmnt("getpltddcategories", dsccon)) || !(prepStmnt("getpltid_ddname", dsccon))){
+        %><option value="DB error">DB error preparing plot type query</option><%
+        return(FALSE)
+    }
+   
+    df <- dbGetDataFrame(dbdrv, dsccon, "EXECUTE getpltddcategories;")
+ 
+    if (is.null(df)) {
+        %><option value="DB error">DB connection error</option><%
+        return(FALSE)
+    } 
+	else if (nrow(df) < 1) {
+    	%><option value="DB error">No plots found in DB</option><%
+        return(FALSE)
+    }
+	
+	for (i in 1:nrow(df)) {
+		df2 <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getpltid_ddname('", df[i,1], "');", sep=""))
+		if (is.null(df2)) {
+			%><option value="DB error">DB connection error</option><%
+			return(FALSE)
+		} 
+		else if (nrow(df2) < 1) {
+			%><option value="DB error">No data found in DB</option><%
+			return(FALSE)
+		}
+		optgroup_html <- sub(".*\\.","",df[i,1])
+		%><optgroup label="<%=optgroup_html%>"><%
+		for (i in 1:nrow(df2)) {
+			%><option value="<%=df2[i,1]%>"><%=df2[i,2]%></option><%
+		}
+		%></optgroup><%
+	}
+    return(TRUE)
+}
+
+# Initialise the server drop down menu contents
+initServerDDHtml <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In initServerDDHtml')
+    }
+
+    if (!(prepStmnt("getsrvrid_display_name", dsccon))) {
+        %><option value="DB error">DB error preparing server query</option><%
+        return(FALSE)
+    }
+    
+    df <- dbGetDataFrame(dbdrv, dsccon, "EXECUTE getsrvrid_display_name;")
+    
+    if (is.null(df)) {
+        %><option value="DB error">DB connection error</option><%
+        return(FALSE)
+    } 
+	else if (nrow(df) < 1) {
+    	%><option value="DB error">No servers found in DB</option><%
+        return(FALSE)
+    }
+    
+    for (i in 1:nrow(df)) {
+		%><option value="<%=df[i,1]%>"><%=df[i,2]%></option><%
+	}
+    return(TRUE)
+}
+
+# Initialise the All and region node tabs html
+initNodeTabsHtml <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In initNodeTabsHtml')
+    }
+
+    if (!(prepStmnt("getsrvrid_display_name", dsccon)) || !(prepStmnt("getgroups", dsccon)) || !(prepStmnt("getnodes", dsccon)) || !(prepStmnt("getnodesbyregion", dsccon))) {
+        %>DB error preparing node query<%
+        return(FALSE)
+    }
+    
+    servers <- dbGetDataFrame(dbdrv, dsccon, "EXECUTE getsrvrid_display_name;")
+
+    if (is.null(servers)) {
+		%>DB connection error<%
+		return(FALSE)
+    } 
+	else if(nrow(servers) < 1) {
+		%>No servers found in DB<%
+		return(FALSE)
+    }
+
+	grouphtml <- "<div class=\"sixteen columns\" id=\"groupcontent\">"
+	nodehtml <- "<div class=\"sixteen columns\" id=\"nodecontent\">"
+
+	for (s in 1:nrow(servers)) {
+		srvr_id <- servers[s,1]
+		srvr_nm <- servers[s,2]
+
+		groups <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getgroups(", srvr_id, ");", sep=""))
+
+		if (is.null(groups)) {
+			%>DB connection error<%
+			return(FALSE)
+		} 
+		else if (nrow(groups) < 1) {
+			%>No groups found in DB<%
+			return(FALSE)
+		}
+		
+		if (s==1) {
+			grouphtml <- paste(grouphtml, "<div class=\"server_showing\" id=\"", srvr_nm, "\">", sep="")
+			gs <- "group_showing"
+			ck <- "checked"
+		} 
+		else {
+			grouphtml <- paste(grouphtml, "<div class=\"hidden\" id=\"", srvr_nm, "\">", sep="")
+			gs <- "hidden"
+			ck <- ""
+		}
+
+		for (g in 1:nrow(groups)) {
+		
+			gp_nm <- groups[g,1]
+
+			if (g==1) {
+				grouphtml <- paste(grouphtml, "<div class=\"Tabs\"><ul><li class=\"activeGpTab\" id=\"li_All_", srvr_nm, 
+								   "\" onclick=\"gpTab('All_", srvr_nm,"')\"><a>All<img id=\"cb_All_", srvr_nm, "_img\" src=\"images/none.png\" 
+								   alt=\"none selected\" height=\"10\" width=\"10\" /></a></li>", sep="")
+
+				nodes <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getnodes(", srvr_id, ");", sep=""))
+                        
+				if (is.null(nodes)) {
+					%>DB connection error...<%
+					return(FALSE)
+				}
+				else if (nrow(nodes) < 1) {
+					%>No nodes found in DB...<%
+					return(FALSE)
+				}
+				
+				nodehtml <- paste(nodehtml, "<div class=\"", gs, "\" id=\"All_", srvr_nm, "\">", sep="")
+				nodehtml <- paste(nodehtml, "<div class=\"allnone\"><a style=\"font-weight:bold;\">Actions:</a> ", sep="")
+				nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectAllBtn\"  value=\"Select all nodes\"    
+								  title=\"Select all available nodes for plotting\" onclick=\"selectAll('cb_All_", srvr_nm, "')\"> ", sep="")
+				nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectNoneBtn\" value=\"De-select all nodes\" 
+								  title=\"De-select all available nodes \"          onclick=\"selectNone('cb_All_", srvr_nm, "')\"> <hr></div><div class=\"node_cbs\">", sep="")
+				for (n in 1:nrow(nodes)) {
+					nd_id <- nodes[n,1]
+					nd_nm <- nodes[n,2]
+					nodehtml <- paste(nodehtml, "<input type=\"checkbox\" class=\"nodeselection\" id=\"", nd_id, "_All_", srvr_nm, "\" name=\"cb_All_", srvr_nm,
+									  "\" value=\"", nd_id, "_All_", srvr_nm, "\"onclick=\"selectNode('", nd_id, "_All_", srvr_nm, "')\"", ck, ">",
+									  "<label class=\"\" for=\"",	nd_id, "_All_", srvr_nm, "\" title=\"Toggle node selection\">", nd_nm, "</label>", sep="")
+				}
+				nodehtml <- paste(nodehtml, "</div></div>", sep="")
+			}
+
+			grouphtml <- paste(grouphtml, "<li id=\"li_", gp_nm, "_", srvr_nm, "\" onclick=\"gpTab('", gp_nm, "_", srvr_nm, "')\"><a>", gp_nm, "<img id=\"cb_", gp_nm, "_",
+							   srvr_nm, "_img\" src=\"images/none.png\" alt=\"none selected\" height=\"10\" width=\"10\" /></a></li>", sep="")
+                    
+			nodes <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
+
+			if (is.null(nodes)) {
+				%>DB connection error...<%
+				return(FALSE)
+			}
+			else if (nrow(nodes) < 1) {
+				%>No nodes found for this region in DB...<%
+				return(FALSE)
+			}
+			
+			nodehtml <- paste(nodehtml, "<div class=\"hidden\" id=\"", gp_nm, "_", srvr_nm, "\">", sep="")
+			nodehtml <- paste(nodehtml, "<div class=\"allnone\"><a style=\"font-weight:bold;\">Actions:</a> ", sep="")
+			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectOnlyRegionBtn\"  value=\"Select only ", gp_nm, "\"    
+							  title=\"Select only the nodes in this region for plotting\"   onclick=\"selectOnly('cb_", gp_nm, "_", srvr_nm,"')\"> ", sep="")
+			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectAllRegionBtn\"   value=\"Include all ", gp_nm, "\"    
+							  title=\"Include all the nodes in this region for plotting\"   onclick=\"selectAll('cb_", gp_nm, "_", srvr_nm,"')\"> ", sep="")
+			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectNoneRegionBtn\"  value=\"Exclude all ", gp_nm, "\" 
+							  title=\"De-select all the nodes in this region for plotting\" onclick=\"selectNone('cb_", gp_nm, "_", srvr_nm,"')\"><hr></div><div class=\"node_cbs\">", sep="")
+
+			for (n in 1:nrow(nodes))   {
+				nd_id <- nodes[n,1]
+				nd_nm <- nodes[n,2]
+				nodehtml <- paste(nodehtml, "<input type=\"checkbox\" class=\"nodeselection\" id=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\" name=\"cb_", gp_nm, "_",
+								  srvr_nm, "\" value=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\"onclick=\"selectNode('", nd_id, "_", gp_nm, "_", srvr_nm, "')\"", ck,
+								  ">", "<label class=\"\" for=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\" title=\"Toggle node selection\">", nd_nm, "</label>", sep="")
+			}
+			nodehtml <- paste(nodehtml, "</div></div>", sep="")
+		}     
+		grouphtml <- paste(grouphtml, "</ul></div></div>", sep="")
+	}
+	grouphtml <- paste(grouphtml, "</div>", sep="")
+	nodehtml <- paste(nodehtml, "</div>", sep="")
+	%><%=grouphtml%><br class="clear" /><%=nodehtml%><%
+
+    return(TRUE)
+}
+
+generatePlot <- function(){
+
+    #TODO(refactor): Move more of this code out to the generatePlot.R file
+
+	if(hh_debug){
+		system('logger -p user.notice In generatePlot')
+	}
+
+	source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep=""))
+    
+	# Query the db to get the plot attributes
+	if (!(prepStmnt("getpltdetails", dsccon))) {
+		return(FALSE)
+	}
+
+	dd_pltid			<- GET$pltid
+	pltdetails			<- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getpltdetails(", dd_pltid, ");", sep=""))	
+	
+	if (is.null(pltdetails)) {
+		return(FALSE)
+	}
+	
+	pltnm				<- pltdetails$name
+	plttitle			<- pltdetails$title
+	pltdescription		<- pltdetails$description
+	pltid				<- pltdetails$plot_id
+		
+	svrid				<- GET$svrid
+	gvis				<- GET$gvis
+	ndarr				<- GET$ndarr
+	svrnm				<- GET$svrnm
+	start				<- GET$start
+	stop				<- GET$stop
+	
+	# Initialise plot parameters
+	initPlotOptions()
+	
+	# Initialise name of plot file and make sure the cache directory exists
+	plot_dir = paste(hh_config$directories$plotcache, "/", svrnm, "/", pltnm, sep="") 
+	dir.create(file.path(plot_dir), showWarnings = FALSE, recursive = TRUE)
+	if (pltnm %in% unknown_graphs ) {
+		plot_file = "plots/no_graph.png"
+	} 
+	else {
+		plot_file = paste(plot_dir, "/", start, "-", stop, "-all.png", sep="")
+		if (gvis == 1) {
+			plot_file <- sub(".png", ".html", plot_file)
+		}
+		if (ndarr != '-1') {
+			plot_file <- sub("-all.", paste("-", digest(ndarr, algo="sha256"), ".", sep=""), plot_file)
+		}
+	}
+
+	# convert the times to POSIX
+	simple_start   <- sub("T", " ", start)
+	simple_stop    <- sub("T", " ", stop)
+
+	cache       <- FALSE # Create new plot_file
+	if (file.exists(plot_file) && gui_config$www$use_plot_caching == 1) {
+		lag_hours <- as.numeric(difftime(file.info(plot_file)$mtime,as.POSIXct(simple_start),units="hours"))
+		if (lag_hours > gui_config$www$caching_delay_in_hours) {
+			cache <- TRUE # Pull back file from disk
+		}
+	}
+
+	if (!cache) {	
+		plot_file <- generatePlotFile(plttitle, pltnm, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon)
+	}
+    
+	# OK - we have a plot file so now lets generate the html to hold that
+	now <- format(Sys.time(), '%Y-%m-%dT%H:%M')
+	if (plot_file != "plots/no_graph.png" && plot_file != "plots/no_results.png" && plot_file != "plots/no_connection.png") {
+		plot_file <- sub(hh_config$directories$plotcache, "../plotcache/", plot_file)
+        
+		if (gvis == '1') {
+			%><div id="plot">
+				<hr />
+				<iframe width="100%" height="520px" frameborder="0" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
+				<hr />
+			</div><%
+		}
+		else if (pltnm %in% log_option) {
+			log_file <- sub(".png", "-log.png", plot_file)
+			stack_file <- sub(".png", "-stack.png", plot_file)
+			%><div id="opts">
+				<hr />
+				<input type="radio" name="pltoptions" id="rbliny" onclick="toggle_plot()" title="Line plot with linear y-axis" checked>
+				<label for="rbliny" title="Line plot with linear y-axis">Linear scale</label>
+				<input type="radio" name="pltoptions" id="rblogy" onclick="toggle_plot()" title="Line plot with log y-axis">
+				<label for="rblogy" title="Line plot with log y-axis">Log scale</label>
+				<input type="radio" name="pltoptions" id="rbstack" onclick="toggle_plot()" title="Stacked line plot with linear y-axis">
+				<label for="rbstack"  title="Stacked line plot with linear y-axis">Stacked linear</label>
+			</div>
+			<div id="plot">
+				<img src="<%=plot_file%>?nocache=<%=now%>" id= "liny" />
+				<img src="<%=log_file%>?nocache=<%=now%>" class="hidden" id="logy" />
+				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" />
+				<hr />
+			</div><%
+		}
+		else {
+			%><div id="plot">
+				<hr />
+				<img src="<%=plot_file%>?nocache=<%=now%>" />
+				<hr />
+			</div><%
+		}
+	}
+	else {
+		%><div id="plot">
+			<hr />
+			<img src="<%=plot_file%>" />
+			<hr />
+		</div><%
+	}
+}
+
+validateDbVersion <- function() {
+	
+	if (hh_debug) {
+		system('logger -p user.notice In validateDbVersion')
+	}
+
+	if (!(prepStmnt("getdbversion", dsccon))) {
+		%>Error: preparing db query<%
+		return(FALSE)
+	}
+		
+	dbversion <- dbGetDataFrame(dbdrv, dsccon, "EXECUTE getdbversion;")
+    
+	if (is.null(dbversion)) {
+		%>Error: DB connection error<%
+		return(FALSE)
+	}
+	
+	if (dbversion != DB_SCHEMA_VERSION) {
+		%>Error: invalid database version<%
+		return(FALSE)
+	}	
+
+	return(TRUE)
+}
+
+#########################################################
+###########  Entry point for brew calls #################
+#########################################################
+
+if (hh_debug) {
+    system('logger -p user.notice Call to Hedgehog brew')
+}
+
+source(paste(hh_config$directories$web_source, "/R/utilities.R", sep = ""))
+if (!validateGetParams()) {
+	%>Error: invalid parameters in method call.<%
+	return()
+}
+
+if (GET$type == "initPltType") {
+	# this doesn't need to call the DB
+	initPltType()
+	return()
+}
+
+# TODO(asap): check the options are all specified, not defaulted
+dsccon <- try(dbConnect(dbdrv, dbname = hh_config$database$name, user = hh_config$database$read_user, port = hh_config$database$port))
+dbSendQuery(dsccon, "set statement_timeout to 300000;")
+if (class(dsccon) != "try-error") {
+	source(paste(hh_config$directories$web_source, "/R/prepareStatement.R", sep = ""))
+	if (validateDbVersion()) {
+		source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep = ""))
+		switch(GET$type,
+			initPlotDDHtml = {initPlotDDHtml()},
+			initServerDDHtml = {initServerDDHtml()},
+			initNodeTabsHtml = {initNodeTabsHtml()},
+			generatePlot = {generatePlot()},
+			generateYaml = {generateYaml(dsccon)}
+		)
+	}
+	dbDisconnect(dsccon)
+}
+%>

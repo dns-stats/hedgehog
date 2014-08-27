@@ -1,0 +1,148 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_rssac_generate_reports.sh
+#
+
+#TODO(asap): Add a flag to allow the user to specify a single server to run the report for
+
+eval $(@BIN@/hedgehog_conf_read.sh)
+
+REQUIRED_API_VERSION=DB_VERSION
+DB_NAME=$hhconfig_database_name
+DEFAULT_DAY=`date --date="- 7 day" +%Y-%m-%d`
+START=`date --date="${DEFAULT_DAY}" +%Y-%m-%dT00:00`
+INPUT_START=""
+DELETE_RAW_DATA_FLAG=""
+PROCESS_UNIQUE_SOURCES=1;
+
+usage () {
+    echo
+    echo "Create RSSAC reports for a specified 24 hour period"
+    echo
+    echo "Usage: $0 options"
+    echo
+    echo "Supported options:"
+    echo "  -s Date on which to create RSSAC reports (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
+    echo "  -u Don't process the unique source data before generating the report"
+	echo "  -D Also delete the raw unique_source data (default: no delete)"
+    echo "  -h Show this help"
+}
+
+while getopts ":s:Duh" opt; do
+    case $opt in
+        s  ) INPUT_START=$OPTARG ;;
+		D  ) DELETE_RAW_DATA_FLAG=" -D " ;;
+		u  ) PROCESS_UNIQUE_SOURCES=0 ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
+# Validate the input date
+if [ ! -z ${INPUT_START} ] ; then
+	date "+%Y-%m-%d" -d ${INPUT_START} >/dev/null 2>&1
+	is_valid=$?
+	if [ ${is_valid} -ne 0 ] ; then
+		echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+		exit 1
+	fi
+	START=`date --date="${INPUT_START}" +%Y-%m-%dT00:00`
+fi
+
+STOP=`date --date="${START}" +%Y-%m-%dT23:59`
+
+DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+
+SQ="'"
+# TODO: do not hardcode this path
+URL="localhost/hedgehog/brew/hedgehog.brew"
+TOP_OUTPUTDIR="$hhconfig_directories_rssac/`date --date=${START} +%Y`/`date --date=${START} +%m`"
+TYPES="generateYaml generatePlot"
+GVIS=0
+# Specify some strings for special handling
+TRAFFIC_SIZE_SMALL="traffic_sizes_small"
+TRAFFIC_SIZE_BIG="traffic_sizes_big"
+TRAFFIC_SIZE_REP_NAME="traffic-sizes"
+
+echo
+echo "Creating RSSAC reports from ${START} to ${STOP} in ${TOP_OUTPUTDIR}" 
+echo
+
+if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
+	echo "Calling hedgehog_process_unique_source_data.sh script"
+	echo "@BIN@/hedgehog_process_unique_source_data.sh -s ${INPUT_START} ${DELETE_RAW_DATA_FLAG}"
+	@BIN@/hedgehog_rssac_process_unique_source_data.sh -s ${INPUT_START} ${DELETE_RAW_DATA_FLAG}
+	echo
+fi
+
+PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' ORDER BY id DESC;" | psql -td $DB_NAME`
+SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -td $DB_NAME `
+NDARR=-1 # all nodes
+
+for SVRNM in $SERVERNMS ; do
+    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -td $DB_NAME | tr -d [[:space:]]`
+    SVRNM_LC="$(echo ${SVRNM} | tr '[:upper:]' '[:lower:]')"
+
+    for TYPE in $TYPES ; do
+        EXT="yaml"
+         [ "${TYPE}" == "generatePlot" ] && EXT="png"
+
+        for PLTID in $PLOTIDS ; do
+			PLTNM=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -td $DB_NAME | sed 's/[[:space:]]//g'`
+			# Clear out the file in the plot cache to make sure we get the most up to date plots in the reports
+			rm -rf $hhconfig_directories_plotcache/${SVRNM}/${PLTNM}/${START}-${STOP}-all*.png >/dev/null 2>&1
+			# Generate the file. Yaml gets written to the rssac directory, plots go into the plotcache
+			echo "*** Generating '${EXT}' for: " ${PLTNM}
+            echo `date` ": curl --max-time 300 --retry 1 --get \"${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}\""
+            RESULT=`curl -s --max-time 300 --retry 1 --get "${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}" 2>&1`
+            echo ${RESULT}
+			echo
+			
+            if [ "${TYPE}" == "generatePlot" ] ; then
+				# Retrieve the plot from the plot cache
+                PLTFILE=`echo ${RESULT} | sed 's/^.*img src="\([^"?]*\).*/\1/' | sed "s:../plotcache:$hhconfig_directories_plotcache:" | sed 's/-log//' | sed 's/-stack//'`
+
+                if [ "${PLTFILE}" != "plots/no_graph.png" ] && [ "${PLTFILE}" != "plots/no_results.png" ] && [ "${PLTFILE}" != "plots/no_connection.png" ] ; then                   
+					# Report names are the same as plot names but use dash instead of underscore
+					REP_NAME=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -td $DB_NAME | sed 's/_/-/g' | sed 's/[[:space:]]//g'`
+					# Special handling. The traffic size data has 2 plots but both need to go into the same directory
+					PLT_DIR_NM=${REP_NAME}
+					if [ "${PLTNM}" == "${TRAFFIC_SIZE_SMALL}" ] || [ "${PLTNM}" == "${TRAFFIC_SIZE_BIG}" ] ; then
+						PLT_DIR_NM="${TRAFFIC_SIZE_REP_NAME}"
+					fi
+                    OUTPUTDIR="${TOP_OUTPUTDIR}/${PLT_DIR_NM}/"
+                    OUTPUTFILE="${SVRNM_LC}-`date --date=${START} +%Y%m%d`-${REP_NAME}.png"
+                    cp ${PLTFILE} ${OUTPUTDIR}${OUTPUTFILE}
+                fi
+            fi
+        done
+    done
+done
+echo "`date`: $0 COMPLETED"

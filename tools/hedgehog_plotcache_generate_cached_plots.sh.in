@@ -1,0 +1,128 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_plotcache_generate_cached_plots.sh
+#
+
+eval $(@BIN@/hedgehog_conf_read.sh)
+
+REQUIRED_API_VERSION=DB_VERSION
+DB_NAME=$hhconfig_database_name
+FROM=`date --date="- 1 day" +%Y-%m-%dT00:00`
+TO=`date --date="- 1 day" +%Y-%m-%dT23:59`
+SQ="'"
+
+usage () {
+    echo
+    echo "Create cached plots for each chosen period (day/week/month) between Start and End range of time"
+    echo "You must add at least one option for which plot window to generate [-D|-W|-M]"
+    echo
+    echo "Usage: $0 options"
+    echo
+    echo "Supported options:"
+    echo "  -s Start date of time range from which to create cached plots (default: \"${FROM}\")"
+    echo "  -e End date of time range from which to create cached plots (default: \"${TO}\")"
+    echo "  -D Generate daily cached plots"
+    echo "  -W Generate weekly cached plots"
+    echo "  -M Generate monthly cached plots"
+    echo "  -h Show this help."
+}
+
+while getopts ":s:e:DWMh" opt; do
+    case $opt in
+        s  ) FROM=$OPTARG ;;
+        e  ) TO=$OPTARG ;;
+        D  ) DAY=1 ;;
+        W  ) WEEK=1 ;;
+        M  ) MONTH=1 ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
+# Validate the start date
+date "+%Y-%m-%dT%H:%M" -d ${FROM} >/dev/null 2>&1
+is_valid=$?
+if [ ${is_valid} -ne 0 ] ; then
+	echo "Error: The start date is not in the required format of YYYY-MM-DDThh:mm" 
+	exit 1
+fi
+
+# Validate the end date
+date "+%Y-%m-%dT%H:%M" -d ${TO} >/dev/null 2>&1
+is_valid=$?
+if [ ${is_valid} -ne 0 ] ; then
+	echo "Error: The end date is not in the required format of YYYY-MM-DDThh:mm" 
+	exit 1
+fi
+
+# Check that Start date is earlier than End date
+FROM_seconds=`date --utc --date "${FROM}" +%s`
+TO_seconds=`date --utc --date "${TO}" +%s`
+[ ${FROM_seconds} -ge ${TO_seconds} ] && echo "Error: Start date must be earlier than End date to generate plots" && exit 1
+
+DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+[ -z "$DAY" ] && [ -z "$WEEK" ] && [ -z "$MONTH" ] && usage && exit 1
+
+echo "INFO: `find $hhconfig_directories_plotcache -type f | wc -l` cached plots"
+echo "SYSMON INFO: `du -c $hhconfig_directories_plotcache | grep total` disk usage for $hhconfig_directories_plotcache"
+
+# TODO: do not hard code this path
+URL="localhost/hedgehog/brew/hedgehog.brew"
+TYPE="generatePlot"
+declare -a STOPS=(`seq $(date +%s -d ${TO}) -86400 $(date +%s -d ${FROM})`)
+INTERACTIVE="0 1"
+# Shouldn't this be limited to the plots with a ddcategory as they are the only ones displayed?
+PLOTIDS=`echo "SELECT id FROM dsc.plot ORDER BY id DESC;" | psql -td $DB_NAME`
+SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -td $DB_NAME`
+NDARR=-1 # all nodes
+
+# Call brew script in order to cache the default plots
+for SVRNM in $SERVERNMS ; do
+    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -td $DB_NAME | tr -d [[:space:]]`
+    for STOP in ${STOPS[@]} ; do
+        STOP=`date --date @${STOP} +%Y-%m-%dT%R`
+        STARTS=()
+        [ -n "$DAY" ] && STARTS+=(`date --date="${STOP}" +%Y-%m-%dT00:00`)
+        [ -n "$WEEK" ] && STARTS+=(`date --date="${STOP} 1 week ago + 1 day" +%Y-%m-%dT00:00`)
+        [ -n "$MONTH" ] && STARTS+=(`date --date="${STOP} 1 month ago + 1 day" +%Y-%m-%dT00:00`)
+        for START in ${STARTS[@]} ; do
+            for GVIS in $INTERACTIVE ; do
+                for PLTID in $PLOTIDS ; do
+                    echo `date` ": curl --max-time 300 --retry 1 --get \"${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}\""
+                    curl -s -o /dev/null --max-time 300 --retry 1 --get "${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}" 2>&1
+                done
+            done
+        done
+    done
+done
+
+echo "INFO: `find $hhconfig_directories_plotcache -type f | wc -l` cached plots"
+echo "SYSMON INFO: `du -c $hhconfig_directories_plotcache | grep total` disk usage for $hhconfig_directories_plotcache"
+echo "`date`: $0 COMPLETED"

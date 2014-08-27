@@ -1,0 +1,15 @@
+Package: RPostgreSQLHelper
+Title: wrapper functions for the RPostgreSQL package to handle db
+        connection failures, where connections are initialised via
+        rapache config file.
+Version: 1.0
+Depends: RPostgreSQL
+Date: 2013-03-20
+Author: Elena Simpson <elly@sinodun.com>
+Maintainer: Elena Simpson <elly@sinodun.com>
+Description: Attempts to reconnect to the database if the
+	connection has been lost and fails gracefully in
+        the event that the connection to the database
+        cannot be re-established.
+License: GPL-3
+Packaged: 2013-03-20 16:11:46 UTC; elly

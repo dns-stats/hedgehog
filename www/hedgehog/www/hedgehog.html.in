@@ -1,0 +1,160 @@
+<!--
+Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Developed by Sinodun IT (www.sinodun.com)
+-->
+
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+
+	<!-- Basic Page Needs
+  ================================================== -->
+	<meta charset="utf-8">
+	<title>Hedgehog</title>
+	<meta name="Hedgehog" content="">
+	<meta name="jad@sinodun.com" content="">
+
+	<!-- Mobile Specific Metas
+  ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+  ================================================== -->
+	<link rel="stylesheet" href="stylesheets/base.css?version=PACKAGEVERSION">
+	<link rel="stylesheet" href="stylesheets/skeleton.css?version=PACKAGEVERSION">
+	<link rel="stylesheet" href="stylesheets/layout.css?version=PACKAGEVERSION">
+
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<!-- Favicons
+   ================================================== -->
+	<link rel="shortcut icon" href="images/favicon.ico">
+	<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+        
+</head>
+<body>
+  <div class="container">
+    <div class="three columns">
+      <h2 class="remove-bottom">Hedgehog</h2>
+      <h5>Version @HH_PACKAGE_VERSION@ <a href="about.html"><img id="helpimg" src="images/help.png" alt="About" height="24" width="24" title="Help" /></a></h5>
+    </div>
+    <form method="get" name="plotParams">
+      <div class="four columns" id="timedisplay"><!-- 
+        auto populated by datetime.js
+   --></div>
+      <div class="five columns" id="timeTabs">
+        <div class="basicadv">
+          <a id="tfbasic" class="strong">Basic Time</a> | <a id="tfadv">Advanced time</a> <input type="button" id="setToday" value="Today" title="Set 'To' date equal to now and 'From' date equal to this time yesterday"> 
+        </div>
+        <div id="timeTabsBasic">
+          <div class="mycolumn" id="lefttimebtns"><!--
+         --><input type="button" id="lextend" value="+<" title="Extend time frame window by selected unit" ><!--
+         --><input type="button" id="larrow" value="<" title="Shift time frame window" ><!--
+       --></div>
+          <div class="mycolumn" id="tframebtns"><!--
+         --><input id="1h" type="radio" name="tframe" value="1"><!--
+         --><label class="button" for="1h">1 hr</label><!--
+         --><input id="4h" type="radio" name="tframe" value="4"><!--
+         --><label class="button" for="4h">4 hrs</label><!--
+         --><input id="12h" type="radio" name="tframe" value="12"><!--
+         --><label class="button" for="12h">12 hrs</label><!--
+         --><br /><!--
+         --><input id="day" type="radio" name="tframe" value="24"><!--
+         --><label class="button" for="day">day</label><!--
+         --><input id="wk" type="radio" name="tframe" value="168"><!--
+         --><label class="button" for="wk">week</label><!--
+         --><input id="mnth" type="radio" name="tframe" value="730"><!--
+         --><label class="button" for="mnth">month</label><!--
+       --></div>
+          <div class="mycolumn" id="righttimebtns"><!--
+         --><input type="button" id="rarrow" value=">" title="Shift time frame window" ><!--
+         --><input type="button" id="rextend" value=">+" title="Extend time frame window by selected unit" ><!--
+       --></div>
+        </div>
+        <div id="timeTabsAdv">
+          <div>
+            <label for="start" >Start</label>
+            <input type="datetime-local" name="start" id="start" />
+          </div>
+          <div>
+            <label for="stop" >End</label>
+            <input type="datetime-local" name="stop" id="stop" />
+          </div>
+        </div>
+      </div>
+      <div class="four columns" id="plotselection">
+        <div id="radioplt">
+            <input type="radio" name="rbplot" id="ggplot" title="Static PNG plot" checked>
+            <label for="ggplot" title="Static PNG plot">Static plot</label>
+            <input type="radio" name="rbplot" id="googleviz" title="Live Google Viz plot">
+            <label for="googleviz" title="Live Google Viz plot">Interactive plot</label>
+        </div>
+        <label for="plotType">Plot</label>
+        <select name="plotType" id="plotType"><!-- 
+        auto populated by gengraph.js
+   --></select>
+        <input id="generate" name="gobutton" type="button" value="Generate Plot!">  
+      </div>
+      <div class="sixteen columns" id="userdisplay"><!-- 
+        auto populated by datetime.js
+   --></div>   
+      <div class="sixteen columns" id="outerplot"><!-- 
+        auto populated by gengraph.js
+   --></div>
+      <div class="one-third column" id="srvr_select">
+      <label for="servers">Servers</label>
+      <select name="servers" id="servers" onchange="serverTab()"><!-- 
+        auto populated by gengraph.js
+   --></select>
+      </div>
+      <div class="sixteen columns" id="nodetabs"><!-- 
+        auto populated by gengraph.js
+        TODO: Node tab appears shifted to the right by a few pixels.
+   --></div>
+    </form>
+    <div class="eight columns" id="local_links" >
+      <hr style='margin-bottom:5px;' />
+      Local Links: &nbsp; <a href="../rssac">RSSAC reports</a> &nbsp; <a href="about.html">Hedgehog QuickHelp</a>
+    </div>
+    <!-- TODO: Better job of links -->
+    <div class="eight columns" id="ext_links" >
+      <hr style='margin-bottom:5px;' />
+      External Links:  &nbsp; <a href="https://github.com/dns-stats/hedgehog/wiki">Hedgehog Homepage</a> &nbsp; <a href="http://dns-stats.org/">dns-stats.org</a>
+    </div>
+    <div class="sixteen columns" id="copyright" >
+      <hr style='margin-top:5px;' />
+      &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
+    </div>
+  </div><!-- container -->
+
+</body>
+
+    <!-- Javascript
+  ================================================== -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="js/gengraph.js?version=PACKAGEVERSION" type="text/javascript"></script>
+    <script src="js/datetimes.js?version=PACKAGEVERSION" type="text/javascript"></script>
+    <script src="js/nodetabs.js?version=PACKAGEVERSION" type="text/javascript"></script>
+
+</html>

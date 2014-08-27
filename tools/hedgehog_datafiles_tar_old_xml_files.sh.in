@@ -1,0 +1,81 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_datafiles_tar_old_xml.sh
+#
+
+eval $(@BIN@/hedgehog_conf_read.sh)
+DONE="done"
+DSCDATA="dscdata"
+
+usage () {
+	echo
+	echo "Pack old xml files already processed into a .tar package to store and archive."
+	echo "The xml files are packed according to their date and node and server."
+	echo 
+    echo "Usage: $0 options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
+cd $hhconfig_directories_data
+
+export SERVER NODE
+for SERVER in * ; do
+    test -L $SERVER && continue;
+    test -d $SERVER || continue;
+    cd $hhconfig_directories_data/$SERVER
+    for NODE in * ; do
+		test -L $NODE && continue;
+        test -d $NODE || continue;
+        test -L $NODE/$DONE && continue;
+        test -d $NODE/$DONE || continue;
+        cd $hhconfig_directories_data/$SERVER/$NODE/$DONE
+		for MYDATE in * ; do
+            test -L $MYDATE && continue;
+            test -d $MYDATE || continue;
+            test -L $MYDATE/$DSCDATA && continue;
+            test -d $MYDATE/$DSCDATA || continue;
+            cd $hhconfig_directories_data/$SERVER/$NODE/$DONE/$MYDATE/$DSCDATA
+            COUNT=`ls -1 *.xml 2>/dev/null | wc  -l`
+            if [ $COUNT -gt 0 ] ; then
+				echo "Creating $hhconfig_directories_data/$SERVER/$NODE/$DONE/$MYDATE/$DSCDATA/xml-`date +%Y%m%d%H%M`.tar.bz2"
+				tar --remove-files -cjf xml-`date +%Y%m%d%H%M`.tar.bz2 *.xml
+            fi
+            cd $hhconfig_directories_data/$SERVER/$NODE/$DONE
+        done
+       cd $hhconfig_directories_data/$SERVER
+    done
+    cd $hhconfig_directories_data
+done

@@ -1,0 +1,36 @@
+
+## 
+## Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+## 
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+## 
+## http://www.apache.org/licenses/LICENSE-2.0
+## 
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+##
+
+## YAML config for Hedgehog
+--- 
+# Database parameters to be specified by the user - these must not be defaulted
+database:  
+  port         : 5432      # specify port for the postgresql DB.
+  name         : hedgehog  # specify dbname for the postgresql DB.
+  owner        : hedgehog  # specify a user to own the postgresql DB. This user will run refile_and_grok.
+  read_user    : www-data  # specify a read user for the postgresql DB. This should be the apache user.
+
+# Directory structure
+# !! This information is currently auto-populated at compile time and it is _not_ recommended that users alter this !!
+directories:
+  conf         : @HH_CONF@          # directory of hedgehog configuration files
+  data         : @HH_DATA_DIR@      # directory holding the XML for all the servers
+  plotcache    : @HH_PLOTCACHE@     # location of the plotcache used by the web front end to hold image files
+  rssac        : @HH_RSSAC@         # location of the rssac directory where the daily reports are stored
+  web_conf     : @HH_WEB_CONF@      # configuration files for web front end
+  web_source   : @HH_WEB_SOURCE@    # source files for web front end
+...

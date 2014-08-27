@@ -1,0 +1,253 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_database_create.sh
+#
+
+# This script creates 2 database users with the user names specified in the <prefix>/etc/hedgehog/hedgehog.yaml file in the 'database' section:
+  # owner		- owns the database schemas and is used to create objects such as tables.
+  # read_user 	- the user that runs apache. This user is read only on the schemas. 
+# By default in postgres users are authenticated by the peer method - i.e. is a system user.
+# Authentication methods are configured in /etc/postgresql/9.1/main/pg_hba.conf
+
+
+eval $(@BIN@/hedgehog_conf_read.sh)
+
+# DSTART defaults to the current month
+DSTART=`date --date="$(date +%Y-%m-01)" +%Y-%m`
+PG_USER="postgres"
+USE_PWD="No"
+PG_PWD=""
+SQ="'"
+
+usage () {
+	echo
+	echo "Install and populate database tables/users."
+	echo
+	echo "This script creates 1 database with 1 schema. It creates 2 database users with"
+	echo "the user names specified in the <prefix>/etc/hedgehog/hedgehog.yaml file"
+	echo "in the 'database' section:"
+	echo "  - owner         - owns the database schemas and is used to create objects such as tables."
+	echo "  - read_user     - the user that runs apache. This user is read only on the schemas."
+	echo
+	echo "It calls the hedeghog_database_update_nodes.sh script which will populate the DB with the"
+	echo "specified nodes and create a directory structure for them in the working data directory."
+	echo
+	echo "Usage: $0 options"
+	echo
+	echo "Supported options:"
+	echo "  -u Owner of postgres processes (Default: ${PG_USER})"
+	echo "  -p Use this flag to be prompted for the postgres user password if one has been configured"
+	echo "  -m Start month of oldest data to be imported (default is current month, format YYYY-MM)"
+	echo "  -h Show this help"
+}
+
+
+while getopts ":u:m:ph" opt; do
+    case $opt in
+        u  ) PG_USER=$OPTARG ;;
+        p  ) USE_PWD="Yes" ;;
+        m  ) DSTART=$OPTARG ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+
+[ $USER != 'root' ] && echo "Must be root to run this script" && exit 1
+
+[ -z $PG_USER ] && usage && exit 1
+
+# Validate the input date. Add day since (oddly) date won't parse just year and month
+date "+%Y-%m-%d" -d ${DSTART}-01 >/dev/null 2>&1
+is_valid=$?
+if [ ${is_valid} -ne 0 ] ; then
+	echo "Error: The start date is not in the required format of YYYY-MM" 
+	exit 1
+fi
+
+echo "Running with the following options:"
+echo "  Port of database....................... $hhconfig_database_port"
+echo "  Name of database....................... $hhconfig_database_name"
+echo "  Owner of database...................... $hhconfig_database_owner"
+echo "  Read user for database................. $hhconfig_database_read_user"
+echo "  Owner of postgres processes............ $PG_USER"
+echo "  Use password to connect to DB.......... $USE_PWD"
+echo "  Start date of oldest data.............. $DSTART"
+echo
+  echo -n "are you sure you want to continue? y/N: "
+  read c
+  if [ "$c" != "y" ] && [ "$c" != "Y" ]
+  then
+    echo "Script halted by user - script exiting."
+    exit 1
+  fi
+
+if [ $USE_PWD == "Yes" ] ; then
+	echo "Enter password for '$PG_USER' user, followed by [ENTER]:"
+	read -s PG_PWD
+fi
+
+sudo -u $PG_USER PGPASSWORD=$PG_PWD psql -tAc "SELECT 1 FROM pg_roles WHERE rolname=$SQ$PG_USER$SQ" 2>/dev/null | grep -q 1
+is_valid=$?
+[ $is_valid -ne 0 ] && echo "Postgres user '$PG_USER' doesn't exist" && exit 1
+
+DB_EXISTS=`sudo -u $PG_USER PGPASSWORD=$PG_PWD psql -tlq | cut -d \| -f 1 | grep -w $hhconfig_database_name`
+[ "x$DB_EXISTS" != "x" ] && echo "That Database exists. If you want to overwrite it then drop it manually and re-run this script" && exit 1
+echo
+echo
+
+###################  USERS & ROLES  #######################
+###########################################################
+
+# Drop and then create any existing databases and roles
+echo "Dropping $hhconfig_database_name database and associated roles (hh_read, hh_write)"
+echo "Creating roles (hh_read, hh_write) and $hhconfig_database_name database"
+sudo -u $PG_USER PGPASSWORD=$PG_PWD psql <<EOF
+
+DROP USER $hhconfig_database_owner;
+DROP ROLE hh_read;
+DROP ROLE hh_write;
+
+CREATE USER $hhconfig_database_owner;
+CREATE ROLE hh_read;
+CREATE ROLE hh_write;
+
+CREATE DATABASE $hhconfig_database_name
+  WITH OWNER = $hhconfig_database_owner
+  ENCODING = 'UTF8'
+  TABLESPACE = pg_default
+  CONNECTION LIMIT = -1; 
+\q
+EOF
+echo
+
+# Create dsc schema and configure hh_read and hh_write roles
+echo "Creating schemas, dropping public schema and revoking all privileges from public"
+echo "Granting privileges to hh_read and hh_write"
+echo "Setting search_path for owner"
+su $PG_USER -c "PGPASSWORD=$PG_PWD psql -d $hhconfig_database_name" <<EOF
+CREATE SCHEMA dsc AUTHORIZATION $hhconfig_database_owner;
+DROP SCHEMA public;
+REVOKE ALL ON DATABASE $hhconfig_database_name FROM public;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT SELECT ON TABLES TO hh_read;
+GRANT CONNECT ON DATABASE $hhconfig_database_name TO hh_read;
+GRANT USAGE ON SCHEMA dsc to hh_read;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT SELECT ON TABLES TO hh_write;
+ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT INSERT ON TABLES TO hh_write;
+ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT UPDATE ON TABLES TO hh_write;
+ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT DELETE ON TABLES TO hh_write;
+GRANT CONNECT ON DATABASE $hhconfig_database_name TO hh_write;
+GRANT USAGE ON SCHEMA dsc to hh_write;
+
+ALTER USER $hhconfig_database_owner SET search_path TO dsc;
+\q
+EOF
+echo
+
+
+# Drop existing read_user and create the read_user anew and
+# configure permissions and search_path
+echo "Dropping $hhconfig_database_read_user role and creating it anew with hh_read privileges and correct search_path"
+su $PG_USER -c "PGPASSWORD=$PG_PWD psql" <<EOF
+DROP USER "$hhconfig_database_read_user";
+CREATE USER "$hhconfig_database_read_user";
+GRANT hh_read TO "$hhconfig_database_read_user";
+ALTER USER "$hhconfig_database_read_user" SET search_path TO dsc;
+\q
+EOF
+echo
+###########################################################
+
+
+#################  CREATE TABLES  #########################
+###########################################################
+# Create the base tables, views, functions and constraints
+echo "Initialising the database (creating base tables, views, functions and constraints)"
+sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name < @SBIN@/hedgehog_database_create.d/initialise_database.sql
+echo
+
+# You have to grant privileges on sequences after creating them
+echo "Granting privileges on sequences to hh_write"
+sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name <<EOF
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA dsc TO hh_write;
+\q
+EOF
+echo
+###########################################################
+
+
+###################  POPULATE TABLES  #####################
+###########################################################
+# Populate the dsc.plot and dsc.iana_lookup tables
+echo "Populating lookup tables (dsc.plot, dsc.iana_lookup)"
+sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name  < @SBIN@/hedgehog_database_create.d/insert_lookup_data.sql #> /dev/null
+
+echo "Populate servers and nodes"
+sudo -u $hhconfig_database_owner @BIN@/hedgehog_database_update_nodes.sh -s
+###########################################################
+
+
+#############  PARTITION DATA TABLES  #####################
+###########################################################
+# Partition the dsc.data table: create 1 table per month per server per plot type, that inherits from the dsc.data table
+# TODO: replace this will a call to the manage_partitions.sh script
+echo "Creating partitioned tables for dsc.data (1 table per month per server per plot type)"
+echo "This may take some time if there is a lot of historic data to import"
+i=1
+DNOW_FIRST=`date +%Y%m01`
+DNOW=`date +%Y_%m`
+DSTART=`date --date="${DSTART}-01" +%Y%m%d`
+SERVERS=`echo "SELECT name FROM dsc.server;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name `
+PLOTS=`echo "SELECT name FROM dsc.plot;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name`
+while [ $DNOW_FIRST -ge $DSTART ]
+do
+  DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y_%m`
+  echo "Creating tables for: " $DNEXT
+  
+  for SERVER in $SERVERS
+  do
+    s_id=`echo "SELECT id FROM dsc.server WHERE name = $SQ$SERVER$SQ;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name`
+    for PLOT in $PLOTS
+    do
+      p_id=`echo "SELECT id FROM dsc.plot WHERE name = $SQ$PLOT$SQ;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name`
+      echo "CREATE TABLE dsc.\"data_${SERVER}_${PLOT}_${DNOW}\" (
+        CHECK (starttime >= TIMESTAMP $SQ$DNOW-01 00:00:00$SQ AT TIME ZONE 'UTC' AND starttime < TIMESTAMP $SQ$DNEXT-01 00:00:00$SQ AT TIME ZONE 'UTC'),
+        CHECK (server_id = $s_id),
+        CHECK (plot_id = $p_id)
+      ) INHERITS (dsc.data);" | sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name
+
+      echo "ALTER TABLE dsc.\"data_${SERVER}_${PLOT}_${DNOW}\"
+        ADD CONSTRAINT \"pk_data_${SERVER}_${PLOT}_${DNOW}\" PRIMARY KEY (server_id, node_id , plot_id , starttime , key1, key2 ),
+        ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_node\" FOREIGN KEY (node_id) REFERENCES dsc.node (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+        ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_plot\" FOREIGN KEY (plot_id) REFERENCES dsc.plot (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;" | sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name 
+    done
+  done
+  DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`
+  DNOW=`date --date="$DNOW_FIRST" +%Y_%m`
+done
+###########################################################

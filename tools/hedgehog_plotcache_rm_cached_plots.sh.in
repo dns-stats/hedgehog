@@ -1,0 +1,105 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_plotcache_rm_cached_plots.sh
+#
+
+eval $(@BIN@/hedgehog_conf_read.sh)
+
+REQUIRED_API_VERSION=DB_VERSION
+DB_NAME=$hhconfig_database_name
+REMOVE_ALL=0
+
+usage () {
+    echo
+    echo "This script is interactive if the -a option is not selected."
+    echo "You will be asked to select which cached plot types you'd like to remove"
+    echo
+    echo "Usage: $0 options"
+    echo
+    echo "Supported options:"
+    echo "  -a Remove all cached plots"
+    echo "  -h Show this help."
+}
+
+while getopts ":ah" opt; do
+    case $opt in
+        a  ) REMOVE_ALL=1 ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
+if [ $REMOVE_ALL -eq 1 ] ; then
+	echo "Removing all cached plots from $hhconfig_directories_plotcache"
+	rm -rf $hhconfig_directories_plotcache/*/*/*.png
+	rm -rf $hhconfig_directories_plotcache/*/*/*.html
+	echo "Done."
+	exit
+fi
+
+DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+
+# Get list of servers and plots from database
+SERVERS=`echo "SELECT display_name FROM dsc.server;" | psql -td $DB_NAME`
+PLOTS=`echo "SELECT name FROM dsc.plot;" | psql -td $DB_NAME`
+PLOTS=(${PLOTS// / }) # convert string to an array
+
+while true ; do
+    if [ ${#PLOTS[@]} -eq 0 ] ; then
+        exit
+    fi
+    echo "Please select which cached plot type you'd like to clear or q to exit:"
+    echo
+    n=0
+    for plot in ${PLOTS[@]} ; do
+        let n=n+1
+        echo "    ${n}. ${plot}"
+    done
+    echo
+    echo -n "Enter selection or q to exit: "
+    read c
+    if [ "$c" == "Q" ] || [ "$c" == "q" ] ; then
+        exit 1
+    elif [[ $c -ge 1 ]] && [[ $c -le $n ]] ; then
+        let c=c-1
+        selection=${PLOTS[${c}]}
+        PLOTS=(${PLOTS[@]:0:$c} ${PLOTS[@]:$(($c + 1))}) # remove selected plot from PLOTS
+        for server in $SERVERS ; do
+            echo "rm -rf $hhconfig_directories_plotcache/${server}/${selection}/*.png"
+            rm -rf $hhconfig_directories_plotcache/${server}/${selection}/*.png
+            echo "rm -rf $hhconfig_directories_plotcache/${server}/${selection}/*.html"
+            rm -rf $hhconfig_directories_plotcache/${server}/${selection}/*.html
+            echo "Removed plots for ${selection}."
+        done
+    else
+        echo "invalid selection - please try again or exit by typing 'q'"
+    fi
+	echo "Do you want to remove another plot?"
+done
