@@ -36,8 +36,7 @@
 #   
 #   dependencies:   RPostgreSQL
 #   
-#   author: Elena Simpson <elly@sinodun.com>
-#   last modified: 16/08/2013
+#   author: John Dickinson <jad@sinodun.com>
 
 
 library("RPostgreSQL")
@@ -47,26 +46,24 @@ maxAttempts <- 3
 
 
 #   attempt to re-establish a db connection
-.reload <- function(db_driver, dbiConNmStr){
+.reload <- function(dbiDriver, dbiConnection, dbConnStr){
     # close any pending result sets
-    resSets = try(dbListResults(db_conn))
+    resSets = try(dbListResults(dbiConnection))
     if(class(resSets) != "try-error"){
         for(resultSet in resSets){
             dbClearResult(resultSet)
         }
     }
-	
+
     # close all connections that the dbiDriver is managing
-    conns = try(dbListConnections(db_driver))
+    conns = try(dbListConnections(dbiDriver))
     if(class(conns) != "try-error"){
         for(connection in conns){
             dbDisconnect(connection)
         }
     }
-	
-	#TODO(asap): pass in the connection string.
-	#TODO(asap): Tidy up parameter names and man files
-	db_conn <- try(dbConnect(biDrvNmStr, dbname=hh_config$database$name, user=hh_config$database$read_user, port=hh_config$database$port))
+
+    dbiConnection <<- try(dbConnect(dbiDriver, dbConnStr))	
 
 }
 
@@ -74,10 +71,10 @@ maxAttempts <- 3
 #   from dbiConnection. If the dbiConnection has been lost,
 #   attempt to reconnect to the db. If dbiConnection cannot
 #   be established, return NULL
-dbGetResultSet <- function(db_driver, db_conn, sqlQueryStr){
+dbGetResultSet <- function(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr){
     rs <- NULL
     for(attempt in 1:(maxAttempts+1)){
-        rs <- try(dbSendQuery(db_conn,sqlQueryStr))
+        rs <- try(dbSendQuery(dbiConnection ,sqlQueryStr))
         if(class(rs) == "try-error"){
             if(attempt == 1){
                 system('logger -p user.notice database connection lost')
@@ -87,7 +84,7 @@ dbGetResultSet <- function(db_driver, db_conn, sqlQueryStr){
                 rs <- NULL
             }else{
                 system(paste("logger -p user.notice re-connecting to the database: attempt ", attempt, " of ", maxAttempts, sep=""))
-                .reload(db_driver, db_conn)
+                .reload(dbiDriver, dbiConnection, dbConnStr)
             }
         }else break
     }
@@ -95,15 +92,13 @@ dbGetResultSet <- function(db_driver, db_conn, sqlQueryStr){
 }
 
 #   return the data frame associated with sqlQueryStr
-#   from dbiConnection. If the dbiConnection has been lost,
-#   attempt to reconnect to the db. If dbiConnection cannot
-#   be established, return NULL
-dbGetDataFrame <- function(db_driver, db_conn, sqlQueryStr){
+#   from dbiConnection. 
+dbGetDataFrame <- function(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr){
     df <- NULL
-    rs <- dbGetResultSet(db_driver, db_conn, sqlQueryStr)
+    rs <- dbGetResultSet(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr)
     if(!is.null(rs)){
         df <- fetch(rs, n=-1)
-	dbClearResult(rs)
+    dbClearResult(rs)
     }
     return(df)
 }

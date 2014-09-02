@@ -24,15 +24,18 @@
 \title{RPostgreSQL dbSendQuery + fetch wrapper function}
 \description{Handles dbiConnection failures}
 \usage{
-dbGetDataFrame(dbiDriver, dbiConnection, sqlQueryString)
+dbGetDataFrame(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{dbiDrivNmStr}{
-String name of the dbiDriver
+  \item{dbiDriver}{
+Database driver dbiDriver
 }
-  \item{dbiConNmStr}{
-String name of the dbiConnection
+  \item{dbiConnection}{
+Database connection dbiConnection
+}
+  \item{dbConnStr}{
+Database connection string dbConnStr
 }
   \item{sqlQueryStr}{
 String containing SQL query to be run
@@ -46,7 +49,7 @@ String containing SQL query to be run
 	https://code.google.com/p/rpostgresql/
 	http://stat.bell-labs.com/RS-DBI/doc/html/index.html
 }
-\author{Elena Simpson <elly@sinodun.com>}
+\author{John Dickinson <jad@sinodun.com>}
 \note{
 %%  ~~further notes~~
 }
@@ -57,21 +60,6 @@ String containing SQL query to be run
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function(dbiDriver, dbiConnection, sqlQueryString)
-{
-	df <- NULL
-	rs <- dbGetResultSet(dbiDriver, dbiConnection, sqlQueryString)
-	if(!is.null(rs)){
-		df <- fetch(rs, n=-1)
-		dbClearResult(rs)
-	}
-	return(df)
-  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

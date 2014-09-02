@@ -42,36 +42,41 @@ $(document).ready(function() {
     window.lastPlot = null;
     window.selectedOpt = null;
 
-	// TODO(asap): A database version mismatch is not being handled correctly - we need to test it here. If there is one the brew
-	// functions here fail and not error is reported to the user!!! 
-    
     // populate plot and server dropdowns and nodetabs then generate default plot    
-    $.when(brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeTabsHtml")).done(function(rp, pt, ss, nt){
+    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeTabsHtml"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nt, dp){
         //initialise plot radio selection
         if (rp[0].indexOf('interactive') !== -1) {
             $('#googleviz').prop('checked', true);
         }
-        
-        // initialise plot drop down id to 28 => by_node
-        // TODO(asap): remove this hardcoding - this should be a config option
+
+        // initialise plot drop down
         $("#plotType").html(pt[0]);
-        $("#plotType").val(28);
-        
+        $("#plotType").val(parseInt(dp[0]));
+
         // initialise server drop down id to 1 (or 'DB error' if applicable)
         //TODO(asap): Default server should be a config option
         $("#servers").html(ss[0]);
         $("#servers").val(1);
-        
+
         // initialise node tabs
         $("#nodetabs").html(nt[0]);
         setServersGroups();
         initnodetabs();
         serverTab();
-        
+
         // generate default plot
-        var db_fail = check_db();
-        if(!db_fail) genDSCGraph();
-        setInitHelpMsg(true);
+        if(db[0].indexOf("Error: Database version mismatch.") > -1) {
+            setDbVersionlMsg(true);
+            $("#outerplot").html('<div class="sixteen columns" id="plot"><hr /><img src="plots/no_connection.png" /><hr /></div>');
+        } else {
+           var db_fail = check_db();
+           if(!db_fail) {
+               genDSCGraph();
+               setInitHelpMsg(true);
+           } else {
+              setDbFailMsg(true);
+           }
+        }
     });
     
     // register callback function for when the static / interactive radio buttons are clicked
@@ -241,6 +246,16 @@ function setDbFailMsg(ind) {
     }
 }
 
+function setDbVersionlMsg(ind) {
+    var existing = $('#userdisplay').html();
+    var msg = '<p class="error remove-bottom"><span class="strong">Error:</span> There is a database version mismatch between the GUI and the database. Please contact an administrator.</p>';
+    if (ind) {
+        if (existing.indexOf(msg) === -1) $('#userdisplay').html(existing + msg);
+    } else {
+        $('#userdisplay').html(existing.replace(msg, ""));
+    }
+}
+
 function setNoResultsMsg(ind) {
     var existing = $('#userdisplay').html();
     var msg = '<p class="info remove-bottom"><span class="strong">Info:</span> Sorry, your query didn\'t return any results. Please try again with new selection criteria.</p>';
@@ -281,7 +296,7 @@ function setUserMsg(msg) {
 }
 
 function check_db() {
-    if ($("#servers option:selected").text() === 'DB error') {
+    if ($("#servers option:selected").text() == '') {
         setDbFailMsg(true);
         $("#outerplot").html('<div class="sixteen columns" id="plot"><hr /><img src="plots/no_connection.png" /><hr /></div>');
         return true;

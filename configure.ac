@@ -18,12 +18,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(Hedgehog, 2.0.0a1, jad@sinodun.com)
+AC_INIT(Hedgehog, 2.0.0b1,  dns-stats-users@dns-stats.org)
 AC_CONFIG_SRCDIR([src/libdsc/DSCDataManager.cpp])
 AC_CONFIG_HEADER([config.h])
 
-AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[6],[Database version])
-AC_SUBST([DB_SCHEMA_VERSION],[6])
+AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[7],[Database version])
+AC_SUBST([DB_SCHEMA_VERSION],[7])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -40,10 +40,6 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 LT_INIT
-
-# Checks for libraries.
-# FIXME: Replace `main' with a function in `-lresolv':
-AC_CHECK_LIB([resolv], [main])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h netinet/in.h stdlib.h string.h sys/param.h unistd.h])

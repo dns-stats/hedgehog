@@ -49,7 +49,7 @@ initPlotDDHtml <- function() {
         return(FALSE)
     }
    
-    df <- dbGetDataFrame(dbdrv, dsccon, "EXECUTE getpltddcategories;")
+    df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, "EXECUTE getpltddcategories;")
  
     if (is.null(df)) {
         %><option value="DB error">DB connection error</option><%
@@ -61,7 +61,7 @@ initPlotDDHtml <- function() {
     }
 	
 	for (i in 1:nrow(df)) {
-		df2 <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getpltid_ddname('", df[i,1], "');", sep=""))
+		df2 <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getpltid_ddname('", df[i,1], "');", sep=""))
 		if (is.null(df2)) {
 			%><option value="DB error">DB connection error</option><%
 			return(FALSE)
@@ -92,7 +92,7 @@ initServerDDHtml <- function() {
         return(FALSE)
     }
     
-    df <- dbGetDataFrame(dbdrv, dsccon, "EXECUTE getsrvrid_display_name;")
+    df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, "EXECUTE getsrvrid_display_name;")
     
     if (is.null(df)) {
         %><option value="DB error">DB connection error</option><%
@@ -121,7 +121,7 @@ initNodeTabsHtml <- function() {
         return(FALSE)
     }
     
-    servers <- dbGetDataFrame(dbdrv, dsccon, "EXECUTE getsrvrid_display_name;")
+    servers <- dbGetDataFrame(dbdrv, dsccon, dbconstr, "EXECUTE getsrvrid_display_name;")
 
     if (is.null(servers)) {
 		%>DB connection error<%
@@ -139,7 +139,7 @@ initNodeTabsHtml <- function() {
 		srvr_id <- servers[s,1]
 		srvr_nm <- servers[s,2]
 
-		groups <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getgroups(", srvr_id, ");", sep=""))
+		groups <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getgroups(", srvr_id, ");", sep=""))
 
 		if (is.null(groups)) {
 			%>DB connection error<%
@@ -170,7 +170,7 @@ initNodeTabsHtml <- function() {
 								   "\" onclick=\"gpTab('All_", srvr_nm,"')\"><a>All<img id=\"cb_All_", srvr_nm, "_img\" src=\"images/none.png\" 
 								   alt=\"none selected\" height=\"10\" width=\"10\" /></a></li>", sep="")
 
-				nodes <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getnodes(", srvr_id, ");", sep=""))
+				nodes <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodes(", srvr_id, ");", sep=""))
                         
 				if (is.null(nodes)) {
 					%>DB connection error...<%
@@ -200,7 +200,7 @@ initNodeTabsHtml <- function() {
 			grouphtml <- paste(grouphtml, "<li id=\"li_", gp_nm, "_", srvr_nm, "\" onclick=\"gpTab('", gp_nm, "_", srvr_nm, "')\"><a>", gp_nm, "<img id=\"cb_", gp_nm, "_",
 							   srvr_nm, "_img\" src=\"images/none.png\" alt=\"none selected\" height=\"10\" width=\"10\" /></a></li>", sep="")
                     
-			nodes <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
+			nodes <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
 
 			if (is.null(nodes)) {
 				%>DB connection error...<%
@@ -238,6 +238,27 @@ initNodeTabsHtml <- function() {
     return(TRUE)
 }
 
+getDefaultPlotId <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In getDefaultPlotId')
+	}
+	
+	# Query the db to get the default plot id
+	if (!(prepStmnt("getdefaultpltid", dsccon))) {
+		return(FALSE)
+	}
+	
+	# TODO: retrieve from conf file
+	defaultpltnm <- "'by_node'"
+	defaultpltid <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getdefaultpltid(", defaultpltnm, ");", sep=""))	
+	
+	if (is.null(defaultpltid) || nrow(defaultpltid) == 0) {
+		return(FALSE)
+	}
+	%><%=as.integer(defaultpltid[1])%><%
+}
+
 generatePlot <- function(){
 
     #TODO(refactor): Move more of this code out to the generatePlot.R file
@@ -254,7 +275,7 @@ generatePlot <- function(){
 	}
 
 	dd_pltid			<- GET$pltid
-	pltdetails			<- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getpltdetails(", dd_pltid, ");", sep=""))	
+	pltdetails			<- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getpltdetails(", dd_pltid, ");", sep=""))	
 	
 	if (is.null(pltdetails)) {
 		return(FALSE)
@@ -304,7 +325,7 @@ generatePlot <- function(){
 	}
 
 	if (!cache) {	
-		plot_file <- generatePlotFile(plttitle, pltnm, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon)
+		plot_file <- generatePlotFile(plttitle, pltnm, dd_pltid, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon)
 	}
     
 	# OK - we have a plot file so now lets generate the html to hold that
@@ -366,7 +387,7 @@ validateDbVersion <- function() {
 		return(FALSE)
 	}
 		
-	dbversion <- dbGetDataFrame(dbdrv, dsccon, "EXECUTE getdbversion;")
+	dbversion <- dbGetDataFrame(dbdrv, dsccon, dbconstr, "EXECUTE getdbversion;")
     
 	if (is.null(dbversion)) {
 		%>Error: DB connection error<%
@@ -374,7 +395,7 @@ validateDbVersion <- function() {
 	}
 	
 	if (dbversion != DB_SCHEMA_VERSION) {
-		%>Error: invalid database version<%
+		%>Error: Database version mismatch. Contact an administrator.<%
 		return(FALSE)
 	}	
 
@@ -403,19 +424,24 @@ if (GET$type == "initPltType") {
 
 # TODO(asap): check the options are all specified, not defaulted
 dsccon <- try(dbConnect(dbdrv, dbname = hh_config$database$name, user = hh_config$database$read_user, port = hh_config$database$port))
-dbSendQuery(dsccon, "set statement_timeout to 300000;")
+dbconstr <<-paste('dbname = ', hh_config$database$name, ', user = ', hh_config$database$read_user, ', port = ', hh_config$database$port, sep="")
+
 if (class(dsccon) != "try-error") {
+	dbSendQuery(dsccon, "set statement_timeout to 300000;")
 	source(paste(hh_config$directories$web_source, "/R/prepareStatement.R", sep = ""))
-	if (validateDbVersion()) {
-		source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep = ""))
-		switch(GET$type,
-			initPlotDDHtml = {initPlotDDHtml()},
-			initServerDDHtml = {initServerDDHtml()},
-			initNodeTabsHtml = {initNodeTabsHtml()},
-			generatePlot = {generatePlot()},
-			generateYaml = {generateYaml(dsccon)}
-		)
-	}
+	source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep = ""))
+	switch(GET$type,
+	    validateDBVersion = {validateDbVersion()},
+		initPlotDDHtml    = {initPlotDDHtml()},
+		initServerDDHtml  = {initServerDDHtml()},
+		initNodeTabsHtml  = {initNodeTabsHtml()},
+		getDefaultPlotId  = {getDefaultPlotId()},
+		generatePlot      = {generatePlot()},
+		generateYaml      = {generateYaml(dsccon)}
+	)
 	dbDisconnect(dsccon)
+} else {
+	%>Error: Could not connect to the database - please check the connection parameters: name, read-user, port<%
+	return(FALSE)
 }
 %>

@@ -66,12 +66,19 @@ H <- 600
 
 linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In linePlot')
+	}
+	
     if(gvis == 1){
-      #title <- sub("\n", " ", title)
-      #de <- cast(df, x ~ key, value='y')
-      #y_var <- tail(colnames(de),-1)
-      #p <- gvisLineChart(de, xvar = 'x', yvar = y_var, options=list(title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
-      p <- gvisAnnotatedTimeLine(df, numvar="y", idvar = "key", datevar = "x", options=list(legendPosition='newRow', height=460, width=920))
+      # For now we default to the timeline flash chart unless 'svg' is specified by the user
+      if (gui_config$www$default_interactive_plot_type == "svg") {
+          p <- gvisAnnotationChart(df, numvar="y", idvar = "key", datevar = "x",
+                                   options=list(legendPosition='newRow', height=460, width=920))
+      }else{
+          p <- gvisAnnotatedTimeLine(df, numvar="y", idvar = "key", datevar = "x", 
+                                     options=list(legendPosition='newRow', height=460, width=920))         
+      }
       title <- sub("\n", "<br />", title)
       p$html$chart['divChart'] <- paste("<div style=\"text-align: center; font-family: HelveticaNeue, 'Helvetica Neue', Helvetica, Arial, sans-serif;\">", title, "</div>", p$html$chart['divChart'],sep="")
       cat(p$html$chart, file=f)
@@ -90,19 +97,20 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       if (nKeys <= NCBPALETTE) {
         p <- p + scale_colour_manual(values=CBPALETTE)
       }
+
       print(p)
       dev.off()
 
       fstack <- sub(".png", "-stack.png", f)
       png(fstack, type="cairo-png", width = W, height = H)
       ps <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
-                  geom_area(stat="identity") +
-                  labs(title=title, x=xlabel, y=ylabel) +
-                  scale_x_datetime(expand=c(0.01,0)) + 
-                  scale_y_continuous(expand=c(0,0), labels = comma) +
-                  theme_bw() +
-                  theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
-                  guides(fill = guide_legend(nrow = 20, byrow = TRUE))
+                   geom_area(stat="identity") +
+                   labs(title=title, x=xlabel, y=ylabel) +
+                   scale_x_datetime(expand=c(0.01,0)) + 
+                   scale_y_continuous(expand=c(0,0), labels = comma) +
+                   theme_bw() +
+                   theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                   guides(fill = guide_legend(nrow = 20, byrow = TRUE))
 
       if (nKeys <= NCBPALETTE) {
         ps <- ps + scale_fill_manual(values=CBPALETTE)
@@ -120,12 +128,18 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
 barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In barPlot')
+	}
+
     if(gvis == 1){
       title <- sub("\n", " ", title)
       if(vertical == 1){
-          p <- gvisColumnChart(df, xvar='x', yvar='y', options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+          p <- gvisColumnChart(df, xvar='x', yvar='y', 
+                               options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
       }else{
-          p <- gvisBarChart(df, xvar='x', yvar='y', options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
+          p <- gvisBarChart(df, xvar='x', yvar='y', 
+                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -153,18 +167,25 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
 
 stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="discrete", vertical=0, gbar_width=0) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In stackedBarPlot')
+	}
+	
     if(gvis == 1){
       title <- sub("\n", " ", title)
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
       if(vertical == 1){
           if (gbar_width == 0) {
-				p <- gvisColumnChart(de, xvar='x', yvar=y_var, options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
-		  } else {
-          		p <- gvisColumnChart(de, xvar='x', yvar=y_var, options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
-		  }
+              p <- gvisColumnChart(de, xvar='x', yvar=y_var, 
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+          } else {
+              p <- gvisColumnChart(de, xvar='x', yvar=y_var, 
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
+          }
       }else{
-          p <- gvisBarChart(de, xvar='x', yvar=y_var, options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
+          p <- gvisBarChart(de, xvar='x', yvar=y_var, 
+                            options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -225,11 +246,16 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
 
 stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In stackedAreaPlot')
+	}
+	
     if(gvis == 1){
       title <- sub("\n", " ", title)
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
-      p <- gvisAreaChart(de, xvar='x', yvar=y_var, options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+      p <- gvisAreaChart(de, xvar='x', yvar=y_var, 
+                         options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
       cat(p$html$chart,file=f)
     }else{
       	df$x <- as.POSIXct(df$x)
@@ -239,7 +265,7 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
       p <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
                   geom_area(stat="identity") + 
                   labs(title=title, x=xlabel, y=ylabel) +
-				  scale_x_datetime(expand=c(0.01,0)) +
+                  scale_x_datetime(expand=c(0.01,0)) +
                   scale_y_continuous(expand=c(0,0), labels = comma) + 
                   theme_bw() +
                   theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
@@ -256,6 +282,10 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
 facetedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, bar_width) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In facetedBarPlot')
+	}
+	
     if(gvis == 1){
         stackedBarPlot(df, f, title, xlabel, ylabel, gvis, pltnm = 'N/A', vertical = 1, gbar_width = bar_width)
     }else{
@@ -279,10 +309,41 @@ facetedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, bar_width) {
     }
 }
 
+getStmntParameters <- function(dsccon, dbdrv, dd_pltid, prepStmtNm, srvrid, start, stop) {
+
+	# Retrieving the datasets ids for the plot
+	if (!(prepStmnt("getdatasetids", dsccon))) {
+		return
+	}
+
+	sql <- paste("EXECUTE ", "getdatasetids", "('", dd_pltid, "');", sep="")
+
+	dataframe <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
+
+	if (is.null(dataframe) || ncol(dataframe) != 1) {
+		return
+	}
+
+	# Preparing the statement parameters with 1 or 2 datasets for the plot
+	ds_ids_list <- gsub("[{}]","",dataframe[1])
+	list <- strsplit(ds_ids_list,",")
+	num_ds_ids <- length(list[[1]])
+	 
+	if ( num_ds_ids == 1 ) {
+		sql <- paste("EXECUTE ",prepStmtNm, "(", srvrid, ", '", list[[1]][1], "', timestamptz '", start, "', timestamptz '", stop, "');", sep="")
+	}
+	else if ( num_ds_ids == 2 ) {
+		sql <- paste("EXECUTE ",prepStmtNm, "(", srvrid, ", '", list[[1]][1], "', '", list[[1]][2], "', timestamptz '", start, "', timestamptz '", stop, "');", sep="")
+	}
+	else {
+		return
+	}    
+	return(sql)
+}
+
 generateYaml <- function(dsccon) {
 
 	if (hh_debug) {
-	   	# Useful syslog output for debugging
 	    system('logger -p user.notice In generateYaml')
     }
 
@@ -293,13 +354,12 @@ generateYaml <- function(dsccon) {
 		
 	# Determine the plot being requested
     prepStmnt("getpltdetails", dsccon)
-    pltdetails <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getpltdetails(", GET$pltid, ");", sep=""))
+    pltdetails <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getpltdetails(", GET$pltid, ");", sep=""))
     
     if (is.null(pltdetails)) {
         return(FALSE)
     }   
 	pltnm     <- pltdetails$name
-	GET$pltid <- pltdetails$plot_id
 
     # Nasty hard coding because the traffic size plot is split into two
 	if (pltnm == 'traffic_sizes_small') {
@@ -310,7 +370,7 @@ generateYaml <- function(dsccon) {
 	} 
 	
     prepStmnt("getsrvr_display_name_from_id", dsccon)
-    server_display_name <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getsrvr_display_name_from_id(", GET$svrid, ");", sep=""))
+    server_display_name <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getsrvr_display_name_from_id(", GET$svrid, ");", sep=""))
 
 	# Load the config file with the rssac spec in it 
     rssac_config = yaml.load_file(paste(hh_config$directories$web_conf, "/rssac.yaml", sep=""))
@@ -339,16 +399,21 @@ generateYaml <- function(dsccon) {
     if (GET$ndarr == '-1') {
         prepStmntNm <- paste(prepStmntNm, "_all_nodes", sep="")
     }
-    sql <- paste("EXECUTE ",prepStmntNm, "(", GET$svrid, ", '", GET$pltid, "', timestamptz '", GET$start, "', timestamptz '", GET$stop, "');", sep="")    
-    if (GET$ndarr != '-1'){
+
+	sql <- getStmntParameters(dsccon, dbdrv, GET$pltid, prepStmntNm, GET$svrid, GET$start, GET$stop)
+	if(is.null(sql)){
+		return(FALSE)
+	}
+    
+	if (GET$ndarr != '-1'){
         sql <- sub(");", paste(", '", GET$ndarr, "');", sep=""), sql)
     }
-
+	
 	# Get the data frame
     if (!prepStmnt(prepStmntNm, dsccon)) 
 		return(FALSE)
 		
-    df <- dbGetDataFrame(dbdrv, dsccon, sql)
+    df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
 
 	# TODO: Handle empty data frames better
 	# This simply means there isn't any data for this server on this day
@@ -465,7 +530,7 @@ initPlotOptions <- function() {
 }
 
 # create plot file if not cached
-generatePlotFile <- function(plttitle, pltnm, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon) {
+generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon) {
 	
 	if (hh_debug) {
 		system('logger -p user.notice In generatePlotFile')
@@ -536,12 +601,16 @@ generatePlotFile <- function(plttitle, pltnm, plot_file, simple_start, simple_st
 	if (ndarr == '-1') {
 		prepStmntNm <- paste(prepStmntNm, "_all_nodes", sep="")
 	}
-
+	
 	if (!(prepStmnt(prepStmntNm, dsccon))) {
 		return
 	}
-
-	sql <- paste("EXECUTE ",prepStmntNm, "(", svrid, ", '", pltid, "', timestamptz '", simple_start, "', timestamptz '", simple_stop, "');", sep="")
+	
+	# Setting statement parameters with 1 or 2 datasets for the plot
+	sql <- getStmntParameters(dsccon, dbdrv, ddpltid, prepStmntNm, svrid, simple_start, simple_stop)
+	if (is.null(sql)) {
+		return
+	}
 	
 	if (pltnm %in% passplotname){
 		sql <- sub(");", paste(", '", pltnm, "');", sep=""), sql)
@@ -555,7 +624,7 @@ generatePlotFile <- function(plttitle, pltnm, plot_file, simple_start, simple_st
 		sql <- sub("\\(", paste("\\(" , time_window, ".0, ", sep=""), sql)
 	}
 
-	df <- dbGetDataFrame(dbdrv, dsccon, sql)
+	df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
 	
 	if (is.null(df)) {
 		plot_file <- "plots/no_connection.png"
