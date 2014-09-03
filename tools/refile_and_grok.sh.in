@@ -71,6 +71,8 @@ while getopts ":w:i:o:cs:rR:h" opt; do
     esac
 done
 
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
 DB_API_VERSION=`psql $DB_NAME  -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
@@ -112,10 +114,11 @@ then
     fi
 fi
 
+set -x #Print commands just before execution - with all expansions and substitutions done, and words marked - useful for debugging.
+
 cd "${WD}"
 exec >$PROG.stdout
 #exec 2>&1
-#set -x #Print commands just before execution - with all expansions and substitutions done, and words marked - useful for debugging.
 
 echo "`date`-->SCRIPT COMMENCED"
 EXECDIR=@BIN@

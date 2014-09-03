@@ -304,7 +304,7 @@ generatePlot <- function(){
 	}
 
 	if (!cache) {	
-		plot_file <- generatePlotFile(plttitle, pltnm, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon)
+		plot_file <- generatePlotFile(plttitle, pltnm, dd_pltid, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon)
 	}
     
 	# OK - we have a plot file so now lets generate the html to hold that

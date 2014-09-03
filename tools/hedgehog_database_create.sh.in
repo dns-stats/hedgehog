@@ -127,9 +127,9 @@ echo "Dropping $hhconfig_database_name database and associated roles (hh_read, h
 echo "Creating roles (hh_read, hh_write) and $hhconfig_database_name database"
 sudo -u $PG_USER PGPASSWORD=$PG_PWD psql <<EOF
 
-DROP USER $hhconfig_database_owner;
-DROP ROLE hh_read;
-DROP ROLE hh_write;
+DROP USER IF EXISTS $hhconfig_database_owner;
+DROP ROLE IF EXISTS hh_read;
+DROP ROLE IF EXISTS hh_write;
 
 CREATE USER $hhconfig_database_owner;
 CREATE ROLE hh_read;
@@ -150,7 +150,7 @@ echo "Granting privileges to hh_read and hh_write"
 echo "Setting search_path for owner"
 su $PG_USER -c "PGPASSWORD=$PG_PWD psql -d $hhconfig_database_name" <<EOF
 CREATE SCHEMA dsc AUTHORIZATION $hhconfig_database_owner;
-DROP SCHEMA public;
+DROP SCHEMA IF EXISTS public;
 REVOKE ALL ON DATABASE $hhconfig_database_name FROM public;
 
 ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT SELECT ON TABLES TO hh_read;
@@ -174,7 +174,7 @@ echo
 # configure permissions and search_path
 echo "Dropping $hhconfig_database_read_user role and creating it anew with hh_read privileges and correct search_path"
 su $PG_USER -c "PGPASSWORD=$PG_PWD psql" <<EOF
-DROP USER "$hhconfig_database_read_user";
+DROP USER IF EXISTS "$hhconfig_database_read_user";
 CREATE USER "$hhconfig_database_read_user";
 GRANT hh_read TO "$hhconfig_database_read_user";
 ALTER USER "$hhconfig_database_read_user" SET search_path TO dsc;
@@ -223,7 +223,7 @@ DNOW_FIRST=`date +%Y%m01`
 DNOW=`date +%Y_%m`
 DSTART=`date --date="${DSTART}-01" +%Y%m%d`
 SERVERS=`echo "SELECT name FROM dsc.server;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name `
-PLOTS=`echo "SELECT name FROM dsc.plot;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name`
+PLOTS=`echo "SELECT name FROM dsc.dataset;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name`
 while [ $DNOW_FIRST -ge $DSTART ]
 do
   DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y_%m`
@@ -234,7 +234,7 @@ do
     s_id=`echo "SELECT id FROM dsc.server WHERE name = $SQ$SERVER$SQ;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name`
     for PLOT in $PLOTS
     do
-      p_id=`echo "SELECT id FROM dsc.plot WHERE name = $SQ$PLOT$SQ;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name`
+      p_id=`echo "SELECT id FROM dsc.dataset WHERE name = $SQ$PLOT$SQ;" | sudo -u $hhconfig_database_owner psql -td $hhconfig_database_name`
       echo "CREATE TABLE dsc.\"data_${SERVER}_${PLOT}_${DNOW}\" (
         CHECK (starttime >= TIMESTAMP $SQ$DNOW-01 00:00:00$SQ AT TIME ZONE 'UTC' AND starttime < TIMESTAMP $SQ$DNEXT-01 00:00:00$SQ AT TIME ZONE 'UTC'),
         CHECK (server_id = $s_id),
@@ -244,7 +244,7 @@ do
       echo "ALTER TABLE dsc.\"data_${SERVER}_${PLOT}_${DNOW}\"
         ADD CONSTRAINT \"pk_data_${SERVER}_${PLOT}_${DNOW}\" PRIMARY KEY (server_id, node_id , plot_id , starttime , key1, key2 ),
         ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_node\" FOREIGN KEY (node_id) REFERENCES dsc.node (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
-        ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_plot\" FOREIGN KEY (plot_id) REFERENCES dsc.plot (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;" | sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name 
+        ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_plot\" FOREIGN KEY (plot_id) REFERENCES dsc.dataset (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;" | sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name 
     done
   done
   DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`

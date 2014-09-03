@@ -96,3 +96,5 @@ for SERVER in * ; do
 	done
 	cd $hhconfig_directories_data
 done
+
+echo "`date`: $0 COMPLETED"
