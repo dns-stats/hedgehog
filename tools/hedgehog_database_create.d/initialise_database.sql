@@ -25,7 +25,6 @@
 --
 -- Name: version; Type: TABLE; Schema: dsc; 
 --
-
 CREATE TABLE dsc.version (
     version integer
 );
@@ -33,7 +32,6 @@ CREATE TABLE dsc.version (
 --
 -- Name: internal_version; Type: TABLE; Schema: dsc; 
 --
-
 CREATE TABLE dsc.internal_version (
     serial integer,
     script character varying(255),
@@ -87,27 +85,82 @@ WITH (
 );
 
 --
--- Name: plot; Type: TABLE; Schema: dsc; 
+-- Name: dataset; Type: TABLE; Schema: dsc; 
 --
---TODO(asap): Change to dataset and visible_plots tables and a plots VIEW
-CREATE TABLE dsc.plot
+CREATE TABLE dsc.dataset
 (
-  id serial NOT NULL, 
-  name character varying(255) NOT NULL	,
-  ddcategory character varying(255),
-  ddname character varying(255),
-  title character varying(255),
-  description character varying(255),
-  plot_id integer NOT NULL
+  id serial NOT NULL,
+  name character varying(255) NOT NULL
 )
 WITH (
   OIDS=FALSE
 );
 
 --
+-- Name: visible_plot; Type: TABLE; Schema: dsc; 
+--
+CREATE TABLE dsc.visible_plot
+(
+  id serial NOT NULL, 
+  name character varying(255) NOT NULL	,
+  display_category character varying(255),
+  display_name character varying(255),
+  title character varying(255),
+  description character varying(255)
+)
+WITH (
+  OIDS=FALSE
+);
+
+--
+-- Name: id_mapping; Type: TABLE; Schema: dsc; 
+--
+CREATE TABLE dsc.id_mapping
+(
+  vp_id integer NOT NULL,
+  d_id integer NOT NULL
+)
+WITH (
+  OIDS=FALSE
+);
+
+--
+-- Name: plot; Type: VIEW; Schema: dsc; 
+--
+CREATE VIEW dsc.plot AS
+(
+	SELECT ROW_NUMBER() OVER(ORDER BY name) AS id, * FROM
+	(
+		SELECT
+			vp.name,
+			vp.display_category AS ddcategory,
+			vp.display_name AS ddname,
+			vp.title,
+			vp.description,
+			(SELECT d_id FROM id_mapping WHERE dsc.id_mapping.vp_id=vp.id LIMIT 1) AS plot_id,
+			(SELECT ARRAY(SELECT dsc.id_mapping.d_id FROM id_mapping INNER JOIN visible_plot ON dsc.visible_plot.id=dsc.id_mapping.vp_id WHERE dsc.id_mapping.vp_id=vp.id)) AS dataset_id
+		FROM
+			dsc.visible_plot AS vp
+		UNION
+		SELECT
+			name,
+			'' AS ddcategory,
+			'' AS ddname,
+			'' AS title,
+			'' AS description,
+			id AS plot_id,
+			ARRAY[id] AS dataset_id
+		FROM
+			dataset
+		WHERE
+			dsc.dataset.name NOT IN (SELECT name FROM dsc.visible_plot)
+	)
+	AS x
+);
+
+--
 -- Name: query_classification; Type: TABLE; Schema: dsc; 
 --
-
 CREATE TABLE dsc.query_classification (
     id serial NOT NULL,
     name character varying(255),
@@ -162,11 +215,18 @@ ALTER TABLE ONLY dsc.node
   ADD CONSTRAINT uniq_node UNIQUE(server_id, name);
 
 --
--- Name: dsc_pk_plot, uniq_plot; Type: CONSTRAINT; Schema: dsc; 
+-- Name: pk_dataset, uniq_dataset_name; Type: CONSTRAINT; Schema: dsc; 
 --
-ALTER TABLE ONLY dsc.plot
-  ADD CONSTRAINT pk_plot PRIMARY KEY (id),
-  ADD CONSTRAINT uniq_plot_name UNIQUE (name);
+ALTER TABLE ONLY dsc.dataset
+  ADD CONSTRAINT pk_dataset PRIMARY KEY (id),
+  ADD CONSTRAINT uniq_dataset_name UNIQUE (name);
+
+--
+-- Name: pk_visible_plot, uniq_visible_plot_name; Type: CONSTRAINT; Schema: dsc; 
+--
+ALTER TABLE ONLY dsc.visible_plot
+  ADD CONSTRAINT pk_visible_plot PRIMARY KEY (id),
+  ADD CONSTRAINT uniq_visible_plot_name UNIQUE (name);
 
 --
 -- Name: dsc_pk_geo; Type: CONSTRAINT; Schema: dsc; 
@@ -186,7 +246,7 @@ ALTER TABLE ONLY dsc.iana_lookup
 ALTER TABLE dsc.data
   ADD CONSTRAINT pk_data PRIMARY KEY (server_id, node_id, plot_id, starttime, key1, key2),
   ADD CONSTRAINT fk_data_node FOREIGN KEY (node_id) REFERENCES dsc.node (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
-  ADD CONSTRAINT fk_data_plot FOREIGN KEY (plot_id) REFERENCES dsc.plot(id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+  ADD CONSTRAINT fk_data_plot FOREIGN KEY (plot_id) REFERENCES dsc.dataset(id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 /*
 --
@@ -210,7 +270,7 @@ DECLARE
     ins_sql TEXT;
 BEGIN
     SELECT name INTO STRICT server FROM dsc.server WHERE id = new.server_id;
-    SELECT name INTO STRICT plot FROM dsc.plot WHERE id = new.plot_id;
+    SELECT name INTO STRICT plot FROM dsc.dataset WHERE id = new.plot_id;
     tbl_nm := 'data_' || server || '_' || plot || '_' || to_char(NEW.starttime, 'YYYY_MM');
     ins_sql := 
         'INSERT INTO dsc.'|| tbl_nm

@@ -50,6 +50,8 @@ while getopts ":p:h" opt; do
     esac
 done
 
+echo "`date`: $0 COMMENCED"
+
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
 DB_API_VERSION=`psql $DB_NAME  -tc  "select version from dsc.version;"`
@@ -80,14 +82,14 @@ else
 fi
 
 SERVERS=`psql -td $DB_NAME -c "SELECT name FROM dsc.server;"`
-PLOTS=`psql -td $DB_NAME -c "SELECT name FROM dsc.plot WHERE id=plot_id;"`
+PLOTS=`psql -td $DB_NAME -c "SELECT name FROM dsc.dataset;"`
 
 for server in $SERVERS
 do
     s_id=`psql -td $DB_NAME -c "SELECT id FROM dsc.server WHERE name = '$server';"`
     for plot in $PLOTS
     do
-      p_id=`psql -td $DB_NAME -c "SELECT id FROM dsc.plot WHERE name = '$plot';"`
+      p_id=`psql -td $DB_NAME -c "SELECT id FROM dsc.dataset WHERE name = '$plot';"`
       
       psql $DB_NAME <<EOF
 BEGIN;
@@ -101,8 +103,10 @@ CREATE TABLE dsc.data_${server}_${plot}_${NOW} (
 ALTER TABLE dsc.data_${server}_${plot}_${NOW}
         ADD CONSTRAINT pk_data_${server}_${plot}_${NOW} PRIMARY KEY (server_id, node_id , plot_id , starttime , key1, key2 ),
         ADD CONSTRAINT fk_data_${server}_${plot}_${NOW}_node FOREIGN KEY (node_id) REFERENCES dsc.node (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
-        ADD CONSTRAINT fk_data_${server}_${plot}_${NOW}_plot FOREIGN KEY (plot_id) REFERENCES dsc.plot (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+        ADD CONSTRAINT fk_data_${server}_${plot}_${NOW}_plot FOREIGN KEY (plot_id) REFERENCES dsc.dataset (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
 COMMIT;
 EOF
     done
 done
+
+echo "`date`: $0 COMPLETED"
