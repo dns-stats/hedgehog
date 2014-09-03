@@ -238,6 +238,29 @@ initNodeTabsHtml <- function() {
     return(TRUE)
 }
 
+getDefaultPlotId <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In getDefaultPlotId')
+	}
+	
+	# Query the db to get the default plot id
+	if (!(prepStmnt("getdefaultpltid", dsccon))) {
+		return(FALSE)
+	}
+	
+	# TODO: retrieve from conf file
+	defaultpltnm <- "'by_node'"
+	defaultpltid <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getdefaultpltid(", defaultpltnm, ");", sep=""))	
+	
+	if (is.null(defaultpltid) || nrow(defaultpltid) == 0) {
+		return(FALSE)
+	}
+	id <- as.integer(defaultpltid[1])
+	system(paste('logger -p user.notice plot id:  "', id, '"', sep=""))
+	%><%=id%><%
+}
+
 generatePlot <- function(){
 
     #TODO(refactor): Move more of this code out to the generatePlot.R file
@@ -304,7 +327,7 @@ generatePlot <- function(){
 	}
 
 	if (!cache) {	
-		plot_file <- generatePlotFile(plttitle, pltnm, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon)
+		plot_file <- generatePlotFile(plttitle, pltnm, dd_pltid, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon)
 	}
     
 	# OK - we have a plot file so now lets generate the html to hold that
@@ -414,6 +437,7 @@ if (class(dsccon) != "try-error") {
 		initPlotDDHtml    = {initPlotDDHtml()},
 		initServerDDHtml  = {initServerDDHtml()},
 		initNodeTabsHtml  = {initNodeTabsHtml()},
+		getDefaultPlotId  = {getDefaultPlotId()},
 		generatePlot      = {generatePlot()},
 		generateYaml      = {generateYaml(dsccon)}
 	)
