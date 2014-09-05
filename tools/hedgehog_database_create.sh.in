@@ -145,6 +145,7 @@ EOF
 echo
 
 # Create dsc schema and configure hh_read and hh_write roles
+# Schema name of 'dsc' is preserved for backwards compatibility
 echo "Creating schemas, dropping public schema and revoking all privileges from public"
 echo "Granting privileges to hh_read and hh_write"
 echo "Setting search_path for owner"

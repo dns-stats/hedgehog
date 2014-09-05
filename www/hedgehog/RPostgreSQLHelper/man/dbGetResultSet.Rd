@@ -24,15 +24,18 @@
 \title{RPostgreSQL dbSendQuery wrapper function}
 \description{Handles dbiConnection failures}
 \usage{
-dbGetResultSet(dbiDriver, dbiConnection, sqlQueryString)
+dbGetResultSet(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{dbiDrivNmStr}{
-String name of the dbiDriver
+  \item{dbiDriver}{
+Database driver dbiDriver
 }
-  \item{dbiConNmStr}{
-String name of the dbiConnection
+  \item{dbiConnection}{
+Database connection dbiConnection
+}
+  \item{dbConnStr}{
+Database connection string dbConnStr
 }
   \item{sqlQueryStr}{
 String containing SQL query to be run
@@ -46,7 +49,7 @@ String containing SQL query to be run
 	https://code.google.com/p/rpostgresql/
 	http://stat.bell-labs.com/RS-DBI/doc/html/index.html
 }
-\author{Elena Simpson <elly@sinodun.com>}
+\author{John Dickinson <jad@sinodun.com>}
 \note{
 %%  ~~further notes~~
 }
@@ -57,36 +60,6 @@ String containing SQL query to be run
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (dbiDriver, dbiConnection, sqlQueryString) 
-{
-    rs <- NULL
-    for (attempt in 1:2) {
-        rs <- dbSendQuery(dbiConnection, sqlQueryString)
-        if (is.null(rs)) {
-            if (attempt > 1) {
-                system("logger -p user.crit apache2 failed to reconnect to db: administrator action required")
-            }
-            else {
-                system("logger -p user.notice database connection lost")
-                for (resultSet in dbListResults(dbiConnection)) {
-                  dbClearResult(resultSet)
-                }
-                for (connection in dbListConnections(dbiDriver)) {
-                  dbDisconnect(connection)
-                }
-                dbUnloadDriver(dbDriver)
-                .reload()
-            }
-        }
-        else break
-    }
-    return(rs)
-  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

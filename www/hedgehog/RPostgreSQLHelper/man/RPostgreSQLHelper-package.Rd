@@ -32,11 +32,11 @@ Version: \tab 1.0\cr
 Date: \tab 2013-03-20\cr
 License: \tab GPL-3\cr
 }
-dbSendQuery: dbGetResultSet(db_driver, db_conn, sqlQueryStr)
+dbSendQuery: dbGetResultSet(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr)
 
-dbSendQuery + fetch: dbGetDataFrame(db_driver, db_conn, sqlQueryStr)
+dbSendQuery + fetch: dbGetDataFrame(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr)
 }
-\author{Elena Simpson <elly@sinodun.com>}
+\author{John Dickinson <jad@sinodun.com>}
 \references{
 	https://code.google.com/p/rpostgresql/
 	http://stat.bell-labs.com/RS-DBI/doc/html/index.html

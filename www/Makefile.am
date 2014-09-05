@@ -1,5 +1,4 @@
 # TODO: Split this makefile up
-# TODO(asap): Install under <prefix>/usr/share
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
 
@@ -73,7 +72,7 @@ EXTRA_DIST = 	$(srcdir)/hedgehog/www/hedgehog.html.in \
 install-data-hook:
 	sudo R CMD REMOVE RPostgreSQLHelper || true
 	sudo R CMD INSTALL $(srcdir)/hedgehog/RPostgreSQLHelper
-	test -f @datadir@/$(hh_web_conf_dir)/hedgehog_gui.yaml || \
-		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml @datadir@/$(hh_web_conf_dir)
-		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml @datadir@/$(hh_web_conf_dir)/hedgehog_gui.yaml.sample
+	test -f ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml || \
+		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}
+		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml.sample
 

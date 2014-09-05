@@ -34,7 +34,7 @@ suppressPackageStartupMessages(library(yaml))
 
 dbdrv  <- dbDriver("PostgreSQL")
 hh_config <- yaml.load_file("@HH_CONF_FILE@")
-gui_config <- yaml.load_file(paste(hh_config$directories$web_conf, "/hedgehog_gui.yaml", sep=""))
+gui_config <- yaml.load_file(paste(hh_config$directories$conf, "/hedgehog_gui.yaml", sep=""))
 
 
 # sink("/temp/R/R.out", append=TRUE)
