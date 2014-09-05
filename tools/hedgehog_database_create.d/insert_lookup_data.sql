@@ -127,17 +127,17 @@ INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where 
 INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='traffic_volume'), (SELECT id FROM dataset WHERE name='traffic_volume_responses'));
 INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='unique_sources'), (SELECT id FROM dataset WHERE name='unique_sources'));
 
-INSERT INTO query_classification (id, name, title) VALUES (1, 'Malformed', 'The DNS message was malformed and could not be entirely parsed');
-INSERT INTO query_classification (id, name, title) VALUES (2, 'Src port 0', 'The UDP query came from source port 0');
-INSERT INTO query_classification (id, name, title) VALUES (3, 'Funny Qtype', 'Query type was not one of the documented types');
-INSERT INTO query_classification (id, name, title) VALUES (4, 'Funny Qclass', 'Query class was not IN');
-INSERT INTO query_classification (id, name, title) VALUES (5, 'RFC1918PTR', 'The query type was PTR and the name was in an in-addr.arpa zone covered by RFC1918 private address space');
-INSERT INTO query_classification (id, name, title) VALUES (6, 'A-for-.', 'The query name was empty (equal to the root zone)');
-INSERT INTO query_classification (id, name, title) VALUES (7, 'A-for-A', 'The query name was already an IPv4 address');
-INSERT INTO query_classification (id, name, title) VALUES (8, 'localhost', 'The query was for localhost');
-INSERT INTO query_classification (id, name, title) VALUES (9, 'root-servers.net', 'The query was for a root-servers.net name');
-INSERT INTO query_classification (id, name, title) VALUES (10, 'Non-Authoritative TLD', ' The query was for a known-invalid TLD');
-INSERT INTO query_classification (id, name, title) VALUES (11, 'Unclassified', 'the query did not fall INTO one of the other categories');
+INSERT INTO query_classification (name, title) VALUES ('Malformed', 'The DNS message was malformed and could not be entirely parsed');
+INSERT INTO query_classification (name, title) VALUES ('Src port 0', 'The UDP query came from source port 0');
+INSERT INTO query_classification (name, title) VALUES ('Funny Qtype', 'Query type was not one of the documented types');
+INSERT INTO query_classification (name, title) VALUES ('Funny Qclass', 'Query class was not IN');
+INSERT INTO query_classification (name, title) VALUES ('RFC1918PTR', 'The query type was PTR and the name was in an in-addr.arpa zone covered by RFC1918 private address space');
+INSERT INTO query_classification (name, title) VALUES ('A-for-.', 'The query name was empty (equal to the root zone)');
+INSERT INTO query_classification (name, title) VALUES ('A-for-A', 'The query name was already an IPv4 address');
+INSERT INTO query_classification (name, title) VALUES ('localhost', 'The query was for localhost');
+INSERT INTO query_classification (name, title) VALUES ('root-servers.net', 'The query was for a root-servers.net name');
+INSERT INTO query_classification (name, title) VALUES ('Non-Authoritative TLD', ' The query was for a known-invalid TLD');
+INSERT INTO query_classification (name, title) VALUES ('Unclassified', 'the query did not fall INTO one of the other categories');
 
 
 INSERT INTO dsc.geo(name,country_code) values
