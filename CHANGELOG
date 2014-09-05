@@ -14,6 +14,12 @@
 # limitations under the License.
 #
 
+Hedgehog 2.0.0b1
+----------------
+
+* Database schema changes: split plot table in 3:
+  dataset, visible_plot and id_mapping
+* Handling of plots based on 2 datasets
 
 Hedgehog 2.0.0a1 - 2014-08-27
 ----------------------------

@@ -329,7 +329,7 @@ DSCStrategy::get_plot_id(const string& plot, pqxx::work& pg_db_trans) {
     try {
         sql.clear();
         sql.str("");
-        sql << "SELECT id FROM dsc.plot WHERE name = '" << plot << "'" << endl;
+        sql << "SELECT id FROM dsc.dataset WHERE name = '" << plot << "'" << endl;
         r = pg_db_trans.exec(sql.str());
         if ( r.size() != 1 ) {
             cerr << "Error: Expected 1 plot with name " << plot << ", "
