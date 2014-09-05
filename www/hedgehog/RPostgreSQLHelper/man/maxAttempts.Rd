@@ -39,6 +39,5 @@
 }
 \examples{
 data(maxAttempts)
-## maybe str(maxAttempts) ; plot(maxAttempts) ...
 }
 \keyword{datasets}

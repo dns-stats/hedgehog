@@ -293,7 +293,7 @@ generateYaml <- function(dsccon) {
 		
 	# Determine the plot being requested
     prepStmnt("getpltdetails", dsccon)
-    pltdetails <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getpltdetails(", GET$pltid, ");", sep=""))
+    pltdetails <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getpltdetails(", GET$pltid, ");", sep=""))
     
     if (is.null(pltdetails)) {
         return(FALSE)
@@ -310,7 +310,7 @@ generateYaml <- function(dsccon) {
 	} 
 	
     prepStmnt("getsrvr_display_name_from_id", dsccon)
-    server_display_name <- dbGetDataFrame(dbdrv, dsccon, paste("EXECUTE getsrvr_display_name_from_id(", GET$svrid, ");", sep=""))
+    server_display_name <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getsrvr_display_name_from_id(", GET$svrid, ");", sep=""))
 
 	# Load the config file with the rssac spec in it 
     rssac_config = yaml.load_file(paste(hh_config$directories$web_conf, "/rssac.yaml", sep=""))
@@ -348,7 +348,7 @@ generateYaml <- function(dsccon) {
     if (!prepStmnt(prepStmntNm, dsccon)) 
 		return(FALSE)
 		
-    df <- dbGetDataFrame(dbdrv, dsccon, sql)
+    df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
 
 	# TODO: Handle empty data frames better
 	# This simply means there isn't any data for this server on this day
@@ -555,7 +555,7 @@ generatePlotFile <- function(plttitle, pltnm, plot_file, simple_start, simple_st
 		sql <- sub("\\(", paste("\\(" , time_window, ".0, ", sep=""), sql)
 	}
 
-	df <- dbGetDataFrame(dbdrv, dsccon, sql)
+	df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
 	
 	if (is.null(df)) {
 		plot_file <- "plots/no_connection.png"

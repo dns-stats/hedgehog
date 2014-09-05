@@ -90,11 +90,7 @@ int
 DSCDataManager::load(const string dat_line, vector<DSCStrategy*>::iterator strategy_it) {
 
     clear();
-    
-    //node_ = bfs::initial_path().filename().generic_string();
-    //server_ = bfs::initial_path().parent_path().filename().generic_string();
-    //name_ = file_path.filename().string();
-    
+
     // Call out to the strategy factory as the strategies 
     // know how to convert the line of data to a DSCUMap
     if ( using_pg_db_ == true ){
