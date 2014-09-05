@@ -114,7 +114,7 @@ then
     fi
 fi
 
-set -x #Print commands just before execution - with all expansions and substitutions done, and words marked - useful for debugging.
+#set -x #Print commands just before execution - with all expansions and substitutions done, and words marked - useful for debugging.
 
 cd "${WD}"
 exec >$PROG.stdout
