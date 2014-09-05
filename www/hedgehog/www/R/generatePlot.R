@@ -307,7 +307,9 @@ getStmntParameters <- function(dsccon, dbdrv, dd_pltid, prepStmtNm, srvrid, star
 	}
 
 	sql <- paste("EXECUTE ", "getdatasetids", "('", dd_pltid, "');", sep="")
+
 	dataframe <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
+
 	if (is.null(dataframe)) {
 		return
 	}
