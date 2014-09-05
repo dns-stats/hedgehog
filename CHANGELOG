@@ -14,6 +14,13 @@
 # limitations under the License.
 #
 
+Hedgehog 2.0.0b1
+----------------
+
+* Issue #1: hedgehog_gui.yaml configuration file is now installed in
+  <prefix>/etc/hedgeghog
+* Database version mismatch now reported correctly in the GUI
+
 
 Hedgehog 2.0.0a1 - 2014-08-27
 ----------------------------

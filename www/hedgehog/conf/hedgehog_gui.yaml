@@ -19,13 +19,12 @@
 ## Developed by Sinodun IT (www.sinodun.com)
 ##
 
-# TODO(asap): Install this under <>/etc/
 
 --- ## YAML config for hedgehog GUI.
 www:
   default_plot_type           : interactive # static = png plots, interactive = googlevis plots
-  presentation_delay_in_hours : 0           # number of hours behind now for which the GUI will display data  
   use_plot_caching            : 1           # 1 = true: use cached plots when possible, 0 = false: never use cached plots
   caching_delay_in_hours      : 1           # if cache=1 then only plots with an end time earlier than this this number of hours ago
                                             # are cached. More recent plots are not cached as data may still be being imported
+  presentation_delay_in_hours : 0           # number of hours behind now for which the GUI will display data 
 ...
