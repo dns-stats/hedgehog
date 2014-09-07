@@ -14,24 +14,40 @@
 # limitations under the License.
 #
 
-KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0a1
+KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b1
 -----------------------------
 * Currently, the database and web front end must run on the same server.
 
-* The full list of possible plots are displayed via the drop down menu in the 
+* The full list of possible plots are displayed via the drop down menu in the
   GUI, regardless of whether there is data in the database for the plot
 
-* Flash is required to view interactive plots in a browser.
+* By default, Flash is required to view interactive plots. A configuration
+  option is available (default_interactive_plot_type in hedgehog_gui.yaml)
+  which can specify the system to produce SVG plots instead (which do not 
+  require Flash). However there is a known issue with the SVG plots where long
+  legends are not wrapped properly:
+  https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536
+  This effects, for example, the 'Traffic volume' plot. When this issue is 
+  addressed the SVG plots will become the default plot type. 
+
+* The plot is not sorted according to size correctly in the interactive plots
+  for horizontal bar charts. The static plots should be used instead. This
+  includes:
+  - QTYPE for most popular TLD
+  - Busient client subnet
+  - RCODE by client subnet
+  - Root abusers
+  - Query classification by subnet
 
 * Support for RSSAC reports is added for XML imports only, however extended 
   RCODES cannot be collected by the existing DSC collector so only base RCODES
-  are collected and displayed. If the DSC collector is extended then further 
+  are collected and displayed. If the DSC collector is extended then further
   work must be done in Hedgehog to also support extended RCODES
 
-* The Unique Sources plot is not available until after the RSSAC report has 
+* The Unique Sources plot is not available until after the RSSAC report has
   been generated for the date in question.
 
 * If a user touches any controls while a query is waiting to return
   then the 'generate graph' button becomes enabled again and a second
-  plot can be generated that will then over write the first. 
+  plot can be generated that will then over write the first.
 
