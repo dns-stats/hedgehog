@@ -67,11 +67,14 @@ H <- 600
 linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
     if(gvis == 1){
-      #title <- sub("\n", " ", title)
-      #de <- cast(df, x ~ key, value='y')
-      #y_var <- tail(colnames(de),-1)
-      #p <- gvisLineChart(de, xvar = 'x', yvar = y_var, options=list(title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
-      p <- gvisAnnotatedTimeLine(df, numvar="y", idvar = "key", datevar = "x", options=list(legendPosition='newRow', height=460, width=920))
+      # For now we default to the timeline flash chart unless 'svg' is specified by the user
+      if (gui_config$www$default_interactive_plot_type == "svg") {
+          p <- gvisAnnotationChart(df, numvar="y", idvar = "key", datevar = "x",
+                                   options=list(legendPosition='newRow', height=460, width=920))
+      }else{
+          p <- gvisAnnotatedTimeLine(df, numvar="y", idvar = "key", datevar = "x", 
+                                     options=list(legendPosition='newRow', height=460, width=920))         
+      }
       title <- sub("\n", "<br />", title)
       p$html$chart['divChart'] <- paste("<div style=\"text-align: center; font-family: HelveticaNeue, 'Helvetica Neue', Helvetica, Arial, sans-serif;\">", title, "</div>", p$html$chart['divChart'],sep="")
       cat(p$html$chart, file=f)
@@ -90,19 +93,20 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       if (nKeys <= NCBPALETTE) {
         p <- p + scale_colour_manual(values=CBPALETTE)
       }
+
       print(p)
       dev.off()
 
       fstack <- sub(".png", "-stack.png", f)
       png(fstack, type="cairo-png", width = W, height = H)
       ps <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
-                  geom_area(stat="identity") +
-                  labs(title=title, x=xlabel, y=ylabel) +
-                  scale_x_datetime(expand=c(0.01,0)) + 
-                  scale_y_continuous(expand=c(0,0), labels = comma) +
-                  theme_bw() +
-                  theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
-                  guides(fill = guide_legend(nrow = 20, byrow = TRUE))
+                   geom_area(stat="identity") +
+                   labs(title=title, x=xlabel, y=ylabel) +
+                   scale_x_datetime(expand=c(0.01,0)) + 
+                   scale_y_continuous(expand=c(0,0), labels = comma) +
+                   theme_bw() +
+                   theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                   guides(fill = guide_legend(nrow = 20, byrow = TRUE))
 
       if (nKeys <= NCBPALETTE) {
         ps <- ps + scale_fill_manual(values=CBPALETTE)
@@ -123,9 +127,11 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
     if(gvis == 1){
       title <- sub("\n", " ", title)
       if(vertical == 1){
-          p <- gvisColumnChart(df, xvar='x', yvar='y', options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+          p <- gvisColumnChart(df, xvar='x', yvar='y', 
+                               options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
       }else{
-          p <- gvisBarChart(df, xvar='x', yvar='y', options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
+          p <- gvisBarChart(df, xvar='x', yvar='y', 
+                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -159,12 +165,15 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       y_var <- tail(colnames(de),-1)
       if(vertical == 1){
           if (gbar_width == 0) {
-				p <- gvisColumnChart(de, xvar='x', yvar=y_var, options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
-		  } else {
-          		p <- gvisColumnChart(de, xvar='x', yvar=y_var, options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
-		  }
+              p <- gvisColumnChart(de, xvar='x', yvar=y_var, 
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+          } else {
+              p <- gvisColumnChart(de, xvar='x', yvar=y_var, 
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
+          }
       }else{
-          p <- gvisBarChart(de, xvar='x', yvar=y_var, options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
+          p <- gvisBarChart(de, xvar='x', yvar=y_var, 
+                            options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -229,7 +238,8 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
       title <- sub("\n", " ", title)
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
-      p <- gvisAreaChart(de, xvar='x', yvar=y_var, options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+      p <- gvisAreaChart(de, xvar='x', yvar=y_var, 
+                         options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
       cat(p$html$chart,file=f)
     }else{
       	df$x <- as.POSIXct(df$x)
@@ -239,7 +249,7 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
       p <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
                   geom_area(stat="identity") + 
                   labs(title=title, x=xlabel, y=ylabel) +
-				  scale_x_datetime(expand=c(0.01,0)) +
+                  scale_x_datetime(expand=c(0.01,0)) +
                   scale_y_continuous(expand=c(0,0), labels = comma) + 
                   theme_bw() +
                   theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
