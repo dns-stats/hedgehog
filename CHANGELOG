@@ -14,18 +14,19 @@
 # limitations under the License.
 #
 
-Hedgehog 2.0.0b1
-----------------
+Hedgehog 2.0.0b1 - 2014-09-09
+-----------------------------
 
+* Database schema changes: Plot table split into 3 and replaced by a view.
+  Added explicit handling of plots based on 2 datasets.
+  ****** Database version bumped - not backwards compatible *****
 * Added new config option 'default_interactive_plot_type' to 
   hedgehog_gui.yaml. This can be used to generate SVG interactive plots
   instead of the default interactive plots which require Flash.
-* Database schema changes: Plot table split into 3 and replaced by a view.
-  Support explicit handling of plots based on 2 datasets.
-  ** Database version bumped - not backwards compatible **
 * Issue-#1: hedgehog_gui.yaml configuration file is now installed in
   <prefix>/etc/hedgeghog
 * Database version mismatch now reported correctly in the GUI
+
 
 Hedgehog 2.0.0a1 - 2014-08-27
 ----------------------------

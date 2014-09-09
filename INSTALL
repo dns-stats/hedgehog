@@ -158,12 +158,13 @@ www:
 
 1.3.4. Configure apache
 
-You will probably need to edit the /etc/apache2/apache2.conf file to enable access to the install directory by adding <Directory <prefix>/share/hedgehog> and <Directory <prefix>/var/hedgehog/www> elements.
-Depending on your configuration you may want to change the name of the hedgehog.conf file or disable the default site using the following command:
+Depending on your exact installation choices and apache configuration:
+* You will probably need to edit the /etc/apache2/apache2.conf file to enable access to the Hedgehog directories by adding <Directory> elements for <prefix>/share/hedgehog> and <prefix>/var/hedgehog/www> 
+* You may want to disable the default site using the following command:
 
 sudo a2dissite 000-default.conf
 
-Add the Hedgehog configuration files to apache and enable the site:
+Add the Hedgehog configuration files to apache and enable the site (this file name can be changed if required to match any local apache policy):
 
 sudo cp <prefix>/share/hedgehog/conf/hedgehog.conf /etc/apache2/sites-available/
 sudo a2ensite hedgehog.conf

@@ -18,7 +18,7 @@
 # Developed by Sinodun IT (www.sinodun.com)
 #
 
-system('logger -p user.notice Call to Hedgehog startup.R')
+#system('logger -p user.notice Call to Hedgehog startup.R')
 
 suppressPackageStartupMessages(library(Cairo))
 suppressPackageStartupMessages(library(brew))
