@@ -1,6 +1,7 @@
 ######################### NODES CONFIGURATION FILE ###################
 # Format is:     server-name, node-name, node-region
-# Each field can contain alphanumeric characters and hyphens (-) only
+# Each field can contain alphanumeric characters and hyphens (-) only 
+# '#' is the comment character
 # 
 # server-name  - This must be unique and it must match the name used in the
 #                data directory path for uploaded files.
@@ -10,7 +11,7 @@
 #                It should be unique for a given server. It is optional and if not
 #                specified the node is added to a group called 'Other'.
 # 
-# Example input:
+# Example input: (uncomment the following)
 
 #Server-A,Node-1,Region-1
 #Server-A,Node-2,Region-1

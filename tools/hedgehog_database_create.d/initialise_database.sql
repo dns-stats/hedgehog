@@ -113,12 +113,12 @@ WITH (
 );
 
 --
--- Name: id_mapping; Type: TABLE; Schema: dsc; 
+-- Name: dataset_visible_plot; Type: TABLE; Schema: dsc; 
 --
-CREATE TABLE dsc.id_mapping
+CREATE TABLE dsc.dataset_visible_plot
 (
-  vp_id integer NOT NULL,
-  d_id integer NOT NULL
+  visible_plot_id integer NOT NULL,
+  dataset_id integer NOT NULL
 )
 WITH (
   OIDS=FALSE
@@ -126,6 +126,10 @@ WITH (
 
 --
 -- Name: plot; Type: VIEW; Schema: dsc; 
+-- This view is used for backwards compatibility and to provide an interface
+-- into the new dataset and visible plots tables since there is now a 
+-- many to many relationship between them. When the front end code is 
+-- refactored it can be replaced by a cleaner view!
 --
 CREATE VIEW dsc.plot AS
 (
@@ -137,8 +141,8 @@ CREATE VIEW dsc.plot AS
 			vp.display_name AS ddname,
 			vp.title,
 			vp.description,
-			(SELECT d_id FROM id_mapping WHERE dsc.id_mapping.vp_id=vp.id LIMIT 1) AS plot_id,
-			(SELECT ARRAY(SELECT dsc.id_mapping.d_id FROM id_mapping INNER JOIN visible_plot ON dsc.visible_plot.id=dsc.id_mapping.vp_id WHERE dsc.id_mapping.vp_id=vp.id)) AS dataset_id
+			(SELECT dataset_id FROM dataset_visible_plot WHERE dsc.dataset_visible_plot.visible_plot_id=vp.id LIMIT 1) AS plot_id,
+			(SELECT ARRAY(SELECT dataset_id FROM dataset_visible_plot WHERE dsc.dataset_visible_plot.visible_plot_id=vp.id)) AS dataset_id
 		FROM
 			dsc.visible_plot AS vp
 		UNION
@@ -309,7 +313,19 @@ CREATE FUNCTION unique_source_summary_function(integer, integer, timestamp with 
     LANGUAGE plpgsql
     AS $_$
 BEGIN
-return query SELECT key1 as x, count(key2) AS y FROM dsc.data as d WHERE server_id=$1 AND plot_id=$2 AND starttime>=$3 AND starttime<=$4 AND d.node_id = ANY (string_to_array($5, ',')::integer[]) GROUP BY x UNION SELECT 'IPv6/64' as x, count(*) as y from (SELECT substring(key2 FROM '(^([0-9a-f]{1,4}:{0,1}[0-9a-f]{0,4}:{0,1}[0-9a-f]{0,4}:{0,1}[0-9a-f]{0,4}))') as subnet FROM dsc.data as d WHERE server_id=$1 AND plot_id=$2 AND starttime>=$3 AND starttime<=$4 AND key1='IPv6' AND d.node_id = ANY (string_to_array($5, ',')::integer[]) GROUP BY subnet) AS sq ORDER BY y DESC;
+return query SELECT 
+				key1 as x, 
+				count(key2) AS y 
+				FROM dsc.data as d 
+				WHERE server_id=$1 AND plot_id=$2 AND starttime>=$3 AND starttime<=$4 AND d.node_id = ANY (string_to_array($5, ',')::integer[]) 
+				GROUP BY x 
+			UNION 
+			SELECT 
+				'IPv6/64' as x, 
+				count(*) as y from (SELECT substring(key2 FROM '(^([0-9a-f]{1,4}:{0,1}[0-9a-f]{0,4}:{0,1}[0-9a-f]{0,4}:{0,1}[0-9a-f]{0,4}))') as subnet 
+				FROM dsc.data as d 
+				WHERE server_id=$1 AND plot_id=$2 AND starttime>=$3 AND starttime<=$4 AND key1='IPv6' AND d.node_id = ANY (string_to_array($5, ',')::integer[]) GROUP BY subnet) AS sq 
+				ORDER BY y DESC;
 END
 $_$;
 

@@ -23,31 +23,41 @@
 # File:   hedgehog_rssac_rm_old_unique_source_data.sh
 #
 
-#TODO(asap): This script must truncate entire tables in order to reclaim disk space
 #TODO: Add option to select all servers or just one server
 
 eval $(@BIN@/hedgehog_conf_read.sh)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name
-DEFAULT_DAY=`date --date="- 14 day" +%Y-%m-%d`
-START=${DEFAULT_DAY}
+DEFAULT_DAY=`date --date="$(date +%Y-%m-15)" +%Y%m%d`
+NOW=`date --date="now" +%Y%m%d`
 FORCE_SUM_DEL=0
 DELETE_RAW=0
+
+if [ $DEFAULT_DAY -ge $NOW ] ; then
+	START=`date --date="$NOW - 2 month" +%Y-%m`
+else
+	START=`date --date="$NOW - 1 month" +%Y-%m`
+fi
 
 
 usage () {
     echo
-    echo "Delete the raw unique source data on and before a given date"
+    echo "Delete all the raw unique_source data in the database for a given month. All data older "
+    echo "than this is also deleted."
+    echo "This script is intended to be run monthly to free disk space on systems where the raw"
+    echo "unique sources data becomes unmanagably large."
     echo
     echo "Usage: $0 options"
     echo
     echo "Supported options:"
-    echo "  -s Date from which to delete all unique source data (default is 14 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
+    echo "  -s Month from which to delete all raw unique source data (default ${START}: format YYYY-MM)"
+    echo "       (default is 2 months ago when in the first half of the current month and"
+    echo "        1 month ago when in the second half of the current month)"
     echo "  -h Show this help"
 }
 
-while getopts ":d:s:h" opt; do
+while getopts ":s:h" opt; do
     case $opt in
         s  ) START=$OPTARG ;;
         h  ) usage
@@ -64,28 +74,42 @@ echo "`date`: $0 COMMENCED"
 DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
-# Validate the start date
-date "+%Y-%m-%d" -d ${START} >/dev/null 2>&1
-is_valid=$?
-if [ ${is_valid} -ne 0 ] ; then
-	echo "Error: The start date is not in the required format of YYYY-MM-DD" 
-	exit 1
+# Validate the input date. Add day since (oddly) date won't parse just year and month
+if [ ! -z $START ] ; then
+	date "+%Y-%m-%d" -d ${START}-01 >/dev/null 2>&1
+	is_valid=$?
+	if [ ${is_valid} -ne 0 ] ; then
+		echo "Error: The start date is not in the required format of YYYY-MM" 
+		exit 1
+	fi
+	
+	START_FIRST=`date --date=$START-01 +%Y%m%d`
+	NOW_FIRST=`date --date="$NOW" +%Y%m01`
+	echo  $NOW_FIRST $START_FIRST
+	if [ $NOW_FIRST -le $START_FIRST ] ; then
+		echo "Error: The given month cannot be this month or in the future." 
+		exit 1
+	fi
 fi
 
-echo "Deleting unique_source data on and before ${START}"
+echo "Deleting unique_source data during and before ${START}" 
 
 SQ="'"
 UNIQUE_SOURCE_RAW_PLOT_NAME="unique_sources_raw"
-UNIQUE_SOURCE_RAW_PLOT_ID=`echo "SELECT id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_RAW_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
 
-DELETE_RAW_SQL="DELETE FROM dsc.data WHERE plot_id = ${UNIQUE_SOURCE_RAW_PLOT_ID} AND starttime <= TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;"
-									
-psql $DB_NAME <<EOF
-BEGIN;
-set client_min_messages to WARNING;
-${DELETE_RAW_SQL}
-COMMIT;
-EOF
+TABLE_NAMES=`psql $DB_NAME -tc "select tablename from pg_tables where schemaname='dsc' order by tablename" | grep $UNIQUE_SOURCE_RAW_PLOT_NAME`   
+
+START_TRUNC=`date --date="$START-01" +%Y%m%d `
+for TABLENAME in $TABLE_NAMES
+do
+	(( SIZE=${#TABLENAME}-7 ))
+	TMP_DATE=`echo ${TABLENAME:$SIZE} | sed -e 's/_/-/'`
+	TABLE_DATE=`date --date="$TMP_DATE-01" +%Y%m%d`
+	if [ $START_TRUNC -ge $TABLE_DATE ] ; then
+		echo "Deleting table $TABLENAME"
+		psql $DB_NAME -c "truncate $TABLENAME;"
+	fi
+done
 
 echo "`date`: $0 COMPLETED"
 exit 0

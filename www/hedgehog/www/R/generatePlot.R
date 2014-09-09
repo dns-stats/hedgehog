@@ -317,34 +317,27 @@ getStmntParameters <- function(dsccon, dbdrv, dd_pltid, prepStmtNm, srvrid, star
 	}
 
 	sql <- paste("EXECUTE ", "getdatasetids", "('", dd_pltid, "');", sep="")
-<<<<<<< HEAD
-	dataframe <- dbGetDataFrame(dbdrv, dsccon, sql)
-=======
+
 	dataframe <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
->>>>>>> Database schema changes: splitting plot table into dataset and visible_plot tables + view plot
-	if (is.null(dataframe)) {
+
+	if (is.null(dataframe) || ncol(dataframe) != 1) {
 		return
 	}
 
 	# Preparing the statement parameters with 1 or 2 datasets for the plot
-	if (ncol(dataframe) == 1) {
-		 ds_ids_list <- gsub("[{}]","",dataframe[1])
-		 list <- strsplit(ds_ids_list,",")
-		 num_ds_ids <- length(list[[1]])
-		 
-		if ( num_ds_ids == 1 ) {
-			sql <- paste("EXECUTE ",prepStmtNm, "(", srvrid, ", '", list[[1]][1], "', timestamptz '", start, "', timestamptz '", stop, "');", sep="")
-		}
-		else if ( num_ds_ids == 2 ) {
-			sql <- paste("EXECUTE ",prepStmtNm, "(", srvrid, ", '", list[[1]][1], "', '", list[[1]][2], "', timestamptz '", start, "', timestamptz '", stop, "');", sep="")
-		}
-		else {
-			return
-		}
+	ds_ids_list <- gsub("[{}]","",dataframe[1])
+	list <- strsplit(ds_ids_list,",")
+	num_ds_ids <- length(list[[1]])
+	 
+	if ( num_ds_ids == 1 ) {
+		sql <- paste("EXECUTE ",prepStmtNm, "(", srvrid, ", '", list[[1]][1], "', timestamptz '", start, "', timestamptz '", stop, "');", sep="")
+	}
+	else if ( num_ds_ids == 2 ) {
+		sql <- paste("EXECUTE ",prepStmtNm, "(", srvrid, ", '", list[[1]][1], "', '", list[[1]][2], "', timestamptz '", start, "', timestamptz '", stop, "');", sep="")
 	}
 	else {
 		return
-	}
+	}    
 	return(sql)
 }
 

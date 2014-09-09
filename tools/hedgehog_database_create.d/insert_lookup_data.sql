@@ -19,12 +19,12 @@
  */
 
 
-/* In 2.0 version 6 is used for backwards compatibility  */
+/* In 2.0 version 7 is used for backwards compatibility  */
 INSERT INTO dsc.version (version) VALUES 
-    (6);
+    (7);
 
 INSERT INTO dsc.internal_version ( serial, script, description, applied ) VALUES
-    (6, '-', 'DB creation', now() );
+    (7, '-', 'DB creation', now() );
 
 INSERT INTO dataset (name) VALUES ('certain_qnames_vs_qtype');
 INSERT INTO dataset (name) VALUES ('chaos_types_and_names');
@@ -92,40 +92,40 @@ INSERT INTO visible_plot (name, display_category, display_name, title) VALUES ('
 INSERT INTO visible_plot (name, display_category, display_name, title) VALUES ('traffic_volume', '9.RSSAC', 'Traffic volume', 'The number of queries and responses by transport and IP version');
 INSERT INTO visible_plot (name, display_category, display_name, title) VALUES ('unique_sources', '9.RSSAC', 'Unique sources', 'The number of unique source addresses');
 
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='by_node'), (SELECT id FROM dataset WHERE name='qtype'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='chaos_types_and_names'), (SELECT id FROM dataset WHERE name='chaos_types_and_names'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='do_bit'), (SELECT id FROM dataset WHERE name='do_bit'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='edns_version'), (SELECT id FROM dataset WHERE name='edns_version'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='idn_qname'), (SELECT id FROM dataset WHERE name='idn_qname'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='opcode'), (SELECT id FROM dataset WHERE name='opcode'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='rd_bit'), (SELECT id FROM dataset WHERE name='rd_bit'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='qtype'), (SELECT id FROM dataset WHERE name='qtype'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='dnssec_qtype'), (SELECT id FROM dataset WHERE name='dnssec_qtype'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='certain_qnames_vs_qtype'), (SELECT id FROM dataset WHERE name='certain_qnames_vs_qtype'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='qtype_vs_tld'), (SELECT id FROM dataset WHERE name='qtype_vs_tld'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='qtype_vs_qnamelen'), (SELECT id FROM dataset WHERE name='qtype_vs_qnamelen'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='rcode'), (SELECT id FROM dataset WHERE name='rcode'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='rcode_vs_replylen'), (SELECT id FROM dataset WHERE name='rcode_vs_replylen'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='rcode_vs_replylen_big'), (SELECT id FROM dataset WHERE name='rcode_vs_replylen'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='dns_ip_version'), (SELECT id FROM dataset WHERE name='dns_ip_version'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='dns_ip_version_vs_qtype'), (SELECT id FROM dataset WHERE name='dns_ip_version_vs_qtype'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='direction_vs_ipproto'), (SELECT id FROM dataset WHERE name='direction_vs_ipproto'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='transport_vs_qtype'), (SELECT id FROM dataset WHERE name='transport_vs_qtype'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='pcap_stats'), (SELECT id FROM dataset WHERE name='pcap_stats'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='client_subnet_accum'), (SELECT id FROM dataset WHERE name='client_subnet_accum'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='client_addr_vs_rcode_accum'), (SELECT id FROM dataset WHERE name='client_addr_vs_rcode_accum'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='ipv6_rsn_abusers_accum'), (SELECT id FROM dataset WHERE name='ipv6_rsn_abusers_accum'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='client_subnet2_accum'), (SELECT id FROM dataset WHERE name='client_subnet2_accum'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='client_subnet2_count'), (SELECT id FROM dataset WHERE name='client_subnet2_count'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='client_subnet2_trace'), (SELECT id FROM dataset WHERE name='client_subnet2_trace'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='rcode_volume'), (SELECT id FROM dataset WHERE name='rcode'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='traffic_sizes_small'), (SELECT id FROM dataset WHERE name='traffic_sizes_queries'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='traffic_sizes_small'), (SELECT id FROM dataset WHERE name='traffic_sizes_responses'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='traffic_sizes_big'), (SELECT id FROM dataset WHERE name='traffic_sizes_queries'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='traffic_sizes_big'), (SELECT id FROM dataset WHERE name='traffic_sizes_responses'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='traffic_volume'), (SELECT id FROM dataset WHERE name='traffic_volume_queries'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='traffic_volume'), (SELECT id FROM dataset WHERE name='traffic_volume_responses'));
-INSERT INTO id_mapping (vp_id, d_id) VALUES ((SELECT id from visible_plot where name='unique_sources'), (SELECT id FROM dataset WHERE name='unique_sources'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='by_node'), (SELECT id FROM dataset WHERE name='qtype'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='chaos_types_and_names'), (SELECT id FROM dataset WHERE name='chaos_types_and_names'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='do_bit'), (SELECT id FROM dataset WHERE name='do_bit'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='edns_version'), (SELECT id FROM dataset WHERE name='edns_version'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='idn_qname'), (SELECT id FROM dataset WHERE name='idn_qname'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='opcode'), (SELECT id FROM dataset WHERE name='opcode'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='rd_bit'), (SELECT id FROM dataset WHERE name='rd_bit'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='qtype'), (SELECT id FROM dataset WHERE name='qtype'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='dnssec_qtype'), (SELECT id FROM dataset WHERE name='dnssec_qtype'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='certain_qnames_vs_qtype'), (SELECT id FROM dataset WHERE name='certain_qnames_vs_qtype'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='qtype_vs_tld'), (SELECT id FROM dataset WHERE name='qtype_vs_tld'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='qtype_vs_qnamelen'), (SELECT id FROM dataset WHERE name='qtype_vs_qnamelen'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='rcode'), (SELECT id FROM dataset WHERE name='rcode'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='rcode_vs_replylen'), (SELECT id FROM dataset WHERE name='rcode_vs_replylen'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='rcode_vs_replylen_big'), (SELECT id FROM dataset WHERE name='rcode_vs_replylen'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='dns_ip_version'), (SELECT id FROM dataset WHERE name='dns_ip_version'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='dns_ip_version_vs_qtype'), (SELECT id FROM dataset WHERE name='dns_ip_version_vs_qtype'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='direction_vs_ipproto'), (SELECT id FROM dataset WHERE name='direction_vs_ipproto'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='transport_vs_qtype'), (SELECT id FROM dataset WHERE name='transport_vs_qtype'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='pcap_stats'), (SELECT id FROM dataset WHERE name='pcap_stats'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='client_subnet_accum'), (SELECT id FROM dataset WHERE name='client_subnet_accum'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='client_addr_vs_rcode_accum'), (SELECT id FROM dataset WHERE name='client_addr_vs_rcode_accum'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='ipv6_rsn_abusers_accum'), (SELECT id FROM dataset WHERE name='ipv6_rsn_abusers_accum'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='client_subnet2_accum'), (SELECT id FROM dataset WHERE name='client_subnet2_accum'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='client_subnet2_count'), (SELECT id FROM dataset WHERE name='client_subnet2_count'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='client_subnet2_trace'), (SELECT id FROM dataset WHERE name='client_subnet2_trace'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='rcode_volume'), (SELECT id FROM dataset WHERE name='rcode'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='traffic_sizes_small'), (SELECT id FROM dataset WHERE name='traffic_sizes_queries'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='traffic_sizes_small'), (SELECT id FROM dataset WHERE name='traffic_sizes_responses'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='traffic_sizes_big'), (SELECT id FROM dataset WHERE name='traffic_sizes_queries'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='traffic_sizes_big'), (SELECT id FROM dataset WHERE name='traffic_sizes_responses'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='traffic_volume'), (SELECT id FROM dataset WHERE name='traffic_volume_queries'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='traffic_volume'), (SELECT id FROM dataset WHERE name='traffic_volume_responses'));
+INSERT INTO dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id from visible_plot where name='unique_sources'), (SELECT id FROM dataset WHERE name='unique_sources'));
 
 INSERT INTO query_classification (name, title) VALUES ('Malformed', 'The DNS message was malformed and could not be entirely parsed');
 INSERT INTO query_classification (name, title) VALUES ('Src port 0', 'The UDP query came from source port 0');

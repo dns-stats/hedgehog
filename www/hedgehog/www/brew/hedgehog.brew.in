@@ -256,9 +256,7 @@ getDefaultPlotId <- function() {
 	if (is.null(defaultpltid) || nrow(defaultpltid) == 0) {
 		return(FALSE)
 	}
-	id <- as.integer(defaultpltid[1])
-	system(paste('logger -p user.notice plot id:  "', id, '"', sep=""))
-	%><%=id%><%
+	%><%=as.integer(defaultpltid[1])%><%
 }
 
 generatePlot <- function(){

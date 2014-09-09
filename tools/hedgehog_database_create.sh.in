@@ -228,7 +228,7 @@ PLOTS=`echo "SELECT name FROM dsc.dataset;" | sudo -u $hhconfig_database_owner p
 while [ $DNOW_FIRST -ge $DSTART ]
 do
   DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y_%m`
-  echo "Creating tables for: " $DNEXT
+  echo "Creating tables for: " $DNOW
   
   for SERVER in $SERVERS
   do
