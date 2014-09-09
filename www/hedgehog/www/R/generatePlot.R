@@ -66,6 +66,10 @@ H <- 600
 
 linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In linePlot')
+	}
+	
     if(gvis == 1){
       # For now we default to the timeline flash chart unless 'svg' is specified by the user
       if (gui_config$www$default_interactive_plot_type == "svg") {
@@ -124,6 +128,10 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
 barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In barPlot')
+	}
+
     if(gvis == 1){
       title <- sub("\n", " ", title)
       if(vertical == 1){
@@ -159,6 +167,10 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
 
 stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="discrete", vertical=0, gbar_width=0) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In stackedBarPlot')
+	}
+	
     if(gvis == 1){
       title <- sub("\n", " ", title)
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
@@ -234,6 +246,10 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
 
 stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In stackedAreaPlot')
+	}
+	
     if(gvis == 1){
       title <- sub("\n", " ", title)
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
@@ -266,6 +282,10 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
 facetedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, bar_width) {
 
+	if (hh_debug) {
+		system('logger -p user.notice In facetedBarPlot')
+	}
+	
     if(gvis == 1){
         stackedBarPlot(df, f, title, xlabel, ylabel, gvis, pltnm = 'N/A', vertical = 1, gbar_width = bar_width)
     }else{
@@ -289,10 +309,41 @@ facetedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, bar_width) {
     }
 }
 
+getStmntParameters <- function(dsccon, dbdrv, dd_pltid, prepStmtNm, srvrid, start, stop) {
+
+	# Retrieving the datasets ids for the plot
+	if (!(prepStmnt("getdatasetids", dsccon))) {
+		return
+	}
+
+	sql <- paste("EXECUTE ", "getdatasetids", "('", dd_pltid, "');", sep="")
+
+	dataframe <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
+
+	if (is.null(dataframe) || ncol(dataframe) != 1) {
+		return
+	}
+
+	# Preparing the statement parameters with 1 or 2 datasets for the plot
+	ds_ids_list <- gsub("[{}]","",dataframe[1])
+	list <- strsplit(ds_ids_list,",")
+	num_ds_ids <- length(list[[1]])
+	 
+	if ( num_ds_ids == 1 ) {
+		sql <- paste("EXECUTE ",prepStmtNm, "(", srvrid, ", '", list[[1]][1], "', timestamptz '", start, "', timestamptz '", stop, "');", sep="")
+	}
+	else if ( num_ds_ids == 2 ) {
+		sql <- paste("EXECUTE ",prepStmtNm, "(", srvrid, ", '", list[[1]][1], "', '", list[[1]][2], "', timestamptz '", start, "', timestamptz '", stop, "');", sep="")
+	}
+	else {
+		return
+	}    
+	return(sql)
+}
+
 generateYaml <- function(dsccon) {
 
 	if (hh_debug) {
-	   	# Useful syslog output for debugging
 	    system('logger -p user.notice In generateYaml')
     }
 
@@ -309,7 +360,6 @@ generateYaml <- function(dsccon) {
         return(FALSE)
     }   
 	pltnm     <- pltdetails$name
-	GET$pltid <- pltdetails$plot_id
 
     # Nasty hard coding because the traffic size plot is split into two
 	if (pltnm == 'traffic_sizes_small') {
@@ -349,11 +399,16 @@ generateYaml <- function(dsccon) {
     if (GET$ndarr == '-1') {
         prepStmntNm <- paste(prepStmntNm, "_all_nodes", sep="")
     }
-    sql <- paste("EXECUTE ",prepStmntNm, "(", GET$svrid, ", '", GET$pltid, "', timestamptz '", GET$start, "', timestamptz '", GET$stop, "');", sep="")    
-    if (GET$ndarr != '-1'){
+
+	sql <- getStmntParameters(dsccon, dbdrv, GET$pltid, prepStmntNm, GET$svrid, GET$start, GET$stop)
+	if(is.null(sql)){
+		return(FALSE)
+	}
+    
+	if (GET$ndarr != '-1'){
         sql <- sub(");", paste(", '", GET$ndarr, "');", sep=""), sql)
     }
-
+	
 	# Get the data frame
     if (!prepStmnt(prepStmntNm, dsccon)) 
 		return(FALSE)
@@ -475,7 +530,7 @@ initPlotOptions <- function() {
 }
 
 # create plot file if not cached
-generatePlotFile <- function(plttitle, pltnm, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon) {
+generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon) {
 	
 	if (hh_debug) {
 		system('logger -p user.notice In generatePlotFile')
@@ -546,12 +601,16 @@ generatePlotFile <- function(plttitle, pltnm, plot_file, simple_start, simple_st
 	if (ndarr == '-1') {
 		prepStmntNm <- paste(prepStmntNm, "_all_nodes", sep="")
 	}
-
+	
 	if (!(prepStmnt(prepStmntNm, dsccon))) {
 		return
 	}
-
-	sql <- paste("EXECUTE ",prepStmntNm, "(", svrid, ", '", pltid, "', timestamptz '", simple_start, "', timestamptz '", simple_stop, "');", sep="")
+	
+	# Setting statement parameters with 1 or 2 datasets for the plot
+	sql <- getStmntParameters(dsccon, dbdrv, ddpltid, prepStmntNm, svrid, simple_start, simple_stop)
+	if (is.null(sql)) {
+		return
+	}
 	
 	if (pltnm %in% passplotname){
 		sql <- sub(");", paste(", '", pltnm, "');", sep=""), sql)

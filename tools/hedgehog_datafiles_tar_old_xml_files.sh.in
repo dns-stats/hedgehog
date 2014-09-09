@@ -47,6 +47,8 @@ while getopts ":h" opt; do
     esac
 done
 
+echo "`date`: $0 COMMENCED"
+
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
 cd $hhconfig_directories_data
@@ -79,3 +81,5 @@ for SERVER in * ; do
     done
     cd $hhconfig_directories_data
 done
+
+echo "`date`: $0 COMPLETED"

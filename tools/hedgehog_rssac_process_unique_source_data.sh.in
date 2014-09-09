@@ -92,8 +92,8 @@ SQ="'"
 SERVER_IDS=`echo "SELECT id FROM dsc.server;" | psql -td $DB_NAME `
 UNIQUE_SOURCE_RAW_PLOT_NAME="unique_sources_raw"
 UNIQUE_SOURCE_SUM_PLOT_NAME="unique_sources"
-UNIQUE_SOURCE_RAW_PLOT_ID=`echo "SELECT id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_RAW_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
-UNIQUE_SOURCE_SUM_PLOT_ID=`echo "SELECT id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_SUM_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
+UNIQUE_SOURCE_RAW_PLOT_ID=`echo "SELECT plot_id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_RAW_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
+UNIQUE_SOURCE_SUM_PLOT_ID=`echo "SELECT plot_id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_SUM_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
 
 DELETE_SUMMARY_SQL=""
 DELETE_RAW_SQL=""

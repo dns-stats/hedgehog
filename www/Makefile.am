@@ -1,4 +1,5 @@
 # TODO: Split this makefile up
+# TODO: misleading error message when trying to remove RPostgreSQLHelper if not there: sudo R CMD REMOVE RPostgreSQLHelper || true
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
 

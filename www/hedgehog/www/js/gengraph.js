@@ -43,16 +43,15 @@ $(document).ready(function() {
     window.selectedOpt = null;
 
     // populate plot and server dropdowns and nodetabs then generate default plot    
-    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeTabsHtml")).done(function(db,rp, pt, ss, nt){
+    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeTabsHtml"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nt, dp){
         //initialise plot radio selection
         if (rp[0].indexOf('interactive') !== -1) {
             $('#googleviz').prop('checked', true);
         }
 
-        // initialise plot drop down id to 28 => by_node
-        // TODO(asap): remove this hardcoding - this should be a config option
+        // initialise plot drop down
         $("#plotType").html(pt[0]);
-        $("#plotType").val(28);
+        $("#plotType").val(parseInt(dp[0]));
 
         // initialise server drop down id to 1 (or 'DB error' if applicable)
         //TODO(asap): Default server should be a config option
