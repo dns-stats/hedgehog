@@ -4,15 +4,15 @@ DESCRIPTION
 -----------
 Hedgehog is a visualisation tool for DNS statistics that consumes data
 acquired with the DSC collector.
- 
+
 Hedgehog was initially developed for ICANN by Sinodun IT and is now released
-open source under the Apache License, version 2.0. For more information on 
-the development and support of Hedgehog see the http://www.dns-stats.org 
+open source under the Apache License, version 2.0. For more information on
+the development and support of Hedgehog see the http://www.dns-stats.org
 website.
 
 OVERVIEW
 --------
-For general information and the User guide see the Hedgehog website: 
+For general information and the User guide see the Hedgehog website:
 https://github.com/dns-stats/hedgehog/wiki
 
 USER GUIDE
@@ -20,12 +20,17 @@ USER GUIDE
 Read the User_Guide.pdf in the docs directory for the lastest version or look
 online: https://github.com/dns-stats/hedgehog/wiki/Documentation
 
-INSTALLATION
+MANUAL INSTALLATION
 ------------
 Read the Installation_Guide.pdf in the docs directory of the INSTALL file.
+
+VAGRANT INSTALLATION
+------------
+You can load Hedgehog locally using a virtual machine and Vagrant (https://www.vagrantup.com/downloads) — Requires also VirtualBox.
+Execute `vagrant up` to build the vm and run provisionning scripts (dependencies installation, compilation, configuration).
+Once completed, you can access to the server using this url: `http://localhost:8080/hedgehog`
 
 SUPPORT
 -------
 - Mailing list: https://mm.dns-stats.org/mailman/listinfo/dns-stats-users
 - Issue tracker: https://github.com/dns-stats/hedgehog/issues
-
