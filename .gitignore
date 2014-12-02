@@ -1,0 +1,19 @@
+#Vagrant
+.vagrant
+
+# Generated automatically
+/build
+Makefile.in
+/*.cache
+/aclocal.m4
+/compile
+/config.guess
+/config.h.*
+/config.sub
+/configure
+/depcomp
+/install-sh
+/ltmain.sh
+/missing
+/m4/libtool.m4
+/m4/lt*
