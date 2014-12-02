@@ -23,6 +23,16 @@ a2ensite hedgehog.conf
 
 echo "umask 002" >> /etc/apache2/envvars
 
+echo "
+<Directory /usr/local/share/hedgehog>
+AllowOverride None
+Require all granted
+</Directory>
+
+<Directory /usr/local/var/hedgehog/www>
+AllowOverride None
+Require all granted
+</Directory>" >> /etc/apache2/apache2.conf
 
 #apache/rapache write some of their logs to user.* so it can be useful to change the syslog config: Uncomment the line beginning 'user.*'.
 #sudo vi /etc/rsyslog.d/50-default.conf
