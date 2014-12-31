@@ -78,5 +78,5 @@ EXTRA_DIST = 	refile_and_grok.sh.in \
 				hedgehog_rssac_rm_old_unique_source_data.sh.in 
 	
 install-data-hook:
-	mkdir -p $(localstatedir)/hedgehog
-	chmod -R 775 $(localstatedir)/hedgehog
+	mkdir -p ${DESTDIR}$(localstatedir)/hedgehog
+	chmod -R 775 ${DESTDIR}$(localstatedir)/hedgehog
