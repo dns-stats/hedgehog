@@ -26,9 +26,12 @@ Read the Installation_Guide.pdf in the docs directory of the INSTALL file.
 
 VAGRANT INSTALLATION
 ------------
-You can load Hedgehog locally using a virtual machine and Vagrant (https://www.vagrantup.com/downloads) — Requires also VirtualBox.
-Execute `vagrant up` to build the vm and run provisionning scripts (dependencies installation, compilation, configuration).
-Once completed, you can access to the server using this url: `http://localhost:8080/hedgehog`
+You can load Hedgehog locally using a virtual machine and Vagrant 
+(https://www.vagrantup.com/downloads) — Requires also VirtualBox.
+Execute `vagrant up` to build the vm and run provisionning scripts 
+(dependencies installation, compilation, configuration).
+Once completed, you can access to the server using this url: 
+`http://localhost:8080/hedgehog`
 
 SUPPORT
 -------
