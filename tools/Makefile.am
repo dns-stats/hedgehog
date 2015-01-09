@@ -17,11 +17,10 @@ bin_SCRIPTS = 	refile_and_grok.sh \
 
 sbin_SCRIPTS = 	hedgehog_database_create.sh 
 
-nobase_sbin_SCRIPTS = 	$(srcdir)/hedgehog_database_create.d/initialise_database.sql \
-						$(srcdir)/hedgehog_database_create.d/insert_lookup_data.sql
-#DDL scripts			$(srcdir)/hedgehog_DDL_scripts/000001_ddl_do_something.sh
+nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
+				   $(srcdir)/hedgehog/sql/insert_lookup_data.sql
 
-subst_S_BIN = sed -e "s,@SBIN@,@sbindir@,"  -e "s,@BIN@,@bindir@,"
+subst_S_BIN = sed -e "s,@SBIN@,@sbindir@,"  -e "s,@BIN@,@bindir@," -e "s,@DATA@,@datadir@,"
 subst_DB_VERSION = sed -e "s|DB_VERSION|@DB_SCHEMA_VERSION@|"
 
 refile_and_grok.sh: refile_and_grok.sh.in Makefile
