@@ -134,12 +134,12 @@ Developed by Sinodun IT (www.sinodun.com)
     </form>
     <div class="eight columns" id="local_links" >
       <hr style='margin-bottom:5px;' />
-      Local Links: &nbsp; <a href="../rssac">RSSAC reports</a> &nbsp; <a href="about.html">Hedgehog QuickHelp</a>
+      Local Links: &nbsp; <a href="../rssac" target="_blank">RSSAC reports</a> &nbsp; <a href="about.html" target="_blank">Hedgehog QuickHelp</a>
     </div>
     <!-- TODO: Better job of links -->
     <div class="eight columns" id="ext_links" >
       <hr style='margin-bottom:5px;' />
-      External Links:  &nbsp; <a href="https://github.com/dns-stats/hedgehog/wiki">Hedgehog Homepage</a> &nbsp; <a href="http://dns-stats.org/">dns-stats.org</a>
+      External Links:  &nbsp; <a href="https://github.com/dns-stats/hedgehog/wiki" target="_blank">Hedgehog Homepage</a> &nbsp; <a href="http://dns-stats.org/" target="_blank">dns-stats.org</a>
     </div>
     <div class="sixteen columns" id="copyright" >
       <hr style='margin-top:5px;' />
