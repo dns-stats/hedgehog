@@ -58,6 +58,8 @@ sudo apt-get install r-base r-base-core r-base-dev libcairo2-dev libxt-dev r-cra
 
 1.2.2. Additional R packages
 
+Hedgehog is tested against version 3.1.1. of R.
+
 Some R packages are needed that are not available through apt, they can be installed via R.
 You will be prompted to choose a mirror site, or you can specify a repo by using a command of the form
 
