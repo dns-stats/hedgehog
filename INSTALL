@@ -96,8 +96,10 @@ mkdir build
 cd build
 ../configure
 make
-sudo make install
+sudo make install-configure
 cd
+
+Note: 'make install-configure' is used above rather than 'make install'.
 
 You may notice the following message during the installation step: "Error in find.package(pkgs, lib) : there is no package called ‘RPostgreSQLHelper’ Execution halted". This can be safely ignored.
 

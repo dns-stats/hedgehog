@@ -78,9 +78,11 @@ EXTRA_DIST = 	$(srcdir)/hedgehog/www/hedgehog.html.in \
 				$(srcdir)/hedgehog/www/brew/hedgehog.brew.in
 
 install-data-hook:
-	R CMD REMOVE RPostgreSQLHelper || true
-	R CMD INSTALL $(datadir)/hedgehog/R_packages/RPostgreSQLHelper
 	test -f ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml || \
 		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}
 		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml.sample
 
+install-configure: install
+	R CMD REMOVE RPostgreSQLHelper || true
+	R CMD INSTALL $(datadir)/hedgehog/R_packages/RPostgreSQLHelper
+.PHONY: install-configure
