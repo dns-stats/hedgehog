@@ -39,7 +39,7 @@ Note: The server and PostgreSQL must both be configured to use UTC!
 1.1. Requirements
 1.1.1. Platform support
 
-Version 2.0.0b1 of Hedgehog is currently only supported on Ubuntu 14.04 LTS Server.
+Hedgehog is currently only supported on Ubuntu 14.04 LTS Server.
 
 1.1.2. Database support
 
@@ -87,17 +87,19 @@ yaml	2.1.13
 
 Download the code from github:
 
-wget https://github.com/dns-stats/hedgehog/archive/2.0.0a1.tar.gz
+wget https://github.com/dns-stats/hedgehog/archive/2.0.0b2.tar.gz
 
-tar -xzf 2.0.0b1.tar.gz
-cd hedgehog-2.0.0b1
+tar -xzf 2.0.0b2.tar.gz
+cd hedgehog-2.0.0b2
 ./autogen.sh
 mkdir build
 cd build
 ../configure
 make
-sudo make install
+sudo make install-configure
 cd
+
+Note: 'make install-configure' is used above rather than 'make install'.
 
 You may notice the following message during the installation step: "Error in find.package(pkgs, lib) : there is no package called ‘RPostgreSQLHelper’ Execution halted". This can be safely ignored.
 

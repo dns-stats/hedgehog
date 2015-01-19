@@ -13,7 +13,7 @@ nobase_data_DATA =  hedgehog/conf/hedgehog.conf \
 					hedgehog/www/hedgehog.html \
 					hedgehog/www/about.html \
 					hedgehog/www/brew/hedgehog.brew 
-	
+
 nobase_dist_data_DATA = hedgehog/www/images/ajax-loader.gif \
 						hedgehog/www/images/apple-touch-icon-114x114.png \
 						hedgehog/www/images/apple-touch-icon.png \
@@ -36,7 +36,14 @@ nobase_dist_data_DATA = hedgehog/www/images/ajax-loader.gif \
 						hedgehog/www/R/utilities.R \
 						hedgehog/www/stylesheets/base.css \
 						hedgehog/www/stylesheets/layout.css \
-						hedgehog/www/stylesheets/skeleton.css
+						hedgehog/www/stylesheets/skeleton.css \
+						hedgehog/R_packages/RPostgreSQLHelper/DESCRIPTION \
+						hedgehog/R_packages/RPostgreSQLHelper/man/dbGetDataFrame.Rd \
+						hedgehog/R_packages/RPostgreSQLHelper/man/dbGetResultSet.Rd \
+						hedgehog/R_packages/RPostgreSQLHelper/man/maxAttempts.Rd \
+						hedgehog/R_packages/RPostgreSQLHelper/man/RPostgreSQLHelper-package.Rd \
+						hedgehog/R_packages/RPostgreSQLHelper/NAMESPACE \
+						hedgehog/R_packages/RPostgreSQLHelper/R/dbGetFunctions.r
 	
 subst_PACKAGEVERSION = sed -e "s,@HH_PACKAGE_VERSION@,@PACKAGE_VERSION@,"
 subst_DB_SCHEMA_VERSION = sed -e 's|DB_SCHEMA_VERSION|@DB_SCHEMA_VERSION@|'
@@ -69,11 +76,13 @@ EXTRA_DIST = 	$(srcdir)/hedgehog/www/hedgehog.html.in \
 				$(srcdir)/hedgehog/conf/hedgehog.conf.in \
 				$(srcdir)/hedgehog/conf/Rapache_hedgehog.load.in \
 				$(srcdir)/hedgehog/www/brew/hedgehog.brew.in
-	
+
 install-data-hook:
-	R CMD REMOVE RPostgreSQLHelper || true
-	R CMD INSTALL $(srcdir)/hedgehog/RPostgreSQLHelper
 	test -f ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml || \
 		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}
 		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml.sample
 
+install-configure: install
+	R CMD REMOVE RPostgreSQLHelper || true
+	R CMD INSTALL $(datadir)/hedgehog/R_packages/RPostgreSQLHelper
+.PHONY: install-configure
