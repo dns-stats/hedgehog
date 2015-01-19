@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b1
+KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
 -----------------------------
 * Currently, the database and web front end must run on the same server.
 
