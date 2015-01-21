@@ -74,13 +74,53 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       # For now we default to the timeline flash chart unless 'svg' is specified by the user
       if (gui_config$www$default_interactive_plot_type == "svg") {
           p <- gvisAnnotationChart(df, numvar="y", idvar = "key", datevar = "x",
-                                   options=list(legendPosition='newRow', height=460, width=920))
+                                   options=list(legendPosition='newRow', height=440, width=900))
+         
       }else{
           p <- gvisAnnotatedTimeLine(df, numvar="y", idvar = "key", datevar = "x", 
-                                     options=list(legendPosition='newRow', height=460, width=920))         
+                                     options=list(legendPosition='newRow', height=440, width=900))         
       }
       title <- sub("\n", "<br />", title)
-      p$html$chart['divChart'] <- paste("<div style=\"text-align: center; font-family: HelveticaNeue, 'Helvetica Neue', Helvetica, Arial, sans-serif;\">", title, "</div>", p$html$chart['divChart'],sep="")
+      ylabel <- gsub(" +", "&nbsp;", ylabel)
+      p$html$chart['divChart'] <- paste("<div style=\"text-align: center; width: 918px; font-family: HelveticaNeue, 
+                                                      'Helvetica Neue', Helvetica, Arial, sans-serif;\">", 
+                                                       title,
+                                        "</div>",
+                                        "<div style=\"display: flex; display: -webkit-flex; width: 918px;\">",  
+                                            "<style type=\"text/css\">
+                                                  .vertical-text {
+                                                    -ms-transform: translateY(190px) rotate(90deg);
+                                                    -moz-transform: translateY(190px) rotate(90deg);
+                                                    -webkit-transform: translateY(190px) rotate(90deg);
+                                                    transform: translateY(190px) rotate(90deg);
+
+                                                    -ms-transform-origin: center center 0;
+                                                    -moz-transform-origin: center center 0;
+                                                    -webkit-transform-origin: center center 0;
+                                                    transform-origin: center center 0; 
+                                                    width: 460px;
+                                                    height: 17px;
+                                                    font-size: small;
+                                                    text-align: center;
+                                                   /* justify-content: flex-end; */
+                                                    -webkit-flex: 17;
+                                                    -ms-flex: 17;
+                                                    -moz-flex: 17;
+                                                    flex: 17;
+                                                  }
+	                                          </style>", 
+                                            "<style type=\"text/css\"> 
+                                                .flex-chart {
+                                                    -webkit-flex: 900;
+                                                    -ms-flex: 900;
+                                                    -moz-flex: 900;
+                                                     flex: 900;
+                                                }
+                                            </style>",
+                                        "<div class=\"flex-chart\">", p$html$chart['divChart'], "</div>",
+                                        "<div class=\"vertical-text\">", ylabel, "</div>", "</div>",
+                                        "<div style=\"text-align: center; width: 918px; font-size: small;\">", xlabel, "</div>",
+                                       sep="")
       cat(p$html$chart, file=f)
     }else{
       nKeys <- length(unique(df$key))
