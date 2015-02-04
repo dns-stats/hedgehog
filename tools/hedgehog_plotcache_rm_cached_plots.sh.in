@@ -23,7 +23,7 @@
 # File:   hedgehog_plotcache_rm_cached_plots.sh
 #
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name

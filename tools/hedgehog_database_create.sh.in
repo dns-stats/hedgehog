@@ -30,7 +30,7 @@
 # Authentication methods are configured in /etc/postgresql/9.1/main/pg_hba.conf
 
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 
 # DSTART defaults to the current month
 DSTART=`date --date="$(date +%Y-%m-01)" +%Y-%m`

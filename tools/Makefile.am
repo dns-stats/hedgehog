@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
 CLEANFILES = $(bin_SCRIPTS) $(sbin_SCRIPTS)
 
 bin_SCRIPTS = 	refile_and_grok.sh \
-				hedgehog_conf_read.sh \
+				hedgehog_conf_read.pl \
 				hedgehog_database_manage_partitions.sh \
 				hedgehog_database_update_nodes.sh \
 				hedgehog_datafiles_create_summary.sh \
@@ -26,8 +26,8 @@ subst_DB_VERSION = sed -e "s|DB_VERSION|@DB_SCHEMA_VERSION@|"
 refile_and_grok.sh: refile_and_grok.sh.in Makefile
 	$(subst_S_BIN) < $(srcdir)/refile_and_grok.sh.in | $(subst_DB_VERSION) > refile_and_grok.sh
 	
-hedgehog_conf_read.sh: hedgehog_conf_read.sh.in Makefile
-	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog_conf_read.sh.in > hedgehog_conf_read.sh
+hedgehog_conf_read.pl: hedgehog_conf_read.pl.in Makefile
+	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog_conf_read.pl.in > hedgehog_conf_read.pl
 	
 hedgehog_database_create.sh: hedgehog_database_create.sh.in Makefile
 	$(subst_S_BIN) < $(srcdir)/hedgehog_database_create.sh.in > hedgehog_database_create.sh
