@@ -21,14 +21,13 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
 * The full list of possible plots are displayed via the drop down menu in the
   GUI, regardless of whether there is data in the database for the plot
 
-* By default, Flash is required to view interactive plots. A configuration
-  option is available (default_interactive_plot_type in hedgehog_gui.yaml)
-  which can specify the system to produce SVG plots instead (which do not 
-  require Flash). However there is a known issue with the SVG plots where long
-  legends are not wrapped properly:
+* A configuration option is available (default_interactive_plot_type in 
+  hedgehog_gui.yaml) which can specify the system to produce SVG or 
+  Flash plots for the interactive plots (google charts). There is a known 
+  issue with the SVG plots where long legends are not wrapped properly:
   https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536
-  This effects, for example, the 'Traffic volume' plot. When this issue is 
-  addressed the SVG plots will become the default plot type. 
+  This effects, for example, the 'Traffic volume' plot. However, we prefer SVG
+  to flash given all the flash vulnerabilities of late. 
 
 * The plot is not sorted according to size correctly in the interactive plots
   for horizontal bar charts. The static plots should be used instead. This
