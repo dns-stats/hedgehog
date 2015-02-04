@@ -23,7 +23,7 @@
 # File:   hedgehog_datafiles_tar_old_xml.sh
 #
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 DONE="done"
 DSCDATA="dscdata"
 
