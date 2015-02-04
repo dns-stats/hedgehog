@@ -25,7 +25,7 @@
 
 #TODO(asap): Add a flag to allow the user to specify a single server to run the report for
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name

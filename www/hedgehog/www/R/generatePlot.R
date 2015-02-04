@@ -166,6 +166,81 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }
 }
 
+facetedlinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
+
+	if (hh_debug) {
+		system('logger -p user.notice In facetedlinePlot')
+	}
+  if(gvis == 1){
+      # For now we default to the timeline flash chart unless 'svg' is specified by the user
+      if (gui_config$www$default_interactive_plot_type == "svg") {
+              library(reshape2)
+              df1 <- dcast(df,x~key)
+#              p <- gvisTable(df1)
+              p <- gvisLineChart(df1,options=list(legendPosition='newRow', height=440, width=900))
+#, numvar="y", idvar = "key", datevar = "x",
+#                                   options=list(legendPosition='newRow', height=440, width=900))
+         
+      }else{
+          p <- gvisAnnotatedTimeLine(df)
+# , numvar="y", idvar = "key", datevar = "x", 
+#                                     options=list(legendPosition='newRow', height=440, width=900))         
+      }
+      title <- sub("\n", "<br />", title)
+      ylabel <- gsub(" +", "&nbsp;", ylabel)
+      
+      cat(p$html$chart, file=f)
+    }else{
+
+      nKeys <- length(unique(df$key))
+      df$x <- as.POSIXct(df$x)
+      rkey1 <- sub("dns-(.*)-.*-.*-(.*)","\\1-\\2",df$key)
+      png(f, type="cairo-png", width = W, height = H)
+      df["rkey"] <- rkey1
+      p <- ggplot(data=df, aes(x=x, y=y, group=key, colour=key)) +
+                  geom_jitter(position = position_jitter(width=2)) +
+                  geom_line() +
+                  labs(title=title, x=xlabel, y=ylabel) +
+                  facet_grid(rkey ~ ., scales="free") +
+                  scale_x_datetime(expand=c(0.01,0)) +
+                  scale_y_continuous(expand=c(0.01,0), labels = comma) +
+                  theme_bw() +
+                  theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                  guides(col = guide_legend(nrow = 20, byrow = TRUE, override.aes = list(size=3)))
+      if (nKeys <= NCBPALETTE) {
+        p <- p + scale_colour_manual(values=CBPALETTE)
+      }
+#      df["rkey"] <- NULL
+      print(p)
+
+
+      df1 <- df %>%
+        group_by(x,rkey) %>%
+        mutate(y1 = y - lag(y, default= y[1]))
+            p <- ggplot(data=df1, aes(x=x, y=y1, group=key, colour=key)) +
+#                  geom_jitter(position = position_jitter(width=2)) +
+                  geom_line() +
+                  labs(title=title, x=xlabel, y="Difference Between Number of Queries and Responses") +
+                  facet_grid(rkey ~ ., scales="free") +
+                  scale_x_datetime(expand=c(0.01,0)) +
+                  scale_y_continuous(expand=c(0.01,0), labels = comma) +
+                  theme_bw() +
+                  theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                  guides(col = guide_legend(nrow = 20, byrow = TRUE, override.aes = list(size=3)))
+      if (nKeys <= NCBPALETTE) {
+        p <- p + scale_colour_manual(values=CBPALETTE)
+      }
+      df["rkey"] <- NULL
+#      p1 <- gvisTable(df1)  
+#      print(p)
+      dev.off()
+	}
+  if (hh_debug) {
+		system('logger -p user.notice Out facetedlinePlot')
+	}
+}
+
+
 barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
 
 	if (hh_debug) {
@@ -563,9 +638,9 @@ initPlotOptions <- function() {
     
 	passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
 	avgoverwindow           <<- c(format3, 'qtype_vs_tld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype')
-	lineplots               <<- c(format1, format2, "by_node", "traffic_volume", "rcode_volume")
+	lineplots               <<- c(format1, format2, "by_node", "rcode_volume")
 	facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
-
+	facetedlineplots        <<- c("traffic_volume")
 	log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "traffic_volume", "rcode_volume")
 }
 
@@ -677,6 +752,9 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	}
 	else if (pltnm %in% lineplots) {
 		linePlot(df, plot_file, mytitle, xlab, ylab, gvis)
+	}
+	else if (pltnm %in% facetedlineplots) {
+		facetedlinePlot(df, plot_file, mytitle, xlab, ylab, gvis)
 	}
 	else if (pltnm %in% facetedbarplots) {
 		# currently hard coded to bar width of 14 to make 16 width buckets easy to see
