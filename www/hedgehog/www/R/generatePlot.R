@@ -64,6 +64,44 @@ H <- 600
 
 ##################
 
+style <- function(style_name) {
+    if (style_name == "flex-chart") {
+        return("<style type=\"text/css\"> 
+                    .flex-chart {
+                    -webkit-flex: 900;
+                    -ms-flex: 900;
+                    -moz-flex: 900;
+                    flex: 900;
+                    }
+                    </style>")
+    } else if (style_name == "vertical-text") {
+        return("<style type=\"text/css\">
+                    .vertical-text {
+                    -ms-transform: translateY(190px) rotate(90deg);
+                    -moz-transform: translateY(190px) rotate(90deg);
+                    -webkit-transform: translateY(190px) rotate(90deg);
+                    transform: translateY(190px) rotate(90deg);
+                    
+                    -ms-transform-origin: center center 0;
+                    -moz-transform-origin: center center 0;
+                    -webkit-transform-origin: center center 0;
+                    transform-origin: center center 0; 
+                    width: 460px;
+                    height: 17px;
+                    font-size: small;
+                    text-align: center;
+                    /* justify-content: flex-end; */
+                    -webkit-flex: 17;
+                    -ms-flex: 17;
+                    -moz-flex: 17;
+                    flex: 17;
+                    }
+                    </style>") 
+    }
+    return("")
+}
+
+
 linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
 	if (hh_debug) {
@@ -87,36 +125,8 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
                                                        title,
                                         "</div>",
                                         "<div style=\"display: flex; display: -webkit-flex; width: 918px;\">",  
-                                            "<style type=\"text/css\">
-                                                  .vertical-text {
-                                                    -ms-transform: translateY(190px) rotate(90deg);
-                                                    -moz-transform: translateY(190px) rotate(90deg);
-                                                    -webkit-transform: translateY(190px) rotate(90deg);
-                                                    transform: translateY(190px) rotate(90deg);
-
-                                                    -ms-transform-origin: center center 0;
-                                                    -moz-transform-origin: center center 0;
-                                                    -webkit-transform-origin: center center 0;
-                                                    transform-origin: center center 0; 
-                                                    width: 460px;
-                                                    height: 17px;
-                                                    font-size: small;
-                                                    text-align: center;
-                                                   /* justify-content: flex-end; */
-                                                    -webkit-flex: 17;
-                                                    -ms-flex: 17;
-                                                    -moz-flex: 17;
-                                                    flex: 17;
-                                                  }
-	                                          </style>", 
-                                            "<style type=\"text/css\"> 
-                                                .flex-chart {
-                                                    -webkit-flex: 900;
-                                                    -ms-flex: 900;
-                                                    -moz-flex: 900;
-                                                     flex: 900;
-                                                }
-                                            </style>",
+                                        style("vertical-text"),
+                                        style("flex-chart"),
                                         "<div class=\"flex-chart\">", p$html$chart['divChart'], "</div>",
                                         "<div class=\"vertical-text\">", ylabel, "</div>", "</div>",
                                         "<div style=\"text-align: center; width: 918px; font-size: small;\">", xlabel, "</div>",
