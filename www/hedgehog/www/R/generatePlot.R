@@ -74,7 +74,7 @@ style <- function(style_name) {
                     flex: 900;
                     }
                     </style>")
-    } else if (style_name == "vertical_text") {
+    } else if (style_name == "vertical-text") {
         return("<style type=\"text/css\">
                     .vertical-text {
                     -ms-transform: translateY(190px) rotate(90deg);
