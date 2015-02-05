@@ -18,6 +18,8 @@
 # Developed by Sinodun IT (www.sinodun.com)
 #
 
+library(dplyr)
+
 # TODO(refactor): Refactor this code
 
 # Define globals
@@ -403,6 +405,39 @@ facetedLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }
 }
 
+facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
+
+    if (hh_debug) {
+	    system('logger -p user.notice In facetedDiffLinePlot')
+    }
+
+    nKeys <- length(unique(df$key))
+    df$x <- as.POSIXct(df$x)
+    rkey1 <- sub("dns-(.*)-.*-.*-(.*)", "\\1-\\2", df$key)
+    png(f, type="cairo-png", width=W, height=H)
+    df["rkey"] = rkey1
+
+    df1 <- df %>%
+        group_by(x, rkey) %>%
+            plyr::mutate(y1=y - lag(y, default=y[1]))
+
+    p <- ggplot(data=df1, aes(x=x, y=y1, group=key, colour=key)) +
+                #geom_line(colour=DARKERRED) +
+                geom_line() +
+                labs(title=title, x=xlabel, y="Difference Between Number of Queries and Responses/min") +
+                facet_grid(rkey ~ ., scales="free") +
+                scale_x_datetime(expand=c(0.01,0)) +
+                scale_y_continuous(expand=c(0.01,0), labels=comma) +
+                theme_bw() +
+                theme(panel.grid.major=element_line(colour=GRIDGREY), panel.grid.minor=element_line(colour=GRIDGREY, linetype="dotted")) +
+                guides(col=guide_legend(nrow=20, byrow=TRUE, override.aes=list(size=3)))
+    if (nKeys <= NCBPALETTE) {
+        p <- p + scale_colour_manual(values=CBPALETTE)
+    }
+    print(p)
+    dev.off()
+}
+
 
 getStmntParameters <- function(dsccon, dbdrv, dd_pltid, prepStmtNm, srvrid, start, stop) {
 
@@ -607,10 +642,11 @@ initPlotOptions <- function() {
 	format2                 <<- c(f2mergekeys, f2mergekeys_lookup, f2mergekeys_lookup_key1, f2sumkey2values)
     
 	format3                 <<- c("client_subnet_accum", "ipv6_rsn_abusers_accum")
+	traffic                 <<- c("traffic_volume", "traffic_query_response_difference")
     
 	formatother             <<- c("qtype_vs_tld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node")
     
-	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources")
+	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_query_response_difference")
     
 	formatother             <<- c(formatother, rssac)
 
@@ -621,6 +657,7 @@ initPlotOptions <- function() {
 	lineplots               <<- c(format1, format2, "by_node", "rcode_volume")
 	facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
 	facetedlineplots        <<- c("traffic_volume")
+	faceteddifflineplots    <<- c("traffic_query_response_difference")
 
 	log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "rcode_volume")
 }
@@ -690,6 +727,9 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	else if (pltnm %in% format3 ) {
 		prepStmntNm <- "format3"
 	}
+	else if (pltnm %in% traffic ) {
+		prepStmntNm <- "traffic_volume"
+	}
 	else if (pltnm %in% formatother) {
 		prepStmntNm <- pltnm
 	}
@@ -736,6 +776,9 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	}
     else if (pltnm %in% facetedlineplots) {
 		facetedLinePlot(df, plot_file, mytitle, xlab, ylab, gvis)
+	}
+    else if (pltnm %in% faceteddifflineplots) {
+		facetedDiffLinePlot(df, plot_file, mytitle, xlab, ylab, gvis)
 	}
 	else if (pltnm %in% facetedbarplots) {
 		# currently hard coded to bar width of 14 to make 16 width buckets easy to see
