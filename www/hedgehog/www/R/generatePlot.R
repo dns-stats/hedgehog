@@ -18,8 +18,6 @@
 # Developed by Sinodun IT (www.sinodun.com)
 #
 
-library(dplyr)
-
 # TODO(refactor): Refactor this code
 
 # Define globals
@@ -417,23 +415,28 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     png(f, type="cairo-png", width=W, height=H)
     df["rkey"] = rkey1
 
-    dfx <- dplyr::arrange(df, x, rkey, key)
+    dfx <- dplyr::arrange(df, x, rkey, desc(key))
     df1 <- aggregate(dfx$y, by=list(x2=dfx$x, rkey=dfx$rkey), FUN=diff)
+    df1 <- plyr::rename(df1,c("x"="y", "x2"="x", "rkey"="key"))
+    if (gvis == 1) {
+        linePlot(df1, f, title, xlabel, ylabel, gvis)
+    } else {
 
-    p <- ggplot(data=df1, aes(x=x2, y=-x, group=rkey)) +
-                geom_line(colour=DARKERRED) +
-                labs(title=title, x=xlabel, y="Difference Between Number of Queries and Responses/min") +
-                facet_grid(rkey ~ ., scales="free") +
-                scale_x_datetime(expand=c(0.01,0)) +
-                scale_y_continuous(expand=c(0.01,0), labels=comma) +
-                theme_bw() +
-                theme(panel.grid.major=element_line(colour=GRIDGREY), panel.grid.minor=element_line(colour=GRIDGREY, linetype="dotted")) +
-                guides(col=guide_legend(nrow=20, byrow=TRUE, override.aes=list(size=3)))
-    if (nKeys <= NCBPALETTE) {
-        p <- p + scale_colour_manual(values=CBPALETTE)
+        p <- ggplot(data=df1, aes(x=x, y=y, group=key)) +
+                    geom_line(colour=DARKERRED) +
+                    labs(title=title, x=xlabel, y="Difference Between Number of Queries and Responses/min") +
+                    facet_grid(key ~ ., scales="free") +
+                    scale_x_datetime(expand=c(0.01,0)) +
+                    scale_y_continuous(expand=c(0.01,0), labels=comma) +
+                    theme_bw() +
+                    theme(panel.grid.major=element_line(colour=GRIDGREY), panel.grid.minor=element_line(colour=GRIDGREY, linetype="dotted")) +
+                    guides(col=guide_legend(nrow=20, byrow=TRUE, override.aes=list(size=3)))
+        if (nKeys <= NCBPALETTE) {
+            p <- p + scale_colour_manual(values=CBPALETTE)
+        }
+        print(p)
+        dev.off()
     }
-    print(p)
-    dev.off()
 }
 
 

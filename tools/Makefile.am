@@ -17,6 +17,8 @@ bin_SCRIPTS = 	refile_and_grok.sh \
 
 sbin_SCRIPTS = 	hedgehog_database_create.sh 
 
+nobase_bin_SCRIPTS = DDL_updates/000009_ddl_traffic_difference.sh
+
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
 				   $(srcdir)/hedgehog/sql/insert_lookup_data.sql
 
@@ -62,6 +64,10 @@ hedgehog_rssac_process_unique_source_data.sh: hedgehog_rssac_process_unique_sour
 hedgehog_rssac_rm_old_unique_source_data.sh: hedgehog_rssac_rm_old_unique_source_data.sh.in Makefile
 	$(subst_DB_VERSION) < $(srcdir)/hedgehog_rssac_rm_old_unique_source_data.sh.in | $(subst_S_BIN) > hedgehog_rssac_rm_old_unique_source_data.sh
 	
+DDL_updates/000009_ddl_traffic_difference.sh: $(srcdir)/DDL_updates/000009_ddl_traffic_difference.sh.in Makefile
+	mkdir -p DDL_updates
+	$(subst_DB_VERSION) < $(srcdir)/DDL_updates/000009_ddl_traffic_difference.sh.in | $(subst_S_BIN) > DDL_updates/000009_ddl_traffic_difference.sh
+
 EXTRA_DIST = 	refile_and_grok.sh.in \
 				hedgehog_conf_read.sh.in \
 				hedgehog_database_create.sh.in \
