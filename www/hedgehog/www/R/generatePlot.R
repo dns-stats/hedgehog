@@ -417,13 +417,11 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     png(f, type="cairo-png", width=W, height=H)
     df["rkey"] = rkey1
 
-    df1 <- df %>%
-        group_by(x, rkey) %>%
-            plyr::mutate(y1=y - lag(y, default=y[1]))
+    dfx <- dplyr::arrange(df, x, rkey, key)
+    df1 <- aggregate(dfx$y, by=list(x2=dfx$x, rkey=dfx$rkey), FUN=diff)
 
-    p <- ggplot(data=df1, aes(x=x, y=y1, group=key, colour=key)) +
-                #geom_line(colour=DARKERRED) +
-                geom_line() +
+    p <- ggplot(data=df1, aes(x=x2, y=-x, group=rkey)) +
+                geom_line(colour=DARKERRED) +
                 labs(title=title, x=xlabel, y="Difference Between Number of Queries and Responses/min") +
                 facet_grid(rkey ~ ., scales="free") +
                 scale_x_datetime(expand=c(0.01,0)) +
