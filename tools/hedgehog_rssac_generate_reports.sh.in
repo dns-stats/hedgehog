@@ -90,6 +90,7 @@ GVIS=0
 TRAFFIC_SIZE_SMALL="traffic_sizes_small"
 TRAFFIC_SIZE_BIG="traffic_sizes_big"
 TRAFFIC_SIZE_REP_NAME="traffic-sizes"
+TRAFFIC_VOLUME_DIFF="traffic_volume_difference"
 
 echo
 echo "Creating RSSAC reports from ${START} to ${STOP} in ${TOP_OUTPUTDIR}" 
@@ -102,7 +103,7 @@ if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
 	echo
 fi
 
-PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' ORDER BY id DESC;" | psql -td $DB_NAME`
+PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' and name != '$TRAFFIC_VOLUME_DIFF' ORDER BY id DESC;" | psql -td $DB_NAME`
 SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -td $DB_NAME `
 NDARR=-1 # all nodes
 

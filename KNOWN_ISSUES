@@ -26,7 +26,7 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
   Flash plots for the interactive plots (google charts). There is a known 
   issue with the SVG plots where long legends are not wrapped properly:
   https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536
-  This effects, for example, the 'Traffic volume' plot. However, we prefer SVG
+  This affects, for example, the 'Traffic volume' plot. However, we prefer SVG
   to flash given all the flash vulnerabilities of late. 
 
 * The plot is not sorted according to size correctly in the interactive plots
@@ -37,6 +37,9 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
   - RCODE by client subnet
   - Root abusers
   - Query classification by subnet
+
+* The y-axis label is not visible on googleviz line charts in Firefox because the
+  flex box does not display correctly.
 
 * Support for RSSAC reports is added for XML imports only, however extended 
   RCODES cannot be collected by the existing DSC collector so only base RCODES

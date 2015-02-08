@@ -212,6 +212,13 @@ echo "Populate servers and nodes"
 sudo -u $hhconfig_database_owner @BIN@/hedgehog_database_update_nodes.sh -s
 ###########################################################
 
+###################  RUN DDL scripts  #####################
+###########################################################
+# Run any scripts needed to update the DB
+echo "Running DDL scripts"
+sudo -u $hhconfig_database_owner @BIN@/DDL_updates/000009_ddl_traffic_difference.sh
+###########################################################
+
 
 #############  PARTITION DATA TABLES  #####################
 ###########################################################
