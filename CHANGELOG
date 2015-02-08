@@ -21,6 +21,8 @@ Hedgehog 2.0.0b2
 * Various installation changes to support packaging (thanks arhbkb)
 * Changed the yaml parsing to use the Perl YAML::Tiny library
 * Changed the default_interactive_plot_type to svg (instead of flash)
+* Static Traffic Volume plot is now faceted by Transport vs IP version
+* Traffic Query/Response Difference faceted plots added
 
 Hedgehog 2.0.0b1 - 2014-09-09
 -----------------------------
