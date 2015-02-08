@@ -369,6 +369,10 @@ facetedLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 	}
 
     if(gvis == 1){
+	    # fix up the legends to work with svg
+	    rkey_svg <- sub("dns-(.*-.*-).*-(.*)", "\\1\\2", df$key)
+	    rkey_svg <- sub("responses", "resp", rkey_svg)
+	    df["key"] <- rkey_svg
         linePlot(df, f, title, xlabel, ylabel, gvis)
     }else{
         nKeys <- length(unique(df$key))
@@ -628,6 +632,7 @@ initPlotOptions <- function() {
 		system('logger -p user.notice In initPlotOptions')
 	}
 
+	# first, create the groups that link plots to the prepared statements
 	f1                      <<- c("edns_version", "do_bit", "client_port_range", "client_subnet2_trace")
 	f1lookupcodes           <<- c("qtype", "rcode", "dnssec_qtype")
 	f1lookupcodesnoquery    <<- c("opcode")
@@ -643,23 +648,23 @@ initPlotOptions <- function() {
 	format2                 <<- c(f2mergekeys, f2mergekeys_lookup, f2mergekeys_lookup_key1, f2sumkey2values)
     
 	format3                 <<- c("client_subnet_accum", "ipv6_rsn_abusers_accum")
-	traffic                 <<- c("traffic_volume", "traffic_query_response_difference")
+	formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
     
 	formatother             <<- c("qtype_vs_tld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node")
-    
-	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_query_response_difference")
+
+	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
     
 	formatother             <<- c(formatother, rssac)
 
 	unknown_graphs          <<- c("client_subnet_count", "idn_vs_tld", "ipv6_rsn_abusers_count")
-    
+
+	# now create other useful groups    
 	passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
 	avgoverwindow           <<- c(format3, 'qtype_vs_tld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype')
 	lineplots               <<- c(format1, format2, "by_node", "rcode_volume")
 	facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
 	facetedlineplots        <<- c("traffic_volume")
-	faceteddifflineplots    <<- c("traffic_query_response_difference")
-
+	faceteddifflineplots    <<- c("traffic_volume_difference")
 	log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "rcode_volume")
 }
 
@@ -693,6 +698,7 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 		ylab <- "Number of Queries in Each 16 Byte Group"
 	}
 
+	# Choose the prepared statement based on the group
 	prepStmntNm <- ""
 	if (pltnm %in% f1) {
 		prepStmntNm <- "f1"
@@ -728,13 +734,14 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	else if (pltnm %in% format3 ) {
 		prepStmntNm <- "format3"
 	}
-	else if (pltnm %in% traffic ) {
+	else if (pltnm %in% formattraffic ) {
 		prepStmntNm <- "traffic_volume"
 	}
 	else if (pltnm %in% formatother) {
 		prepStmntNm <- pltnm
 	}
 
+	# Do other fix ups to the SQL before running the query
 	if (ndarr == '-1') {
 		prepStmntNm <- paste(prepStmntNm, "_all_nodes", sep="")
 	}
@@ -761,8 +768,10 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 		sql <- sub("\\(", paste("\\(" , time_window, ".0, ", sep=""), sql)
 	}
 
+	# Get the data.....
 	df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
-	
+
+	# Now decide how to plot it
 	if (is.null(df)) {
 		plot_file <- "plots/no_connection.png"
 	}
