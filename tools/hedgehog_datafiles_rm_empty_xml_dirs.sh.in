@@ -23,7 +23,7 @@
 # File:   hedgehog_datafiles_rm_empty_xml_dirs.bash
 #
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 DATE=`date --date="- 7 day" +%Y-%m-%d`
 INCOMING="incoming"
 

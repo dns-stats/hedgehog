@@ -30,7 +30,7 @@
 # Authentication methods are configured in /etc/postgresql/9.1/main/pg_hba.conf
 
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 
 # DSTART defaults to the current month
 DSTART=`date --date="$(date +%Y-%m-01)" +%Y-%m`
@@ -189,7 +189,7 @@ echo
 ###########################################################
 # Create the base tables, views, functions and constraints
 echo "Initialising the database (creating base tables, views, functions and constraints)"
-sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name < @SBIN@/hedgehog_database_create.d/initialise_database.sql
+sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name < @DATA@/hedgehog/sql/initialise_database.sql
 echo
 
 # You have to grant privileges on sequences after creating them
@@ -206,10 +206,17 @@ echo
 ###########################################################
 # Populate the dsc.plot and dsc.iana_lookup tables
 echo "Populating lookup tables (dsc.plot, dsc.iana_lookup)"
-sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name  < @SBIN@/hedgehog_database_create.d/insert_lookup_data.sql #> /dev/null
+sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name  < @DATA@/hedgehog/sql/insert_lookup_data.sql #> /dev/null
 
 echo "Populate servers and nodes"
 sudo -u $hhconfig_database_owner @BIN@/hedgehog_database_update_nodes.sh -s
+###########################################################
+
+###################  RUN DDL scripts  #####################
+###########################################################
+# Run any scripts needed to update the DB
+echo "Running DDL scripts"
+sudo -u $hhconfig_database_owner @BIN@/DDL_updates/000009_ddl_traffic_difference.sh
 ###########################################################
 
 

@@ -14,6 +14,19 @@
 # limitations under the License.
 #
 
+Hedgehog 2.0.0b2
+-----------------------------
+
+* Support for Vagrant Provisioning (thanks melalj)
+* Various installation changes to support packaging (thanks arhbkb)
+* Changed the yaml parsing to use the Perl YAML::Tiny library
+* Changed the default_interactive_plot_type to svg (instead of flash)
+* Static Traffic Volume plot is now faceted by Transport vs IP version
+* Traffic Query/Response Difference plots added (requires R package dplyr)
+* RPostgreSQLHelper installed as separate package. This requires running
+ 'sudo make install-configure' on installation now.
+* Added axis labels to googlevis line charts
+
 Hedgehog 2.0.0b1 - 2014-09-09
 -----------------------------
 

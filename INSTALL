@@ -39,7 +39,7 @@ Note: The server and PostgreSQL must both be configured to use UTC!
 1.1. Requirements
 1.1.1. Platform support
 
-Version 2.0.0b1 of Hedgehog is currently only supported on Ubuntu 14.04 LTS Server.
+Hedgehog is currently only supported on Ubuntu 14.04 LTS Server.
 
 1.1.2. Database support
 
@@ -54,9 +54,11 @@ sudo apt-get update
 sudo apt-get install r-base r-base-core r-base-dev libcairo2-dev libxt-dev r-cran-ggplot2 r-cran-dbi \
                      r-cran-cairodevice r-cran-reshape r-cran-digest postgresql postgresql-client \
                      postgresql-server-dev-9.3 postgresql-contrib pgbouncer libboost-all-dev libtool \
-                     libpqxx-dev apache2-mpm-prefork apache2-prefork-dev git libapache2-mod-r-base
+                     libpqxx-dev apache2-mpm-prefork apache2-prefork-dev git libapache2-mod-r-base libyaml-tiny-perl
 
 1.2.2. Additional R packages
+
+Hedgehog is tested against version 3.1.1. of R.
 
 Some R packages are needed that are not available through apt, they can be installed via R.
 You will be prompted to choose a mirror site, or you can specify a repo by using a command of the form
@@ -66,7 +68,7 @@ install.packages("name", repos='http://cran.rstudio.com/')
 Install:
 
 sudo R
-install.packages(c("brew","Cairo","googleVis","RPostgreSQL","R.utils","yaml"))
+install.packages(c("brew","Cairo","googleVis","RPostgreSQL","R.utils","yaml", "dplyr"))
 q()
 
 If you are prompted to save workspace image y/n/c, choose no.
@@ -79,23 +81,26 @@ googleVis	0.5.5
 RPostgreSQL	0.4
 R.utils	1.33.0
 yaml	2.1.13
+dplyr	0.4.1
 
 1.3. Install Hedgehog
 1.3.1. Install and build code
 
 Download the code from github:
 
-wget https://github.com/dns-stats/hedgehog/archive/2.0.0a1.tar.gz
+wget https://github.com/dns-stats/hedgehog/archive/2.0.0b2.tar.gz
 
-tar -xzf 2.0.0b1.tar.gz
-cd hedgehog-2.0.0b1
+tar -xzf 2.0.0b2.tar.gz
+cd hedgehog-2.0.0b2
 ./autogen.sh
 mkdir build
 cd build
 ../configure
 make
-sudo make install
+sudo make install-configure
 cd
+
+Note: 'make install-configure' is used above rather than 'make install'.
 
 You may notice the following message during the installation step: "Error in find.package(pkgs, lib) : there is no package called ‘RPostgreSQLHelper’ Execution halted". This can be safely ignored.
 
@@ -144,7 +149,7 @@ See the "Plot Caching" section in the user guide for a more detailed description
 www:
   default_plot_type             : interactive # 'static'      -> png plots
                                               # 'interactive' -> googlevis plots
-  default_interactive_plot_type : flash       # 'flash' -> plot requires flash
+  default_interactive_plot_type : svg         # 'flash' -> plot requires flash
                                               # 'svg'   -> plot is SVG/VML and does not require flash
                                               # (but with svg plots some legends do not wrap properly)
   use_plot_caching              : 1           # '1' -> true, use cached plots when possible
