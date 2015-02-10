@@ -72,7 +72,7 @@ LAST_SERIAL=`psql $DB_NAME -tc  "select max(serial) from dsc.internal_version;"`
 
 psql $DB_NAME <<EOF
 BEGIN;
-INSERT INTO $DSC_SCHEMA.visible_plot (name, display_category, display_name, title ) VALUES ('traffic_volume_difference', '9.RSSAC', 'Traffic query response difference', 'The differences between queries and responses by transport and IP version');
+INSERT INTO $DSC_SCHEMA.visible_plot (name, display_category, display_name, title ) VALUES ('traffic_volume_difference', '9.RSSAC', 'Traffic volume difference', 'The differences between queries and responses by transport and IP version');
 INSERT INTO $DSC_SCHEMA.dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id FROM $DSC_SCHEMA.visible_plot WHERE name = 'traffic_volume_difference'), (SELECT id FROM $DSC_SCHEMA.dataset WHERE name = 'traffic_volume_queries'));
 INSERT INTO $DSC_SCHEMA.dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id FROM $DSC_SCHEMA.visible_plot WHERE name = 'traffic_volume_difference'), (SELECT id FROM $DSC_SCHEMA.dataset WHERE name = 'traffic_volume_responses'));
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
