@@ -433,7 +433,7 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
                     scale_x_datetime(expand=c(0.01,0)) +
                     scale_y_continuous(expand=c(0.01,0), labels=comma) +
                     theme_bw() +
-                    theme(panel.grid.major=element_line(colour=GRIDGREY), panel.grid.minor=element_line(colour=GRIDGREY, linetype="dotted")) +
+                    theme(panel.margin=grid::unit(3,"mm"), panel.grid.major=element_line(colour=GRIDGREY), panel.grid.minor=element_line(colour=GRIDGREY, linetype="dotted")) +
                     guides(col=guide_legend(nrow=20, byrow=TRUE, override.aes=list(size=3)))
         if (nKeys <= NCBPALETTE) {
             p <- p + scale_colour_manual(values=CBPALETTE)
