@@ -55,10 +55,14 @@ echo "`date`: $0 COMMENCED"
 [ -z $DATE ] && usage && exit 1
 
 # Validate the start date
-date "+%Y-%m-%d" -d $DATE >/dev/null 2>&1
+if [[ ! $DATE =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$ ]] ; then
+		echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+		exit 1
+fi
+date "+%Y-%m-%d" --date="$DATE" >/dev/null 2>&1
 is_valid=$?
 if [ ${is_valid} -ne 0 ] ; then
-	echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+	echo "Error: The start date is invalid" 
 	exit 1
 fi
 

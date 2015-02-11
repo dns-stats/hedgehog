@@ -66,10 +66,14 @@ echo "`date`: $0 COMMENCED"
 
 # Validate the input date
 if [ ! -z ${INPUT_START} ] ; then
-	date "+%Y-%m-%d" -d ${INPUT_START} >/dev/null 2>&1
+	if [[ ! $INPUT_START =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$ ]] ; then
+			echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+			exit 1
+	fi
+	date "+%Y-%m-%d" --date="${INPUT_START}" >dev/null 2>&1
 	is_valid=$?
 	if [ ${is_valid} -ne 0 ] ; then
-		echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+		echo "Error: The start date is invalid" 
 		exit 1
 	fi
 	START=`date --date="${INPUT_START}" +%Y-%m-%dT00:00`
@@ -98,8 +102,8 @@ echo
 
 if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
 	echo "Calling hedgehog_process_unique_source_data.sh script"
-	echo "@BIN@/hedgehog_process_unique_source_data.sh -s ${INPUT_START} ${DELETE_RAW_DATA_FLAG}"
-	@BIN@/hedgehog_rssac_process_unique_source_data.sh -s ${INPUT_START} ${DELETE_RAW_DATA_FLAG}
+	echo "@BIN@/hedgehog_process_unique_source_data.sh -s ${START} ${DELETE_RAW_DATA_FLAG}"
+	@BIN@/hedgehog_rssac_process_unique_source_data.sh -s ${START} ${DELETE_RAW_DATA_FLAG}
 	echo
 fi
 

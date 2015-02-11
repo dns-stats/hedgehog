@@ -61,11 +61,15 @@ if [ -z $PDATE ] ; then
     NOW=`date --date="+1 month" +%Y_%m`
     NEXT=`date --date="+2 month" +%Y_%m`
 else
+	if [[ ! $PDATE =~ ^[0-9]{4}-[0-1][0-9]$ ]] ; then
+			echo "Error: The start date is not in the required format of YYYY-MM" 
+			exit 1
+	fi
 	# Validate the input date. Add day since (oddly) date won't parse just year and month
-	date "+%Y-%m-%d" -d ${PDATE}-01 >/dev/null 2>&1
+	date "+%Y-%m-%d" --date="${PDATE}-01" >/dev/null 2>&1
 	is_valid=$?
 	if [ ${is_valid} -ne 0 ] ; then
-		echo "Error: The start date is not in the required format of YYYY-MM" 
+		echo "Error: The start date is invalid" 
 		exit 1
 	fi
 	
