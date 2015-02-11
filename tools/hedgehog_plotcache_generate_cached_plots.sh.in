@@ -66,18 +66,26 @@ echo "`date`: $0 COMMENCED"
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
 # Validate the start date
-date "+%Y-%m-%dT%H:%M" -d ${FROM} >/dev/null 2>&1
+if [[ ! $FROM =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]$ ]] ; then
+		echo "Error: The start date is not in the required format of YYYY-MM-DDThh:mm" 
+		exit 1
+fi
+date "+%Y-%m-%dT%H:%M" --date="${FROM}" >/dev/null 2>&1
 is_valid=$?
 if [ ${is_valid} -ne 0 ] ; then
-	echo "Error: The start date is not in the required format of YYYY-MM-DDThh:mm" 
+	echo "Error: The start date is invalid" 
 	exit 1
 fi
 
 # Validate the end date
-date "+%Y-%m-%dT%H:%M" -d ${TO} >/dev/null 2>&1
+if [[ ! $TO =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]$ ]] ; then
+		echo "Error: The end date is not in the required format of YYYY-MM-DDThh:mm" 
+		exit 1
+fi
+date "+%Y-%m-%dT%H:%M" --date="${TO}" >/dev/null 2>&1
 is_valid=$?
 if [ ${is_valid} -ne 0 ] ; then
-	echo "Error: The end date is not in the required format of YYYY-MM-DDThh:mm" 
+	echo "Error: The end date is invalid" 
 	exit 1
 fi
 
