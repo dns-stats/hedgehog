@@ -105,7 +105,7 @@ then
     echo "LOG = $LOG"
     echo -n "Would you like to continue? y/N: "
     read c
-    [[ "$c" =~ ^(Y|y) ]] && exit 1
+    [[ ! "$c" =~ ^(Y|y) ]] && exit 1
 fi
 
 #set -x #Print commands just before execution - with all expansions and substitutions done, and words marked - useful for debugging.
