@@ -31,7 +31,7 @@ set -e # exit if any command yields a non 0 exit status
 WD="$hhconfig_directories_data"
 INPUT="XML"
 OUTPUT="DB"
-CONNSTR="dbname=$hhconfig_database_name dbport=$hhconfig_database_port"
+CONNSTR="dbname=$hhconfig_database_name port=$hhconfig_database_port"
 START_DATE=""
 RSSAC_FLAG=""
 RESERVED_CPUS=0
