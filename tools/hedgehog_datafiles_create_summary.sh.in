@@ -58,7 +58,7 @@ while getopts ":s:n:ch" opt; do
              exit 1 ;;
     esac
 done
-
+USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
 SQ="'"

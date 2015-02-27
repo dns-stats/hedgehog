@@ -189,10 +189,10 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
       title <- sub("\n", " ", title)
       if(vertical == 1){
           p <- gvisColumnChart(df, xvar='x', yvar='y', 
-                               options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+                            options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
       }else{
-          p <- gvisBarChart(df, xvar='x', yvar='y', 
-                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
+          p <- gvisBarChart(df, xvar='x', yvar='y',
+                            options=list(title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -230,15 +230,15 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       y_var <- tail(colnames(de),-1)
       if(vertical == 1){
           if (gbar_width == 0) {
-              p <- gvisColumnChart(de, xvar='x', yvar=y_var, 
-                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+              p <- gvisColumnChart(de, xvar='x', yvar=y_var,
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
           } else {
-              p <- gvisColumnChart(de, xvar='x', yvar=y_var, 
-                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
+              p <- gvisColumnChart(de, xvar='x', yvar=y_var,
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
           }
       }else{
-          p <- gvisBarChart(de, xvar='x', yvar=y_var, 
-                            options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"'}", sep=""), hAxis=paste("{title:'",ylabel,"'}", sep=""), height=500, width=920))
+          p <- gvisBarChart(de, xvar='x', yvar=y_var,
+                            options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
       }
       cat(p$html$chart,file=f)
     }else{

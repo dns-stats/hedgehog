@@ -75,7 +75,7 @@ while getopts ":u:m:ph" opt; do
 done
 
 echo "`date`: $0 COMMENCED"
-
+USER=$(whoami)
 [ $USER != 'root' ] && echo "Must be root to run this script" && exit 1
 
 [ -z $PG_USER ] && usage && exit 1
