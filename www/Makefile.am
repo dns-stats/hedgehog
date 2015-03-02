@@ -8,7 +8,6 @@ CLEANFILES = $(data_DATA) $(nobase_data_DATA)
 sysconfdir = @sysconfdir@/hedgehog
 
 nobase_data_DATA =  hedgehog/conf/hedgehog.conf \
-					hedgehog/conf/rssac.yaml \
 					hedgehog/www/R/startup.R \
 					hedgehog/www/hedgehog.html \
 					hedgehog/www/about.html \
@@ -43,8 +42,8 @@ nobase_dist_data_DATA = hedgehog/www/images/ajax-loader.gif \
 						hedgehog/R_packages/RPostgreSQLHelper/man/maxAttempts.Rd \
 						hedgehog/R_packages/RPostgreSQLHelper/man/RPostgreSQLHelper-package.Rd \
 						hedgehog/R_packages/RPostgreSQLHelper/NAMESPACE \
-						hedgehog/R_packages/RPostgreSQLHelper/R/dbGetFunctions.r
-	
+						hedgehog/R_packages/RPostgreSQLHelper/R/dbGetFunctions.r \
+						hedgehog/conf/rssac.yaml
 subst_PACKAGEVERSION = sed -e "s,@HH_PACKAGE_VERSION@,@PACKAGE_VERSION@,"
 subst_DB_SCHEMA_VERSION = sed -e 's|DB_SCHEMA_VERSION|@DB_SCHEMA_VERSION@|'
 
