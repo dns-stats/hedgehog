@@ -38,3 +38,7 @@ subst_HH_CONF_FILE = sed -e "s|@HH_CONF_FILE@|@sysconfdir@/$(hh_conf_dir)/$(hh_c
 export subst_HH_DIRS
 export subst_HH_CONF_FILE
 export hh_web_conf_dir
+
+install-rpg:
+	cd www && $(MAKE) $(AM_MAKEFLAGS) install-rpg
+.PHONY: install-rpg
