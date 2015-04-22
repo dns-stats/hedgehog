@@ -27,6 +27,6 @@ export subst_HH_DIRS
 export subst_HH_CONF_FILE
 export hh_web_conf_dir
 
-install-configure: install
-	cd www && $(MAKE) $(AM_MAKEFLAGS) install-configure
-.PHONY: install-configure
+install-rpg:
+	cd www && $(MAKE) $(AM_MAKEFLAGS) install-rpg
+.PHONY: install-rpg
