@@ -257,6 +257,7 @@ do
         ADD CONSTRAINT \"pk_data_${SERVER}_${PLOT}_${DNOW}\" PRIMARY KEY (server_id, node_id , plot_id , starttime , key1, key2 ),
         ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_node\" FOREIGN KEY (node_id) REFERENCES dsc.node (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
         ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_plot\" FOREIGN KEY (plot_id) REFERENCES dsc.dataset (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;" | sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name 
+      echo "CREATE INDEX \"idx_data_${SERVER}_${PLOT}_${DNOW}_node_id\" ON dsc.\"data_${SERVER}_${PLOT}_${DNOW}\" (node_id);" | sudo -u $hhconfig_database_owner psql -d $hhconfig_database_name
     done
   done
   DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`
