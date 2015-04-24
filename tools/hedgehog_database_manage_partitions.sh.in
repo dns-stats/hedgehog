@@ -108,7 +108,7 @@ ALTER TABLE dsc.data_${server}_${plot}_${NOW}
         ADD CONSTRAINT pk_data_${server}_${plot}_${NOW} PRIMARY KEY (server_id, node_id , plot_id , starttime , key1, key2 ),
         ADD CONSTRAINT fk_data_${server}_${plot}_${NOW}_node FOREIGN KEY (node_id) REFERENCES dsc.node (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
         ADD CONSTRAINT fk_data_${server}_${plot}_${NOW}_plot FOREIGN KEY (plot_id) REFERENCES dsc.dataset (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
-CREATE INDEX idx_data_${server}_${plot}_${now}_node_id ON dsc.data_${server}_${plot}_${now} (node_id);
+CREATE INDEX idx_data_${server}_${plot}_${now}_node_id ON dsc.data_${server}_${plot}_${NOW} (node_id);
 COMMIT;
 EOF
     done
