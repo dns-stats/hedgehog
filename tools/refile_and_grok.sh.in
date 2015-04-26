@@ -96,7 +96,7 @@ echo "Using $CPUS CPUS ($REAL_CPUS available, $RESERVED_CPUS reserved)."
 
 if [[ "$INPUT" = "XML" || "$INPUT" = "DAT" ]] && [ "$OUTPUT" = "DB" ]
 then
-    ARGS="-i ${INPUT} -o PG_DB -c ${CONNSTR} ${START_DATE} ${RSSAC_FLAG}"
+    ARGS="-i ${INPUT} -o PG_DB -c \"${CONNSTR}\" ${START_DATE} ${RSSAC_FLAG}"
     LOG=${LOG/.out/-xml-db.out}
     [ "$INPUT" == "DAT" ] && LOG=${LOG/xml/dat}
 fi
