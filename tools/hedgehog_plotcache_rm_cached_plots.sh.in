@@ -63,12 +63,12 @@ if [ $REMOVE_ALL -eq 1 ] ; then
 	exit
 fi
 
-DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 # Get list of servers and plots from database
-SERVERS=`echo "SELECT display_name FROM dsc.server;" | psql -td $DB_NAME`
-PLOTS=`echo "SELECT name FROM dsc.visible_plot;" | psql -td $DB_NAME`
+SERVERS=`echo "SELECT display_name FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME`
+PLOTS=`echo "SELECT name FROM dsc.visible_plot;" | psql -h $hhconfig_database_host -td $DB_NAME`
 PLOTS=(${PLOTS// / }) # convert string to an array
 
 while true ; do

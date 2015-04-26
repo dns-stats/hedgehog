@@ -23,7 +23,8 @@ database:
   name         : hedgehog  # specify dbname for the postgresql DB.
   owner        : hedgehog  # specify a user to own the postgresql DB. This user will run refile_and_grok.
   read_user    : www-data  # specify a read user for the postgresql DB. This should be the apache user.
-
+  host         : /var/run/postgresql # specify a host for the postgresql DB. If this begins with a slash, it specifies the directory in which the socket file is stored
+  
 # Directory structure
 # !! This information is currently auto-populated at compile time and it is _not_ recommended that users alter this !!
 directories:

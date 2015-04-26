@@ -94,7 +94,7 @@ FROM_seconds=`date --utc --date "${FROM}" +%s`
 TO_seconds=`date --utc --date "${TO}" +%s`
 [ ${FROM_seconds} -ge ${TO_seconds} ] && echo "Error: Start date must be earlier than End date to generate plots" && exit 1
 
-DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 [ -z "$DAY" ] && [ -z "$WEEK" ] && [ -z "$MONTH" ] && usage && exit 1
 
@@ -106,13 +106,13 @@ URL="localhost/hedgehog/brew/hedgehog.brew"
 TYPE="generatePlot"
 declare -a STOPS=(`seq $(date +%s -d ${TO}) -86400 $(date +%s -d ${FROM})`)
 INTERACTIVE="0 1"
-PLOTIDS=`echo "select id from dsc.plot where name in (select name from dsc.visible_plot) ORDER BY id DESC;" | psql -td $DB_NAME`
-SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -td $DB_NAME`
+PLOTIDS=`echo "select id from dsc.plot where name in (select name from dsc.visible_plot) ORDER BY id DESC;" | psql -h $hhconfig_database_host -td $DB_NAME`
+SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME`
 NDARR=-1 # all nodes
 
 # Call brew script in order to cache the default plots
 for SVRNM in $SERVERNMS ; do
-    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -td $DB_NAME | tr -d [[:space:]]`
+    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -h $hhconfig_database_host -td $DB_NAME | tr -d [[:space:]]`
     for STOP in ${STOPS[@]} ; do
         STOP=`date --date @${STOP} +%Y-%m-%dT%R`
         STARTS=()

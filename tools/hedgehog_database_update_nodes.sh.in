@@ -68,7 +68,7 @@ echo "`date`: $0 COMMENCED"
 USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 
@@ -125,34 +125,34 @@ while read line || [[ -n "$line" ]]; do
 
 
 	# Now add the data
-	SERVER_ID=`psql $DB_NAME -tc "select id from server where display_name=$SQ$SERVER_NAME$SQ"`
+	SERVER_ID=`psql -h $hhconfig_database_host $DB_NAME -tc "select id from server where display_name=$SQ$SERVER_NAME$SQ"`
 
 	if [ -z "$SERVER_ID" ] ; then
 		echo "INFO: New server found - inserting: '$SERVER_NAME' "
 		if [ ${PREDICT} -eq 0 ] ; then
 			SERVER_DB_NAME=`echo $SERVER_NAME | awk '{print tolower($0)}' | sed -e 's/-/_/g' `
-			psql -d $DB_NAME -c "INSERT INTO dsc.server (name, display_name) VALUES ('$SERVER_DB_NAME', '$SERVER_NAME');"
-			SERVER_ID=`psql $DB_NAME -tc "select id from server where display_name=$SQ$SERVER_NAME$SQ"`
+			psql -h $hhconfig_database_host -d $DB_NAME -c "INSERT INTO dsc.server (name, display_name) VALUES ('$SERVER_DB_NAME', '$SERVER_NAME');"
+			SERVER_ID=`psql -h $hhconfig_database_host $DB_NAME -tc "select id from server where display_name=$SQ$SERVER_NAME$SQ"`
 			mkdir -p ${DATA_DIR}/${SERVER_NAME}
 			let NEW_SERVER=1
 		fi
 	fi
 
-	NODE_ID=`psql $DB_NAME -tc "select id from dsc.node where server_id=$SERVER_ID and name=$SQ$NODE_NAME$SQ"`
+	NODE_ID=`psql -h $hhconfig_database_host $DB_NAME -tc "select id from dsc.node where server_id=$SERVER_ID and name=$SQ$NODE_NAME$SQ"`
 	
 	if [ -z "${NODE_ID}" ] ; then 
 		echo "INFO: New node found - inserting node with name name: '$NODE_NAME' on server: '$SERVER_NAME' with group: '$GROUP'"
 		if [ ${PREDICT} -eq 0 ] ; then
-			psql -d $DB_NAME -c "INSERT INTO dsc.node (server_id, name, region) VALUES ($SERVER_ID, '$NODE_NAME', '$GROUP');"
+			psql -h $hhconfig_database_host -d $DB_NAME -c "INSERT INTO dsc.node (server_id, name, region) VALUES ($SERVER_ID, '$NODE_NAME', '$GROUP');"
 			mkdir -p $DATA_DIR/$SERVER_NAME/$NODE_NAME/incoming
 		fi		
 	else
-		DB_RESULT=`echo "SELECT region FROM dsc.node where server_id=$SERVER_ID and id=$NODE_ID;" | psql -td $DB_NAME  | sed -e 's/^ *//' -e 's/ *$//'`
+		DB_RESULT=`echo "SELECT region FROM dsc.node where server_id=$SERVER_ID and id=$NODE_ID;" | psql -h $hhconfig_database_host -td $DB_NAME  | sed -e 's/^ *//' -e 's/ *$//'`
 		if [ "${GROUP}" != "${DB_RESULT}" ] ; then
 			# group for existing node has been updated
         	echo "INFO: Updating existing node with name: '$NODE_NAME' on server: '$SERVER_NAME'. Changing group from '$DB_RESULT' to '$GROUP'"
 			if [ ${PREDICT} -eq 0 ] ; then
-				psql -d $DB_NAME -c "UPDATE dsc.node SET region = '$GROUP' WHERE id=$NODE_ID;"	
+				psql -h $hhconfig_database_host -d $DB_NAME -c "UPDATE dsc.node SET region = '$GROUP' WHERE id=$NODE_ID;"	
 			fi
 		fi
 	fi

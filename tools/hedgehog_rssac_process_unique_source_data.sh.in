@@ -62,7 +62,7 @@ echo "`date`: $0 COMMENCED"
 USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 # Validate the start date
@@ -93,11 +93,11 @@ if [ ${FORCE_SUM_DEL} -eq 1 ] ; then
 fi
 
 SQ="'"
-SERVER_IDS=`echo "SELECT id FROM dsc.server;" | psql -td $DB_NAME `
+SERVER_IDS=`echo "SELECT id FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME `
 UNIQUE_SOURCE_RAW_PLOT_NAME="unique_sources_raw"
 UNIQUE_SOURCE_SUM_PLOT_NAME="unique_sources"
-UNIQUE_SOURCE_RAW_PLOT_ID=`echo "SELECT plot_id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_RAW_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
-UNIQUE_SOURCE_SUM_PLOT_ID=`echo "SELECT plot_id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_SUM_PLOT_NAME}${SQ};" | psql -td $DB_NAME `
+UNIQUE_SOURCE_RAW_PLOT_ID=`echo "SELECT plot_id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_RAW_PLOT_NAME}${SQ};" | psql -h $hhconfig_database_host -td $DB_NAME `
+UNIQUE_SOURCE_SUM_PLOT_ID=`echo "SELECT plot_id FROM dsc.plot where name=${SQ}${UNIQUE_SOURCE_SUM_PLOT_NAME}${SQ};" | psql -h $hhconfig_database_host -td $DB_NAME `
 
 DELETE_SUMMARY_SQL=""
 DELETE_RAW_SQL=""
@@ -111,9 +111,9 @@ IPV6_ag_value=0
 for SERVER_ID in $SERVER_IDS ;do
 
 	# Set up the table name
-    SERVER_NAME=`psql -td $DB_NAME -c "SELECT name FROM dsc.server WHERE id=${SERVER_ID};" | tr -d [[:space:]]`
-	NODE_COUNT=`echo "SELECT count(*) FROM dsc.node where server_id=${SERVER_ID};" | psql -td $DB_NAME `
-    NODE_IDS=`echo "SELECT id FROM dsc.node where server_id=${SERVER_ID} order by id;" | psql -td $DB_NAME `
+    SERVER_NAME=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT name FROM dsc.server WHERE id=${SERVER_ID};" | tr -d [[:space:]]`
+	NODE_COUNT=`echo "SELECT count(*) FROM dsc.node where server_id=${SERVER_ID};" | psql -h $hhconfig_database_host -td $DB_NAME `
+    NODE_IDS=`echo "SELECT id FROM dsc.node where server_id=${SERVER_ID} order by id;" | psql -h $hhconfig_database_host -td $DB_NAME `
 	MONTH=`date --date="${START}" +%m`
 	YEAR=`date --date="${START}" +%Y`
 	# Could do this work directly on dsc.data instead
@@ -127,7 +127,7 @@ for SERVER_ID in $SERVER_IDS ;do
 		echo "Processing node id $NODE_ID"
 		# First up, check that there isn't an entry in the summary table for this node. 
 		# Note that if there is actually data when the transaction occurs then the insert will fail and the transaction will rollback.
-		SUMMARY_TABLE_ENTRY=`echo "SELECT count(*) FROM ${UNIQUE_SOURCE_SUM_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;" | psql -td $DB_NAME `
+		SUMMARY_TABLE_ENTRY=`echo "SELECT count(*) FROM ${UNIQUE_SOURCE_SUM_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;" | psql -h $hhconfig_database_host -td $DB_NAME `
 		if [ ${SUMMARY_TABLE_ENTRY} != "0" ] ; then
 			if [ ${FORCE_SUM_DEL} -eq 1 ] ; then
 				echo "Summary data already exists for node id = ${NODE_ID}... Force flag was used overwriting summary data!"
@@ -142,9 +142,9 @@ for SERVER_ID in $SERVER_IDS ;do
 		IPV4_value=0
 		IPV6_value=0
 		IPV6_ag_value=0
-		IPv4_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV4_key}';" | psql -td $DB_NAME `
-		IPv6_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV6_key}';" | psql -td $DB_NAME `
-		IPv6_ag_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV6_ag_key}';" | psql -td $DB_NAME `
+		IPv4_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV4_key}';" | psql -h $hhconfig_database_host -td $DB_NAME `
+		IPv6_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV6_key}';" | psql -h $hhconfig_database_host -td $DB_NAME `
+		IPv6_ag_SUMMARY_RESULT=`echo "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV6_ag_key}';" | psql -h $hhconfig_database_host -td $DB_NAME `
 		if [ ! -z ${IPv4_SUMMARY_RESULT} ] ; then IPV4_value=${IPv4_SUMMARY_RESULT} ; fi
 		if [ ! -z ${IPv6_SUMMARY_RESULT} ] ; then IPV6_value=${IPv6_SUMMARY_RESULT} ; fi
 		if [ ! -z ${IPv6_ag_SUMMARY_RESULT} ] ; then IPV6_ag_value=${IPv6_ag_SUMMARY_RESULT} ; fi
@@ -155,7 +155,7 @@ for SERVER_ID in $SERVER_IDS ;do
 			DELETE_RAW_SQL="DELETE FROM ${UNIQUE_SOURCE_RAW_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;"
 		fi
 													
-		psql $DB_NAME <<EOF
+		psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
 set client_min_messages to WARNING;
 ${DELETE_SUMMARY_SQL}
