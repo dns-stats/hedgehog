@@ -14,9 +14,9 @@ bin_SCRIPTS = 	refile_and_grok.sh \
 				hedgehog_rssac_generate_reports.sh \
 				hedgehog_rssac_process_unique_source_data.sh \
 				hedgehog_rssac_rm_old_unique_source_data.sh \
-        hedgehog_database_create.sh
+				hedgehog_database_init.sh
 
-sbin_SCRIPTS = hedgehog_database_init.sh
+sbin_SCRIPTS = hedgehog_database_create.sh
 
 nobase_bin_SCRIPTS = DDL_updates/000009_ddl_traffic_difference.sh
 
