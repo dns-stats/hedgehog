@@ -18,15 +18,16 @@
 ## YAML config for Hedgehog
 --- 
 # Database parameters to be specified by the user - these must not be defaulted
-database:  
+database:
+  host         : /var/run/postgresql # specify a host for the postgresql DB. If this begins with a slash,
+                                     # it specifies the directory in which the socket file is stored.
   port         : 5432      # specify port for the postgresql DB.
   name         : hedgehog  # specify dbname for the postgresql DB.
   owner        : hedgehog  # specify a user to own the postgresql DB. This user will run refile_and_grok.
-  owner_pass   :           # empty - assuming that the DB is on the same machine as the rest of hedgehog.
+  owner_pass   :           # specify a password for the owner user if needed.
   read_user    : www-data  # specify a read user for the postgresql DB. This should be the apache user.
-  read_pass    :           # empty - assuming that the DB is on the same machine as the rest of hedgehog.
-  host         : /var/run/postgresql # specify a host for the postgresql DB. If this begins with a slash, it specifies the directory in which the socket file is stored
-  
+  read_pass    :           # specify a password for the read user if needed.
+    
 # Directory structure
 # !! This information is currently auto-populated at compile time and it is _not_ recommended that users alter this !!
 directories:
