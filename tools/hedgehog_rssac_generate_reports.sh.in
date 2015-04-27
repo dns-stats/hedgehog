@@ -34,6 +34,7 @@ START=`date --date="${DEFAULT_DAY}" +%Y-%m-%dT00:00`
 INPUT_START=""
 DELETE_RAW_DATA_FLAG=""
 PROCESS_UNIQUE_SOURCES=1;
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo
@@ -81,7 +82,7 @@ fi
 
 STOP=`date --date="${START}" +%Y-%m-%dT23:59`
 
-DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 SQ="'"
@@ -107,12 +108,12 @@ if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
 	echo
 fi
 
-PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' and name != '$TRAFFIC_VOLUME_DIFF' ORDER BY id DESC;" | psql -td $DB_NAME`
-SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -td $DB_NAME `
+PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' and name != '$TRAFFIC_VOLUME_DIFF' ORDER BY id DESC;" | psql -h $hhconfig_database_host -td $DB_NAME`
+SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME `
 NDARR=-1 # all nodes
 
 for SVRNM in $SERVERNMS ; do
-    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -td $DB_NAME | tr -d [[:space:]]`
+    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -h $hhconfig_database_host -td $DB_NAME | tr -d [[:space:]]`
     SVRNM_LC="$(echo ${SVRNM} | tr '[:upper:]' '[:lower:]')"
 
     for TYPE in $TYPES ; do
@@ -120,7 +121,7 @@ for SVRNM in $SERVERNMS ; do
          [ "${TYPE}" == "generatePlot" ] && EXT="png"
 
         for PLTID in $PLOTIDS ; do
-			PLTNM=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -td $DB_NAME | sed 's/[[:space:]]//g'`
+			PLTNM=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -h $hhconfig_database_host -td $DB_NAME | sed 's/[[:space:]]//g'`
 			# Clear out the file in the plot cache to make sure we get the most up to date plots in the reports
 			rm -rf $hhconfig_directories_plotcache/${SVRNM}/${PLTNM}/${START}-${STOP}-all*.png >/dev/null 2>&1
 			# Generate the file. Yaml gets written to the rssac directory, plots go into the plotcache
@@ -137,7 +138,7 @@ for SVRNM in $SERVERNMS ; do
                 if [ "${PLTFILE}" != "plots/no_graph.png" ] && [ "${PLTFILE}" != "plots/no_results.png" ] && [ "${PLTFILE}" != "plots/no_connection.png" ] ; then                   
 					# Report names are the same as plot names but use dash instead of underscore
 					# TODO: use $PLTNM instead of redoing the query then substitute _ with -
-					REP_NAME=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -td $DB_NAME | sed 's/_/-/g' | sed 's/[[:space:]]//g'`
+					REP_NAME=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -h $hhconfig_database_host -td $DB_NAME | sed 's/_/-/g' | sed 's/[[:space:]]//g'`
 					# Special handling. The traffic size data has 2 plots but both need to go into the same directory
 					PLT_DIR_NM=${REP_NAME}
 					if [ "${PLTNM}" == "${TRAFFIC_SIZE_SMALL}" ] || [ "${PLTNM}" == "${TRAFFIC_SIZE_BIG}" ] ; then

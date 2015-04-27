@@ -33,6 +33,7 @@ DEFAULT_DAY=`date --date="$(date +%Y-%m-15)" +%Y%m%d`
 NOW=`date --date="now" +%Y%m%d`
 FORCE_SUM_DEL=0
 DELETE_RAW=0
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 if [ $DEFAULT_DAY -ge $NOW ] ; then
 	START=`date --date="$NOW - 2 month" +%Y-%m`
@@ -71,7 +72,7 @@ echo "`date`: $0 COMMENCED"
 USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 # Validate the input date. Add day since (oddly) date won't parse just year and month
@@ -100,7 +101,7 @@ echo "Deleting unique_source data during and before ${START}"
 SQ="'"
 UNIQUE_SOURCE_RAW_PLOT_NAME="unique_sources_raw"
 
-TABLE_NAMES=`psql $DB_NAME -tc "select tablename from pg_tables where schemaname='dsc' order by tablename" | grep $UNIQUE_SOURCE_RAW_PLOT_NAME`   
+TABLE_NAMES=`psql -h $hhconfig_database_host $DB_NAME -tc "select tablename from pg_tables where schemaname='dsc' order by tablename" | grep $UNIQUE_SOURCE_RAW_PLOT_NAME`   
 
 START_TRUNC=`date --date="$START-01" +%Y%m%d `
 for TABLENAME in $TABLE_NAMES
@@ -110,7 +111,7 @@ do
 	TABLE_DATE=`date --date="$TMP_DATE-01" +%Y%m%d`
 	if [ $START_TRUNC -ge $TABLE_DATE ] ; then
 		echo "Deleting table $TABLENAME"
-		psql $DB_NAME -c "truncate $TABLENAME;"
+		psql -h $hhconfig_database_host $DB_NAME -c "truncate $TABLENAME;"
 	fi
 done
 

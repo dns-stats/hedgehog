@@ -24,8 +24,10 @@ Hedgehog 2.0.0b2
 * Static Traffic Volume plot is now faceted by Transport vs IP version
 * Traffic Query/Response Difference plots added (requires R package dplyr)
 * RPostgreSQLHelper installed as separate package. This requires running
- 'sudo make install-configure' on installation now.
+ 'make install ; make install-rpg' on installation now.
 * Added axis labels to googlevis line charts
+* Added node_id index to data tables
+* Added support for connecting to a remote database and password support
 
 Hedgehog 2.0.0b1 - 2014-09-09
 -----------------------------

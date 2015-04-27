@@ -27,6 +27,7 @@ eval $(@BIN@/hedgehog_conf_read.pl)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
 	echo
@@ -54,7 +55,7 @@ echo "`date`: $0 COMMENCED"
 USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-DB_API_VERSION=`psql $DB_NAME  -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME  -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 if [ -z $PDATE ] ; then
@@ -85,17 +86,17 @@ else
     fi
 fi
 
-SERVERS=`psql -td $DB_NAME -c "SELECT name FROM dsc.server;"`
-PLOTS=`psql -td $DB_NAME -c "SELECT name FROM dsc.dataset;"`
+SERVERS=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT name FROM dsc.server;"`
+PLOTS=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT name FROM dsc.dataset;"`
 
 for server in $SERVERS
 do
-    s_id=`psql -td $DB_NAME -c "SELECT id FROM dsc.server WHERE name = '$server';"`
+    s_id=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT id FROM dsc.server WHERE name = '$server';"`
     for plot in $PLOTS
     do
-      p_id=`psql -td $DB_NAME -c "SELECT id FROM dsc.dataset WHERE name = '$plot';"`
+      p_id=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT id FROM dsc.dataset WHERE name = '$plot';"`
       
-      psql $DB_NAME <<EOF
+      psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
 set client_min_messages to WARNING;
 CREATE TABLE dsc.data_${server}_${plot}_${NOW} (

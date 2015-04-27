@@ -31,6 +31,7 @@ DATA_DIR=$hhconfig_directories_data
 SQ="'"
 PREDICT=0;
 SUPPRESS_WARNINGS=0
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 set -e
 NEW_DDL_SERIAL=8
@@ -62,15 +63,15 @@ echo "`date`: $0 COMMENCED"
 USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
-LAST_SERIAL=`psql $DB_NAME -tc  "select max(serial) from dsc.internal_version;"`
+LAST_SERIAL=`psql -h $hhconfig_database_host $DB_NAME -tc  "select max(serial) from dsc.internal_version;"`
 [ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] && echo "Error: ddl scripts not run in correct order." && exit 1
 
 # Add DB information to support the Traffic Query/Response Difference plot
 
-psql $DB_NAME <<EOF
+psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
 INSERT INTO $DSC_SCHEMA.visible_plot (name, display_category, display_name, title ) VALUES ('traffic_volume_difference', '9.RSSAC', 'Traffic volume difference', 'The differences between queries and responses by transport and IP version');
 INSERT INTO $DSC_SCHEMA.dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id FROM $DSC_SCHEMA.visible_plot WHERE name = 'traffic_volume_difference'), (SELECT id FROM $DSC_SCHEMA.dataset WHERE name = 'traffic_volume_queries'));

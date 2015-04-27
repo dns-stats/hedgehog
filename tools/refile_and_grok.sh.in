@@ -31,7 +31,7 @@ set -e # exit if any command yields a non 0 exit status
 WD="$hhconfig_directories_data"
 INPUT="XML"
 OUTPUT="DB"
-CONNSTR="dbname=$hhconfig_database_name port=$hhconfig_database_port"
+CONNSTR="dbname=$hhconfig_database_name port=$hhconfig_database_port host=$hhconfig_database_host password=$hhconfig_database_owner_pass"
 START_DATE=""
 RSSAC_FLAG=""
 RESERVED_CPUS=0
@@ -40,6 +40,7 @@ ARGS=""
 LOG="dsc-extractor.out"
 APPEND_LOG=0
 REQUIRED_API_VERSION=DB_VERSION
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo "${PROG} - finds all input files in working directory and processes to output format"
@@ -77,7 +78,7 @@ done
 USER=$(whoami)
 [ "$USER" != "$hhconfig_database_owner" ] && echo "Must be $hhconfig_database_owner to run this script." && exit 1
 
-DB_API_VERSION=$(psql "$DB_NAME"  -tc  "select version from dsc.version;")
+DB_API_VERSION=$(psql -h $hhconfig_database_host "$DB_NAME"  -tc  "select version from dsc.version;")
 [ "$DB_API_VERSION" -ne "$REQUIRED_API_VERSION" ] && echo "Error: Database API version incorrect. Current version is $DB_API_VERSION, required version is $REQUIRED_API_VERSION" && exit 1
 
 if ! [[ "$RESERVED_CPUS" =~ ^[0-9]+$ ]] ; then
@@ -96,7 +97,7 @@ echo "Using $CPUS CPUS ($REAL_CPUS available, $RESERVED_CPUS reserved)."
 
 if [[ "$INPUT" = "XML" || "$INPUT" = "DAT" ]] && [ "$OUTPUT" = "DB" ]
 then
-    ARGS="-i ${INPUT} -o PG_DB -c ${CONNSTR} ${START_DATE} ${RSSAC_FLAG}"
+    ARGS="-i ${INPUT} -o PG_DB -c \"${CONNSTR}\" ${START_DATE} ${RSSAC_FLAG}"
     LOG=${LOG/.out/-xml-db.out}
     [ "$INPUT" == "DAT" ] && LOG=${LOG/xml/dat}
 fi
@@ -125,7 +126,7 @@ fi
 echo "$(date) SCRIPT COMMENCED"
 EXECDIR=@BIN@
 export EXECDIR SERVER
-for SERVER in $(psql "$hhconfig_database_name" -tc "select display_name from server;") ; do
+for SERVER in $(psql -h $hhconfig_database_host "$hhconfig_database_name" -tc "select display_name from server;") ; do
     [ -L "$SERVER" ] && continue
     [ -d "$SERVER" ] || continue
     ls "${SERVER}" | xargs -i --max-procs=$CPUS bash -c "[ -L \"${SERVER}/{}\" ] || ([ -d \"${SERVER}/{}\" ] && cd \"${SERVER}/{}\"; echo \"\$(date) START: ${SERVER}/{}\"; $EXECDIR/dsc-extractor ${ARGS} >> \"${LOG}\" 2>&1; echo \"\$(date) DONE: ${SERVER}/{}\")"
