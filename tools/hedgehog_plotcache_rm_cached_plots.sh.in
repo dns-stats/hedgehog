@@ -28,6 +28,7 @@ eval $(@BIN@/hedgehog_conf_read.pl)
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name
 REMOVE_ALL=0
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo

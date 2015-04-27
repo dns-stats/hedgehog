@@ -34,6 +34,7 @@ START=`date --date="${DEFAULT_DAY}" +%Y-%m-%dT00:00`
 INPUT_START=""
 DELETE_RAW_DATA_FLAG=""
 PROCESS_UNIQUE_SOURCES=1;
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo

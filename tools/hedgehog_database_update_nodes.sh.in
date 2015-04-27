@@ -37,6 +37,7 @@ PREDICT=0;
 SQ="'"
 NEW_SERVER=0
 SUPPRESS_WARNINGS=0
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
 	echo

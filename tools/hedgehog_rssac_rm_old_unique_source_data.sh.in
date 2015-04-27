@@ -33,6 +33,7 @@ DEFAULT_DAY=`date --date="$(date +%Y-%m-15)" +%Y%m%d`
 NOW=`date --date="now" +%Y%m%d`
 FORCE_SUM_DEL=0
 DELETE_RAW=0
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 if [ $DEFAULT_DAY -ge $NOW ] ; then
 	START=`date --date="$NOW - 2 month" +%Y-%m`

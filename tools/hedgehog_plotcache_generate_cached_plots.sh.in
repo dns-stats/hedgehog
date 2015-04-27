@@ -30,6 +30,7 @@ DB_NAME=$hhconfig_database_name
 FROM=`date --date="- 1 day" +%Y-%m-%dT00:00`
 TO=`date --date="- 1 day" +%Y-%m-%dT23:59`
 SQ="'"
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo

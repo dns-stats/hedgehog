@@ -31,7 +31,7 @@ DEFAULT_DAY=`date --date="- 7 day" +%Y-%m-%d`
 START=${DEFAULT_DAY}
 FORCE_SUM_DEL=0
 DELETE_RAW=0
-
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo

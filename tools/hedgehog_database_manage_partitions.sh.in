@@ -27,6 +27,7 @@ eval $(@BIN@/hedgehog_conf_read.pl)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
 	echo

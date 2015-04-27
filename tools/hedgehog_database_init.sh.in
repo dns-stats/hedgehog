@@ -93,7 +93,9 @@ echo
     echo "Script halted by user - script exiting."
     exit 1
   fi
-  
+
+export PGPASSWORD=$hhconfig_database_owner_pass
+
 psql -h $hhconfig_database_host -d $hhconfig_database_name <<EOF
   CREATE SCHEMA dsc AUTHORIZATION "$hhconfig_database_owner";
   REVOKE ALL ON DATABASE "$hhconfig_database_name" FROM public;

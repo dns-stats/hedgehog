@@ -22,7 +22,9 @@ database:
   port         : 5432      # specify port for the postgresql DB.
   name         : hedgehog  # specify dbname for the postgresql DB.
   owner        : hedgehog  # specify a user to own the postgresql DB. This user will run refile_and_grok.
+  owner_pass   :           # empty - assuming that the DB is on the same machine as the rest of hedgehog.
   read_user    : www-data  # specify a read user for the postgresql DB. This should be the apache user.
+  read_pass    :           # empty - assuming that the DB is on the same machine as the rest of hedgehog.
   host         : /var/run/postgresql # specify a host for the postgresql DB. If this begins with a slash, it specifies the directory in which the socket file is stored
   
 # Directory structure
