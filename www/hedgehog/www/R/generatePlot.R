@@ -74,14 +74,26 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 	}
 	
     if(gvis == 1){
+      # Stupid bug in gvis where the name of the numvar column causes issues with the correct name being diplayed in the legend
+      names(df)[names(df)=="y"] <- "yyyyyyyyyyyy"
       # For now we default to the timeline flash chart unless 'svg' is specified by the user
       if (gui_config$www$default_interactive_plot_type == "svg") {
-          p <- gvisAnnotationChart(df, numvar="y", idvar = "key", datevar = "x",
-                                   options=list(legendPosition='newRow', height=440, width=900))
+          p <- gvisAnnotationChart(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x",
+                                   options=list(legendPosition='newRow', height=440, width=900, colors="['#0072B2','#990F0F','#99700F',
+      '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#990F0F','#99700F','#1F990F',
+      '#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99',
+      '#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99','#E67E7E',
+      '#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F',
+      '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2']"))
          
       }else{
-          p <- gvisAnnotatedTimeLine(df, numvar="y", idvar = "key", datevar = "x", 
-                                     options=list(legendPosition='newRow', height=440, width=900))         
+          p <- gvisAnnotatedTimeLine(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x", 
+                                     options=list(legendPosition='newRow', height=440, width=900, colors="['#0072B2','#990F0F','#99700F',
+      '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#990F0F','#99700F','#1F990F',
+      '#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99',
+      '#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99','#E67E7E',
+      '#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F',
+      '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2']"))         
       }
       title <- sub("\n", "<br />", title)
       ylabel <- gsub(" +", "&nbsp;", ylabel)
@@ -141,7 +153,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }
 }
 
-barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
+barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
 
 	if (hh_debug) {
 		system('logger -p user.notice In barPlot')
@@ -153,8 +165,13 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0) {
           p <- gvisColumnChart(df, xvar='x', yvar='y', 
                             options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
       }else{
+        if(small==1){
           p <- gvisBarChart(df, xvar='x', yvar='y',
                             options=list(title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+        } else {
+          p <- gvisBarChart(df, xvar='x', yvar='y',
+                            options=list(title=title, vAxis=paste("{title:'",xlabel,"')", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+        }
       }
       cat(p$html$chart,file=f)
     }else{
@@ -193,10 +210,10 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       if(vertical == 1){
           if (gbar_width == 0) {
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
-                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
           } else {
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
-                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
           }
       }else{
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
@@ -780,7 +797,7 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 		stackedBarPlot(df, plot_file, mytitle, "IP Version", "Average Query Rate (q/sec)", gvis, pltnm, vertical=1)
 	}
 	else if (pltnm == 'unique_sources') {
-		barPlot(df, plot_file, mytitle, "IP Version/Aggregation", "Number of Unique Sources", gvis)
+		barPlot(df, plot_file, mytitle, "IP Version/Aggregation", "Number of Unique Sources", gvis, small=0)
 	}
 		
 	return(plot_file)

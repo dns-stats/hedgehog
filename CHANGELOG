@@ -28,6 +28,9 @@ Hedgehog 2.0.0b2
 * Added axis labels to googlevis line charts
 * Added node_id index to data tables
 * Added support for connecting to a remote database and password support
+* Fixed color palette in annotated charts
+* Work around for mages/googleVis#14
+* Corrected previous commit where font sizes were changed unnecessarily.
 
 Hedgehog 2.0.0b1 - 2014-09-09
 -----------------------------
