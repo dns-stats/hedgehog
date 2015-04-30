@@ -1,0 +1,52 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+usage () {
+	echo
+	echo "Pack old xml files already processed into a .tar package to store and archive."
+	echo "The xml files are packed according to their date and node and server."
+	echo 
+    echo "Usage: $0 options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+    exit 1
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage ;;
+        \? ) usage ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+
+eval $(@BIN@/hedgehog_conf_read.pl)
+
+for i in $(find $hhconfig_directories_data -maxdepth 3 -name done -type d) ; do
+    for j in $(find $i -mindepth 1 -maxdepth 1 -type d) ; do
+    short=$(echo $j | sed "s|$hhconfig_directories_data||")
+    DIR_FOUND=$(echo $short | awk -F\/ ' { print $5 } ')
+    TODAY=$(date +%Y-%m-%d)
+    if [ $DIR_FOUND == $TODAY ] ; then
+      continue
+    else
+      echo "tar -cj --remove-files -f $i/done-$DIR_FOUND.tar.bz2 $j"
+#      tar -cj --remove-files -f $i/done-$DIR_FOUND.tar.bz2 $j
+    fi
+  done
+done
