@@ -8,14 +8,13 @@ bin_SCRIPTS = 	refile_and_grok.sh \
 				hedgehog_database_update_nodes.sh \
 				hedgehog_datafiles_create_summary.sh \
 				hedgehog_datafiles_rm_empty_xml_dirs.sh \
-				hedgehog_datafiles_tar_old_xml_files.sh \
 				hedgehog_plotcache_generate_cached_plots.sh \
 				hedgehog_plotcache_rm_cached_plots.sh \
 				hedgehog_rssac_generate_reports.sh \
 				hedgehog_rssac_process_unique_source_data.sh \
 				hedgehog_rssac_rm_old_unique_source_data.sh \
 				hedgehog_database_init.sh \
-				hedgehog_tar_xml.sh
+				hedgehog_datafiles_tar_xml.sh
 
 sbin_SCRIPTS = hedgehog_database_create.sh
 
@@ -30,8 +29,8 @@ subst_DB_VERSION = sed -e "s|DB_VERSION|@DB_SCHEMA_VERSION@|"
 refile_and_grok.sh: refile_and_grok.sh.in Makefile
 	$(subst_S_BIN) < $(srcdir)/refile_and_grok.sh.in | $(subst_DB_VERSION) > refile_and_grok.sh
 
-hedgehog_tar_xml.sh: hedgehog_tar_xml.sh.in Makefile
-	$(subst_S_BIN) < $(srcdir)/hedgehog_tar_xml.sh.in > hedgehog_tar_xml.sh
+hedgehog_datafiles_tar_xml.sh: hedgehog_datafiles_tar_xml.sh.in Makefile
+	$(subst_S_BIN) < $(srcdir)/hedgehog_datafiles_tar_xml.sh.in > hedgehog_datafiles_tar_xml.sh
 	
 hedgehog_conf_read.pl: hedgehog_conf_read.pl.in Makefile
 	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog_conf_read.pl.in > hedgehog_conf_read.pl
@@ -77,7 +76,7 @@ EXTRA_DIST = 	refile_and_grok.sh.in \
 				hedgehog_database_update_nodes.sh.in \
 				hedgehog_datafiles_create_summary.sh.in \
 				hedgehog_datafiles_rm_empty_xml_dirs.sh.in \
-				hedgehog_datafiles_tar_old_xml_files.sh.in \
+				hedgehog_datafiles_tar_xml.sh.in \
 				hedgehog_plotcache_generate_cached_plots.sh.in \
 				hedgehog_plotcache_rm_cached_plots.sh.in \
 				hedgehog_rssac_generate_reports.sh.in \

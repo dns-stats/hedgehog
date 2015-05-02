@@ -18,6 +18,7 @@ usage () {
 	echo
 	echo "Pack old xml files already processed into a .tar package to store and archive."
 	echo "The xml files are packed according to their date and node and server."
+  echo "The filename has the following format done-PID-date.tar.bz (e.g. done-14143-2015-05-01.tar.bz2)."
 	echo 
     echo "Usage: $0 options"
     echo
@@ -45,8 +46,11 @@ for i in $(find $hhconfig_directories_data -maxdepth 3 -name done -type d) ; do
     if [ $DIR_FOUND == $TODAY ] ; then
       continue
     else
-      echo "tar -cj --remove-files -f $i/done-$DIR_FOUND.tar.bz2 $j"
-#      tar -cj --remove-files -f $i/done-$DIR_FOUND.tar.bz2 $j
+    echo "tar -cj --remove-files -f $i/done-$$-$DIR_FOUND.tar.bz2 $j"
+    nice -n 19 tar -cj --remove-files -f $i/done-$$-$DIR_FOUND.tar.bz2 $j
+
     fi
   done
 done
+
+echo "`date`: $0 COMPLETED"
