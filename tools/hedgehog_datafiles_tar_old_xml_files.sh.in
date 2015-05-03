@@ -15,16 +15,16 @@
 # limitations under the License.
 #
 usage () {
-	echo
-	echo "Pack old xml files already processed into a .tar package to store and archive."
-	echo "The xml files are packed according to their date and node and server."
+  echo
+  echo "Pack old xml files already processed into a .tar package to store and archive."
+  echo "The xml files are packed according to their date and node and server."
   echo "The filename has the following format done-PID-date.tar.bz (e.g. done-14143-2015-05-01.tar.bz2)."
-	echo 
+  echo 
     echo "Usage: $0 options"
     echo
     echo "Supported options:"
     echo "  -h Show this help."
-    exit 1
+  exit 1
 }
 
 while getopts ":h" opt; do
@@ -36,6 +36,9 @@ done
 
 echo "`date`: $0 COMMENCED"
 
+USER=$(whoami)
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
 eval $(@BIN@/hedgehog_conf_read.pl)
 
 for i in $(find $hhconfig_directories_data -maxdepth 3 -name done -type d) ; do
@@ -46,9 +49,8 @@ for i in $(find $hhconfig_directories_data -maxdepth 3 -name done -type d) ; do
     if [ $DIR_FOUND == $TODAY ] ; then
       continue
     else
-    echo "tar -cj --remove-files -f $i/done-$$-$DIR_FOUND.tar.bz2 $j"
-    nice -n 19 tar -cj --remove-files -f $i/done-$$-$DIR_FOUND.tar.bz2 $j
-
+      echo "tar -cj --remove-files -f $i/done-$$-$DIR_FOUND.tar.bz2 $j"
+      nice -n 19 tar -cj --remove-files -f $i/done-$$-$DIR_FOUND.tar.bz2 $j
     fi
   done
 done
