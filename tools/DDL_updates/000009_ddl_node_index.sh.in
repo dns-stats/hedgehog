@@ -40,23 +40,43 @@ REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 0 ))
 
 DSC_SCHEMA="dsc"
 
+CONCURRENT=0
+SKIP=0
+
 usage () {
     echo
     echo "Usage: $0 options"
     echo
     echo "Supported options:"
+    echo "  -c Build the indexes with the CONCURRENTLY flag set. This is slower"
+    echo "     but allows writes to continue being made to the tables."
+    echo "  -s Skip creating the new indexes. The new indexes should improve"
+    echo "     performance but are optional. You still need to run this script to"
+    echo "     update version numbers correctly in the database."
     echo "  -h Show this help."
+    exit 1
 }
 
 
-while getopts ":h" opt; do
+while getopts ":csh" opt; do
     case $opt in
-        h  ) usage
-             exit 1 ;;
-        \? ) usage
-             exit 1 ;;
+        c  ) CONCURRENT=1 ;;
+        s  ) SKIP=1 ;;
+        h  ) usage ;;
+        \? ) usage ;;
     esac
 done
+
+echo "This script creates a new index on the data tables. It will take a long"
+echo "time to complete if you have a lot of data. In addition it requires a lock"
+echo "against writes to the tables being updated (reads are fine)."
+echo "You should either stop database writes while it is running, set the -c flag"
+echo "on the command line or use -s to skip index creation."
+echo
+echo "Do you wish to continue? [yN]"
+read c
+[[ ! "$c" =~ ^(Y|y) ]] && exit 1
+
 
 echo "`date`: $0 COMMENCED"
 USER=$(whoami)
@@ -69,9 +89,16 @@ LAST_SERIAL=`psql -h $hhconfig_database_host $DB_NAME -tc  "select max(serial) f
 [ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] && echo "Error: ddl scripts not run in correct order." && exit 1
 
 # Create node_id indexes on all data tables
-MYFILE=$(mktemp)
-psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index idx_' || table_name || '_node_id on ' || table_name || ' (node_id);' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
-psql -h $hhconfig_database_host $DB_NAME < $MYFILE
+if [ $SKIP -eq 0 ] ; then
+  MYFILE=$(mktemp)
+  if [ $CONCURRENT -eq 0 ] ; then
+    psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index idx_' || table_name || '_node_id on ' || table_name || ' (node_id);' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
+  else
+    psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index CONCURRENTLY idx_' || table_name || '_node_id on ' || table_name || ' (node_id);' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
+  fi
+  psql -h $hhconfig_database_host $DB_NAME < $MYFILE
+  rm $MYTEMP
+fi
 
 psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
