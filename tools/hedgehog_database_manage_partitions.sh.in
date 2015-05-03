@@ -98,7 +98,7 @@ do
       
       psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
-set client_min_messages to WARNING;
+
 CREATE TABLE dsc.data_${server}_${plot}_${NOW} (
   CHECK (starttime >= TIMESTAMP '$NOW-01 00:00:00' AT TIME ZONE 'UTC' AND starttime < TIMESTAMP '$NEXT-01 00:00:00' AT TIME ZONE 'UTC'),
   CHECK (plot_id = $p_id),
