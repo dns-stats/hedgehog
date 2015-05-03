@@ -31,6 +31,7 @@ Hedgehog 2.0.0b2
 * Fixed color palette in annotated charts
 * Work around for mages/googleVis#14
 * Corrected previous commit where font sizes were changed unnecessarily.
+* Improved old xml tar script
 
 Hedgehog 2.0.0b1 - 2014-09-09
 -----------------------------

@@ -28,7 +28,7 @@ subst_DB_VERSION = sed -e "s|DB_VERSION|@DB_SCHEMA_VERSION@|"
 
 refile_and_grok.sh: refile_and_grok.sh.in Makefile
 	$(subst_S_BIN) < $(srcdir)/refile_and_grok.sh.in | $(subst_DB_VERSION) > refile_and_grok.sh
-	
+
 hedgehog_conf_read.pl: hedgehog_conf_read.pl.in Makefile
 	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog_conf_read.pl.in > hedgehog_conf_read.pl
 	
@@ -49,7 +49,7 @@ hedgehog_datafiles_rm_empty_xml_dirs.sh: hedgehog_datafiles_rm_empty_xml_dirs.sh
 
 hedgehog_datafiles_tar_old_xml_files.sh: hedgehog_datafiles_tar_old_xml_files.sh.in Makefile
 	$(subst_S_BIN) < $(srcdir)/hedgehog_datafiles_tar_old_xml_files.sh.in > hedgehog_datafiles_tar_old_xml_files.sh
-	
+
 hedgehog_plotcache_generate_cached_plots.sh: hedgehog_plotcache_generate_cached_plots.sh.in Makefile
 	$(subst_DB_VERSION) < $(srcdir)/hedgehog_plotcache_generate_cached_plots.sh.in | $(subst_S_BIN) > hedgehog_plotcache_generate_cached_plots.sh
 
