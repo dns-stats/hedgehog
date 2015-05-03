@@ -76,7 +76,7 @@ EXTRA_DIST = 	refile_and_grok.sh.in \
 				hedgehog_database_update_nodes.sh.in \
 				hedgehog_datafiles_create_summary.sh.in \
 				hedgehog_datafiles_rm_empty_xml_dirs.sh.in \
-				hedgehog_datafiles_tar_old_xml.sh.in \
+				hedgehog_datafiles_tar_old_xml_files.sh.in \
 				hedgehog_plotcache_generate_cached_plots.sh.in \
 				hedgehog_plotcache_rm_cached_plots.sh.in \
 				hedgehog_rssac_generate_reports.sh.in \
