@@ -73,4 +73,4 @@ ALTER USER "$DB_OWNER" SET search_path TO dsc;
 EOF
 
 echo
-echo "Please add $DB_OWNER and $DB_READER to pg_hba.conf"
+echo "Please add $DB_OWNER and $DB_READER to pg_hba.conf, set passwords etc."

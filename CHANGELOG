@@ -32,6 +32,7 @@ Hedgehog 2.0.0b2
 * Work around for mages/googleVis#14
 * Corrected previous commit where font sizes were changed unnecessarily.
 * Improved old xml tar script
+* Improvements to database creation and upgrade scripts
 
 Hedgehog 2.0.0b1 - 2014-09-09
 -----------------------------

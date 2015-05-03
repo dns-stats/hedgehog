@@ -126,7 +126,6 @@ EOF
 echo
 ###########################################################
 
-
 ###################  POPULATE TABLES  #####################
 ###########################################################
 # Populate the dsc.plot and dsc.iana_lookup tables
@@ -141,47 +140,27 @@ echo "Populate servers and nodes"
 ###########################################################
 # Run any scripts needed to update the DB
 echo "Running DDL scripts"
-@BIN@/DDL_updates/000009_ddl_traffic_difference.sh
+@BIN@/DDL_updates/000008_ddl_traffic_difference.sh
+# Skip the index creation as hedgehog_database_manage_partitions.sh will do it
+# for us. Still need to run the script too ensure database versions are correct.
+@BIN@/DDL_updates/000009_ddl_node_index.sh -s
 ###########################################################
-
 
 #############  PARTITION DATA TABLES  #####################
 ###########################################################
-# Partition the dsc.data table: create 1 table per month per server per plot type, that inherits from the dsc.data table
+# Partition the dsc.data table: create 1 table per month per server per plot
 # TODO: replace this will a call to the manage_partitions.sh script
 echo "Creating partitioned tables for dsc.data (1 table per month per server per plot type)"
 echo "This may take some time if there is a lot of historic data to import"
 i=1
 DNOW_FIRST=`date +%Y%m01`
-DNOW=`date +%Y_%m`
+DNOW=`date +%Y-%m`
 DSTART=`date --date="${DSTART}-01" +%Y%m%d`
-SERVERS=`echo "SELECT name FROM dsc.server;" | psql -h $hhconfig_database_host -td $hhconfig_database_name `
-PLOTS=`echo "SELECT name FROM dsc.dataset;" | psql -h $hhconfig_database_host -td $hhconfig_database_name`
 while [ $DNOW_FIRST -ge $DSTART ]
 do
-  DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y_%m`
-  echo "Creating tables for: " $DNOW
-  
-  for SERVER in $SERVERS
-  do
-    s_id=`echo "SELECT id FROM dsc.server WHERE name = $SQ$SERVER$SQ;" | psql -h $hhconfig_database_host -td $hhconfig_database_name`
-    for PLOT in $PLOTS
-    do
-      p_id=`echo "SELECT id FROM dsc.dataset WHERE name = $SQ$PLOT$SQ;" | psql -h $hhconfig_database_host -td $hhconfig_database_name`
-      echo "CREATE TABLE dsc.\"data_${SERVER}_${PLOT}_${DNOW}\" (
-        CHECK (starttime >= TIMESTAMP $SQ$DNOW-01 00:00:00$SQ AT TIME ZONE 'UTC' AND starttime < TIMESTAMP $SQ$DNEXT-01 00:00:00$SQ AT TIME ZONE 'UTC'),
-        CHECK (server_id = $s_id),
-        CHECK (plot_id = $p_id)
-      ) INHERITS (dsc.data);" | psql -h $hhconfig_database_host -d $hhconfig_database_name
-
-      echo "ALTER TABLE dsc.\"data_${SERVER}_${PLOT}_${DNOW}\"
-        ADD CONSTRAINT \"pk_data_${SERVER}_${PLOT}_${DNOW}\" PRIMARY KEY (server_id, node_id , plot_id , starttime , key1, key2 ),
-        ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_node\" FOREIGN KEY (node_id) REFERENCES dsc.node (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
-        ADD CONSTRAINT \"fk_data_${SERVER}_${PLOT}_${DNOW}_plot\" FOREIGN KEY (plot_id) REFERENCES dsc.dataset (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;" | psql -h $hhconfig_database_host -d $hhconfig_database_name 
-      echo "CREATE INDEX \"idx_data_${SERVER}_${PLOT}_${DNOW}_node_id\" ON dsc.\"data_${SERVER}_${PLOT}_${DNOW}\" (node_id);" | psql -h $hhconfig_database_host -d $hhconfig_database_name
-    done
-  done
+  DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y-%m`
+  @BIN@/hedgehog_database_manage_partitions.sh -p ${DNOW}
   DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`
-  DNOW=`date --date="$DNOW_FIRST" +%Y_%m`
+  DNOW=`date --date="$DNOW_FIRST" +%Y-%m`
 done
 ###########################################################

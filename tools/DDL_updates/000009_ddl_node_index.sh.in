@@ -67,20 +67,21 @@ while getopts ":csh" opt; do
     esac
 done
 
-echo "This script creates new indexes on all the data tables. It will take a long"
-echo "time to complete if you have a lot of data. In addition it requires a lock"
-echo "against writes to the tables being updated (reads are fine)."
-echo "You should either:"
-echo "1. Stop database writes while this script is running"
-echo "2. Set the -c flag to build the indexes concurrently"
-echo "3. Set the -s flag to skip index creation."
-echo
-echo "See the usage (-h) for more details."
-echo
-echo "Do you wish to continue? [yN]"
-read c
-[[ ! "$c" =~ ^(Y|y) ]] && exit 1
-
+if [ $SKIP -eq 0 ] ; then
+  echo "This script creates new indexes on all the data tables. It will take a long"
+  echo "time to complete if you have a lot of data. In addition it requires a lock"
+  echo "against writes to the tables being updated (reads are fine)."
+  echo "You should either:"
+  echo "1. Stop database writes while this script is running"
+  echo "2. Set the -c flag to build the indexes concurrently"
+  echo "3. Set the -s flag to skip index creation."
+  echo
+  echo "See the usage (-h) for more details."
+  echo
+  echo "Do you wish to continue? [yN]"
+  read c
+  [[ ! "$c" =~ ^(Y|y) ]] && exit 1
+fi
 
 echo "`date`: $0 COMMENCED"
 USER=$(whoami)
@@ -101,7 +102,7 @@ if [ $SKIP -eq 0 ] ; then
     psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index CONCURRENTLY idx_' || table_name || '_node_id on ' || table_name || ' (node_id);' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
   fi
   psql -h $hhconfig_database_host $DB_NAME < $MYFILE
-  rm $MYTEMP
+  rm $MYFILE
 fi
 
 psql -h $hhconfig_database_host $DB_NAME <<EOF
