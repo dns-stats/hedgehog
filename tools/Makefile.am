@@ -19,10 +19,10 @@ bin_SCRIPTS = 	refile_and_grok.sh \
 sbin_SCRIPTS = hedgehog_database_create.sh
 
 nobase_bin_SCRIPTS = DDL_updates/000008_ddl_traffic_difference.sh \
-										DDL_updates/000009_ddl_node_index.sh
+				DDL_updates/000009_ddl_node_index.sh
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
-				   $(srcdir)/hedgehog/sql/insert_lookup_data.sql
+				$(srcdir)/hedgehog/sql/insert_lookup_data.sql
 
 subst_S_BIN = sed -e "s,@SBIN@,@sbindir@,"  -e "s,@BIN@,@bindir@," -e "s,@DATA@,@datadir@,"
 subst_DB_VERSION = sed -e "s|DB_VERSION|@DB_SCHEMA_VERSION@|"

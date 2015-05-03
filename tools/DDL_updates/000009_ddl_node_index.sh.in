@@ -67,11 +67,15 @@ while getopts ":csh" opt; do
     esac
 done
 
-echo "This script creates a new index on the data tables. It will take a long"
+echo "This script creates new indexes on all the data tables. It will take a long"
 echo "time to complete if you have a lot of data. In addition it requires a lock"
 echo "against writes to the tables being updated (reads are fine)."
-echo "You should either stop database writes while it is running, set the -c flag"
-echo "on the command line or use -s to skip index creation."
+echo "You should either:"
+echo "1. Stop database writes while this script is running"
+echo "2. Set the -c flag to build the indexes concurrently"
+echo "3. Set the -s flag to skip index creation."
+echo
+echo "See the usage (-h) for more details."
 echo
 echo "Do you wish to continue? [yN]"
 read c
