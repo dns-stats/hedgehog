@@ -26,6 +26,7 @@
 use YAML::Tiny;
 $yaml = YAML::Tiny->read("@HH_CONF_FILE@");
 foreach $key (keys  $yaml->[0]{database}){
+  next if (!$yaml->[0]{database}{$key}); 
   print "hhconfig_database_$key=\"$yaml->[0]{database}{$key}\"\n";
 }
 foreach $key (keys  $yaml->[0]{directories}){
