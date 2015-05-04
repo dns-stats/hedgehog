@@ -167,10 +167,10 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
       }else{
         if(small==1){
           p <- gvisBarChart(df, xvar='x', yvar='y',
-                            options=list(title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
         } else {
           p <- gvisBarChart(df, xvar='x', yvar='y',
-                            options=list(title=title, vAxis=paste("{title:'",xlabel,"')", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"')", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
         }
       }
       cat(p$html$chart,file=f)
