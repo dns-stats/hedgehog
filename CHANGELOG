@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-Hedgehog 2.0.0b2
+Hedgehog 2.0.0b2 - 2014-05-05
 -----------------------------
 
 * Support for Vagrant Provisioning (thanks melalj)
