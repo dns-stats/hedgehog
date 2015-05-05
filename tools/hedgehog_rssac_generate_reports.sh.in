@@ -45,7 +45,7 @@ usage () {
     echo "Supported options:"
     echo "  -s Date on which to create RSSAC reports (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
     echo "  -u Don't process the unique source data before generating the report"
-	echo "  -D Also delete the raw unique_source data (default: no delete)"
+    echo "  -D Also delete the raw unique_source data from the database to save space (default: no delete)"
     echo "  -h Show this help"
 }
 

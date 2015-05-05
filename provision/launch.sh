@@ -40,8 +40,8 @@ Require all granted
 service apache2 restart
 
 #Edit the the <prefix>/etc/hedgehog/nodes.csv to specify the servers, nodes and grouping to be used (example format is provided with entries commented out).
-#sudo /usr/local/sbin/hedgehog_database_create.sh
-
+#sudo -u postgres /usr/local/sbin/hedgehog_database_create.sh
+#sudo -u hedgehog /usr/local/bin/hedgehog_database_init.sh
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
 cd /vagrant

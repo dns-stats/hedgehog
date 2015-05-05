@@ -30,13 +30,13 @@ DB_READER=www-data
 usage () {
 	echo
 	echo "Create database and roles/users."
-  echo
+	echo
 	echo "Usage: $0 options"
 	echo
 	echo "Supported options:"
-	echo "  -o Owner of the database (Default: $DB_OWNER)"
-	echo "  -r Reader of the database. (Default: $DB_READER) Typically the user the web server runs as."
-  echo "  -n Name of the database (Default: $DB_NAME)"
+	echo "  -o Owner of the database  (Default: $DB_OWNER)"
+	echo "  -r Reader of the database (Default: $DB_READER) Typically the same user that the web server runs as."
+	echo "  -n Name of the database   (Default: $DB_NAME)"
 	echo "  -h Show this help"
 	echo
 	echo "In the 'database' section of hedgehog.yaml you should set the same values"

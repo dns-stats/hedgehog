@@ -25,12 +25,11 @@ Hedgehog 2.0.0b2
 * Traffic Query/Response Difference plots added (requires R package dplyr)
 * RPostgreSQLHelper installed as separate package. This requires running
  'make install ; make install-rpg' on installation now.
-* Added axis labels to googlevis line charts
+* Added vertical axis labels to googlevis line charts
 * Added node_id index to data tables
 * Added support for connecting to a remote database and password support
 * Fixed color palette in annotated charts
-* Work around for mages/googleVis#14
-* Corrected previous commit where font sizes were changed unnecessarily.
+* Work around for bug: mages/googleVis#14
 * Improved old xml tar script
 * Improvements to database creation and upgrade scripts
 
