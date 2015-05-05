@@ -1,0 +1,156 @@
+A PFD version of this is available in the docs directory
+
+An online version of this is available at:
+https://github.com/dns-stats/hedgehog/wiki/Updgrade_2.0.0b1_to_2.0.0b2
+
+
+1. Pre-installation
+  1.1 Install new dependancies
+  1.2 Download, configure and make new release
+  1.3 Cron jobs
+  1.4 Disable web front end
+2 Installation
+  2.1 Install new release
+  2.2 Remove moved/deleted files
+  2.3 Update Apache configuration
+  2.4 Update configuration settings
+  2.5 Upgrade database
+  2.6 Web cache
+3 Post-install
+  3.1 Test web front end
+  3.2 Re-enable cron jobs
+
+
+Back up the old installation
+
+If desired, back up the existing installation (the directory structure in the
+User Guide is a useful reference) and database. 
+
+
+1. Pre-installation
+
+1.1 Install new dependancies
+Install additional packages
+
+sudo apt-get install libyaml-tiny-perl
+
+Install additional R packages
+
+sudo R
+install.packages(c("dplyr"))
+q()
+
+1.2 Download, configure and make new release
+
+Download the code from github:
+
+wget https://github.com/dns-stats/hedgehog/archive/2.0.0b2.tar.gz
+
+tar -xzf 2.0.0b2.tar.gz
+cd hedgehog-2.0.0.b2
+./autogen.sh
+mkdir build
+cd build
+../configure
+make
+
+1.3 Cron jobs
+
+Stop refile and grok cron job running:
+
+sudo -u hedgegho crontab -e
+# Import XML data every 15 mins
+00,15,30,45 * * * * <prefix>/bin/refile_and_grok.sh -c >> /home/hedgehog/refile_and_grok_xml_to_db.sh.log 2>&1
+
+Comment out any other jobs that are about to run. If the dsc-extractor process 
+is running wait for it to finish before continuing.
+
+1.4 Disable web front end
+
+It is recommended to disable the web front end during upgrade e.g by enabling a 
+holding page.
+
+
+2 Installation
+
+2.1 Install new release
+
+cd hedgehog-2.0.0b2/build
+sudo make install
+sudo make install-rpg
+
+Note: 'make install-rpg' is required in addition to make install. It installs an
+R package to assist with the database connection.
+
+2.2 Remove moved/deleted files
+
+Some files were moved or deleted between b1 and b2. To clean the install 
+directory run the following commands
+
+sudo rm -rf <prefix>/sbin/hedgehog_database_create.d/
+sudo rm     <prefix>/bin/hedgehog_conf_read.sh
+sudo rm     <prefix>/share/hedgehog/www/R.utilities.R
+
+2.3 Update Apache configuration
+
+sudo cp <prefix>/share/hedgehog/conf/hedgehog.conf /etc/apache2/sites-available/
+
+2.4 Update configuration settings
+
+2.4.1 <prefix>/etc/hedgehog/hedgehog.yaml 
+ 
+In 2.0.0b2 the format of this file has changed as additional parameters have been added.
+* The installed 2.0.0b1 hedgehog.yaml file is not overwritten by the 2.0.0b2 installation.
+* A 2.0.0b2 sample file is installed in <prefix>/etc/hedgehoghedgehog.yaml.sample. 
+* If default parameters were used in 2.0.0b1, then simply copy the sample file 
+  into place using the command below. 
+  Otherwise a manual migration to the new file format is required.
+
+sudo cp <prefix>/etc/hedgehog/hedgehog.yaml.sample <prefix>/etc/hedgehog/hedgehog.yaml
+
+2.4.2 <prefix>/etc/hedgehog/hedgehog_gui.yaml 
+
+In 2.0.0b2 the default setting for the default_interactive_plot_type has changed
+from flash to svg. 
+
+* The installed 2.0.0b1 hedgehog.yaml file will not have been overwritten by the
+  installation. 
+* A 2.0.0b2 sample file is installed in <prefix>/etc/hedgehoghedgehog_gui.yaml.sample.
+
+2.5 Upgrade database
+
+sudo -u hedgehog /<prefix>/bin/DDL_updates/000008_ddl_traffic_difference.sh
+sudo -u hedgehog /<prefix>/bin/DDL_updates/000009_ddl_node_index.sh
+
+Note that the 000009_ddl_node_index.sh script requires user input and it is 
+recommended to read the usage before running this script.
+
+2.6 Web cache
+
+Axis labels have been added to the gviz plots and several minor bugs in the plots
+have been fixed. If you wish to flush the cache of existing plot files so that
+all plots will be re-generated with the new release then run the command below.
+
+sudo -u hedgehog /<prefix>/bin/hedgehog_plotcache_rm_cached_plots.sh -a
+
+
+3 Post-install
+
+3.1 Test web front end
+
+Re-enable and test the web front end. Make sure to restart apache.
+
+sudo service apache2 reload
+
+3.2 Re-enable cron jobs
+
+Restart refile and grok cron job running:
+
+sudo -u hedgehog crontab -e
+# Import XML data every 15 mins
+00,15,30,45 * * * * <prefix>/bin/refile_and_grok.sh -c >> /home/hedgehog/refile_and_grok_xml_to_db.sh.log 2>&1
+
+Re-enable any other jobs that were disabled for the upgrade.
+
+
+

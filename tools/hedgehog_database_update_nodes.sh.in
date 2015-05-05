@@ -78,6 +78,9 @@ if [ ! -f $NODES_FILE ] ; then
 	exit 1
 fi
 echo "Processing file: " $NODES_FILE
+if [ ${PREDICT} -eq 1 ] ; then
+	echo "***** PREDICTION MODE *****"
+fi
 
 # Process the nodes file
 while read line || [[ -n "$line" ]]; do

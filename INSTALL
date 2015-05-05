@@ -19,8 +19,9 @@ Table of Contents:
 1.3.2. System users and groups
 1.3.3. Configure Hedgehog
 1.3.4. Configure apache
-1.3.5. Create and populate the database
-1.3.6. Test the Hedgehog front end
+1.3.5. Create the database
+1.3.6  Create and the database tables etc.
+1.3.7. Test the Hedgehog front end
 2. Running Hedgehog
 2.1. Import data
 2.1.1. Importing historical .DAT data
@@ -97,10 +98,11 @@ mkdir build
 cd build
 ../configure
 make
-sudo make install-configure
+sudo make install
+sudo make install-rpg
 cd
 
-Note: 'make install-configure' is used above rather than 'make install'.
+Note: 'make install-rpg' is required in addition to make install. It installs an R package to assist with the database connection.
 
 You may notice the following message during the installation step: "Error in find.package(pkgs, lib) : there is no package called ‘RPostgreSQLHelper’ Execution halted". This can be safely ignored.
 
@@ -127,10 +129,14 @@ Edit the <prefix>/etc/hedgehog/hedgehog.yaml configuration file to make sure the
 Also configure the database parameters (port, name) as required. (Note a limitation of 2.0 is that the database and web front end must run on the same machine)
 
 database:
+  host         : /var/run/postgresql # specify a host for the postgresql DB. If this begins with a slash,
+                                     # it specifies the directory in which the socket file is stored.
   port         : 5432      # specify port for the postgresql DB.
   name         : hedgehog  # specify dbname for the postgresql DB.
   owner        : hedgehog  # specify an owner for the postgresql DB. This user will also run refile_and_grok
+  owner_pass   :           # specify a password for the owner user if needed.
   read_user    : www-data  # specify a read user for the postgresql DB. This is typically the apache user.
+  read_pass    :           # specify a password for the read user if needed.
 
 ! Do not edit the 'directories' section of this file as in 2.0 it is auto-generated.
 
@@ -188,7 +194,15 @@ Finally, restart apache:
 
 sudo service apache2 restart
 
-1.3.5. Create and populate the database
+1.3.5. Create the database
+
+Ask your DBA to create the necessary database. This is a script to help them. It create the DATABASE, USERS and ROLES needed to run hedgehog (using default values), and can optionally accept a user specified database name and read/write user names.
+
+<prefix>/sbin/hedgehog_database_create.sh
+ 
+Ensure that the user names and passwords match those in hedgehog.yaml and match the users you created above. If required, also edit the pg_hba.conf file to allow the users access.
+
+1.3.6 Create the database tables etc.
 
 NOTE: For this version of Hedgehog the servers and nodes to be processed and displayed must be specified manually.
 
@@ -197,14 +211,11 @@ Edit the the <prefix>/etc/hedgehog/nodes.csv to specify the servers, nodes and g
 
 Then run the command below noting the following:
 - If you have historic data to import then use the -m flag to specify the month of the oldest data that will need importing. Otherwise the database tables will be created to hold data from this month onwards.
-- This script assumes there is a default postgres user called 'postgres' (with no password configured) that has sufficient privileges to create databases and users. 
-- If the the default postgres user is not called 'postgres' then use the -u parameter to specify the name of the database user to use to create the Hedgehog database
-- If the postgres user requires a password, use the -p flag to be prompted to enter the password.
 - Note that this script will also create the directory structure for all the specified servers and nodes under the data directory if it does not exist
 
 sudo <prefix>/sbin/hedgehog_database_create.sh
 
-1.3.6. Test the Hedgehog front end
+1.3.7. Test the Hedgehog front end
 
 At this point you should be able to see the servers and nodes in the web front end at the URL http://<server-name>/hedgehog
 
@@ -278,3 +289,4 @@ Below is an example crontab for a typical system Note that the hedgehog_manage_p
 0 2 1 * * <prefix>/bin/hedgehog_datafiles_rm_empty_xml_dirs.sh -D >> /home/hedgehog/hedgehog_datafiles_rm_empty_xml_dirs.sh.log 2>&1
 # Monthly job to remove empty xml directories that are older than 7 days old
 0 2 7 * * <prefix>/bin/hedgehog_datafiles_tar_old_xml.sh -D >> /home/hedgehog/hedgehog_datafiles_tar_old_xml.sh.log 2>&1
+
