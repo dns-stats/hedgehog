@@ -12,10 +12,9 @@ https://github.com/dns-stats/hedgehog/wiki/Upgrade_2.0.0b1_to_2.0.0b2
 2 Installation
   2.1 Install new release
   2.2 Remove moved/deleted files
-  2.3 Update Apache configuration
-  2.4 Update configuration settings
-  2.5 Upgrade database
-  2.6 Web cache
+  2.3 Update configuration settings
+  2.4 Upgrade database
+  2.5 Web cache
 3 Post-install
   3.1 Test web front end
   3.2 Re-enable cron jobs
@@ -89,15 +88,10 @@ directory run the following commands
 
 sudo rm -rf <prefix>/sbin/hedgehog_database_create.d/
 sudo rm     <prefix>/bin/hedgehog_conf_read.sh
-sudo rm     <prefix>/share/hedgehog/www/R.utilities.R
 
-2.3 Update Apache configuration
+2.3 Update configuration settings
 
-sudo cp <prefix>/share/hedgehog/conf/hedgehog.conf /etc/apache2/sites-available/
-
-2.4 Update configuration settings
-
-2.4.1 <prefix>/etc/hedgehog/hedgehog.yaml 
+2.3.1 <prefix>/etc/hedgehog/hedgehog.yaml 
  
 In 2.0.0b2 the format of this file has changed as additional parameters have been added.
 * The installed 2.0.0b1 hedgehog.yaml file is not overwritten by the 2.0.0b2 installation.
@@ -108,7 +102,7 @@ In 2.0.0b2 the format of this file has changed as additional parameters have bee
 
 sudo cp <prefix>/etc/hedgehog/hedgehog.yaml.sample <prefix>/etc/hedgehog/hedgehog.yaml
 
-2.4.2 <prefix>/etc/hedgehog/hedgehog_gui.yaml 
+2.3.2 <prefix>/etc/hedgehog/hedgehog_gui.yaml 
 
 In 2.0.0b2 the default setting for the default_interactive_plot_type has changed
 from flash to svg. 
@@ -117,15 +111,15 @@ from flash to svg.
   installation. 
 * A 2.0.0b2 sample file is installed in <prefix>/etc/hedgehoghedgehog_gui.yaml.sample.
 
-2.5 Upgrade database
+2.4 Upgrade database
+
+Note that the 000009_ddl_node_index.sh script requires user input and it is
+recommended to read the usage (use the -h flag) before running this script.
 
 sudo -u hedgehog /<prefix>/bin/DDL_updates/000008_ddl_traffic_difference.sh
 sudo -u hedgehog /<prefix>/bin/DDL_updates/000009_ddl_node_index.sh
 
-Note that the 000009_ddl_node_index.sh script requires user input and it is 
-recommended to read the usage before running this script.
-
-2.6 Web cache
+2.5 Web cache
 
 Axis labels have been added to the gviz plots and several minor bugs in the plots
 have been fixed. If you wish to flush the cache of existing plot files so that
