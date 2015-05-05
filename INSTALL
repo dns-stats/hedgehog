@@ -213,7 +213,7 @@ Then run the command below noting the following:
 - If you have historic data to import then use the -m flag to specify the month of the oldest data that will need importing. Otherwise the database tables will be created to hold data from this month onwards.
 - Note that this script will also create the directory structure for all the specified servers and nodes under the data directory if it does not exist
 
-sudo <prefix>/sbin/hedgehog_database_create.sh
+sudo -u hedgehog <prefix>/sbin/hedgehog_database_init.sh
 
 1.3.7. Test the Hedgehog front end
 
