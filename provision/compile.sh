@@ -14,6 +14,7 @@ make
 
 echo "::::::::::::: INSTALL HEDGEHOG :::::::::::::"
 make install
+make install-rpg
 
 
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
