@@ -336,7 +336,7 @@ generatePlot <- function(){
 		if (gvis == '1') {
 			%><div id="plot">
 				<hr />
-				<iframe width="100%" height="520px" frameborder="0" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
+				<iframe scrolling="no" width="100%" height="520px" frameborder="0" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
 				<hr />
 			</div><%
 		}
@@ -422,9 +422,13 @@ if (GET$type == "initPltType") {
 	return()
 }
 
-# TODO(asap): check the options are all specified, not defaulted
-dsccon <- try(dbConnect(dbdrv, dbname = hh_config$database$name, user = hh_config$database$read_user, port = hh_config$database$port))
-dbconstr <<-paste('dbname = ', hh_config$database$name, ', user = ', hh_config$database$read_user, ', port = ', hh_config$database$port, sep="")
+if (is.null(hh_config$database$read_pass)) { 
+    db_password <- ""
+} else {
+    db_password <- hh_config$database$read_pass
+}
+dsccon <- try(dbConnect(dbdrv, dbname = hh_config$database$name, user = hh_config$database$read_user, port = hh_config$database$port, host = hh_config$database$host, password = db_password))
+dbconstr <<-paste('dbname = ', hh_config$database$name, ', user = ', hh_config$database$read_user, ', port = ', hh_config$database$port, ', host = ', hh_config$database$host, ', password = ', hh_config$database$read_pass, sep="")
 
 if (class(dsccon) != "try-error") {
 	dbSendQuery(dsccon, "set statement_timeout to 300000;")

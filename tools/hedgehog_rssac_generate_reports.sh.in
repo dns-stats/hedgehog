@@ -25,7 +25,7 @@
 
 #TODO(asap): Add a flag to allow the user to specify a single server to run the report for
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name
@@ -34,6 +34,7 @@ START=`date --date="${DEFAULT_DAY}" +%Y-%m-%dT00:00`
 INPUT_START=""
 DELETE_RAW_DATA_FLAG=""
 PROCESS_UNIQUE_SOURCES=1;
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo
@@ -44,7 +45,7 @@ usage () {
     echo "Supported options:"
     echo "  -s Date on which to create RSSAC reports (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
     echo "  -u Don't process the unique source data before generating the report"
-	echo "  -D Also delete the raw unique_source data (default: no delete)"
+    echo "  -D Also delete the raw unique_source data from the database to save space (default: no delete)"
     echo "  -h Show this help"
 }
 
@@ -61,23 +62,28 @@ while getopts ":s:Duh" opt; do
 done
 
 echo "`date`: $0 COMMENCED"
-
+USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
 # Validate the input date
 if [ ! -z ${INPUT_START} ] ; then
-	date "+%Y-%m-%d" -d ${INPUT_START} >/dev/null 2>&1
+	if [[ ! $INPUT_START =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$ ]] ; then
+			echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+			exit 1
+	fi
+	date "+%Y-%m-%d" --date="${INPUT_START}" >/dev/null 2>&1
 	is_valid=$?
 	if [ ${is_valid} -ne 0 ] ; then
-		echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+		echo "Error: The start date is invalid" 
 		exit 1
 	fi
 	START=`date --date="${INPUT_START}" +%Y-%m-%dT00:00`
+        DEFAULT_DAY=`date --date="${INPUT_START}" +%Y-%m-%d`
 fi
 
 STOP=`date --date="${START}" +%Y-%m-%dT23:59`
 
-DB_API_VERSION=`psql $DB_NAME -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 SQ="'"
@@ -90,6 +96,7 @@ GVIS=0
 TRAFFIC_SIZE_SMALL="traffic_sizes_small"
 TRAFFIC_SIZE_BIG="traffic_sizes_big"
 TRAFFIC_SIZE_REP_NAME="traffic-sizes"
+TRAFFIC_VOLUME_DIFF="traffic_volume_difference"
 
 echo
 echo "Creating RSSAC reports from ${START} to ${STOP} in ${TOP_OUTPUTDIR}" 
@@ -97,17 +104,17 @@ echo
 
 if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
 	echo "Calling hedgehog_process_unique_source_data.sh script"
-	echo "@BIN@/hedgehog_process_unique_source_data.sh -s ${INPUT_START} ${DELETE_RAW_DATA_FLAG}"
-	@BIN@/hedgehog_rssac_process_unique_source_data.sh -s ${INPUT_START} ${DELETE_RAW_DATA_FLAG}
+	echo "@BIN@/hedgehog_process_unique_source_data.sh -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}"
+	@BIN@/hedgehog_rssac_process_unique_source_data.sh -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}
 	echo
 fi
 
-PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' ORDER BY id DESC;" | psql -td $DB_NAME`
-SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -td $DB_NAME `
+PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' and name != '$TRAFFIC_VOLUME_DIFF' ORDER BY id DESC;" | psql -h $hhconfig_database_host -td $DB_NAME`
+SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME `
 NDARR=-1 # all nodes
 
 for SVRNM in $SERVERNMS ; do
-    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -td $DB_NAME | tr -d [[:space:]]`
+    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -h $hhconfig_database_host -td $DB_NAME | tr -d [[:space:]]`
     SVRNM_LC="$(echo ${SVRNM} | tr '[:upper:]' '[:lower:]')"
 
     for TYPE in $TYPES ; do
@@ -115,7 +122,7 @@ for SVRNM in $SERVERNMS ; do
          [ "${TYPE}" == "generatePlot" ] && EXT="png"
 
         for PLTID in $PLOTIDS ; do
-			PLTNM=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -td $DB_NAME | sed 's/[[:space:]]//g'`
+			PLTNM=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -h $hhconfig_database_host -td $DB_NAME | sed 's/[[:space:]]//g'`
 			# Clear out the file in the plot cache to make sure we get the most up to date plots in the reports
 			rm -rf $hhconfig_directories_plotcache/${SVRNM}/${PLTNM}/${START}-${STOP}-all*.png >/dev/null 2>&1
 			# Generate the file. Yaml gets written to the rssac directory, plots go into the plotcache
@@ -132,7 +139,7 @@ for SVRNM in $SERVERNMS ; do
                 if [ "${PLTFILE}" != "plots/no_graph.png" ] && [ "${PLTFILE}" != "plots/no_results.png" ] && [ "${PLTFILE}" != "plots/no_connection.png" ] ; then                   
 					# Report names are the same as plot names but use dash instead of underscore
 					# TODO: use $PLTNM instead of redoing the query then substitute _ with -
-					REP_NAME=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -td $DB_NAME | sed 's/_/-/g' | sed 's/[[:space:]]//g'`
+					REP_NAME=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -h $hhconfig_database_host -td $DB_NAME | sed 's/_/-/g' | sed 's/[[:space:]]//g'`
 					# Special handling. The traffic size data has 2 plots but both need to go into the same directory
 					PLT_DIR_NM=${REP_NAME}
 					if [ "${PLTNM}" == "${TRAFFIC_SIZE_SMALL}" ] || [ "${PLTNM}" == "${TRAFFIC_SIZE_BIG}" ] ; then

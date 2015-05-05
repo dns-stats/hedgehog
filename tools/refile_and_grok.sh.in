@@ -23,22 +23,24 @@
 # File: refile_and_grok.sh  
 #
 
-PROG=`basename "$0" .sh`
+PROG=$(basename "$0" .sh)
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 
 set -e # exit if any command yields a non 0 exit status
-WD=$hhconfig_directories_data
+WD="$hhconfig_directories_data"
 INPUT="XML"
 OUTPUT="DB"
-CONNSTR="dbname=$hhconfig_database_name dbport=$hhconfig_database_port"
+CONNSTR="dbname=$hhconfig_database_name port=$hhconfig_database_port host=$hhconfig_database_host password=$hhconfig_database_owner_pass"
 START_DATE=""
-RSSAC_FLAG="";
+RSSAC_FLAG=""
 RESERVED_CPUS=0
 DB_NAME="$hhconfig_database_name"
 ARGS=""
 LOG="dsc-extractor.out"
+APPEND_LOG=0
 REQUIRED_API_VERSION=DB_VERSION
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo "${PROG} - finds all input files in working directory and processes to output format"
@@ -50,13 +52,14 @@ usage () {
     echo "-s Start date from which to process incoming data (XML input only)"
     echo "-r Disable processing of rssac data. Default is to process all data."
     echo "-R Reserved processors. Number of CPUS processors to exclude from import (default 0)."
+    echo "-a Append output to the $PROG.stdout file (default is overwrite)"
     echo "-h Show this help."
     echo
 }
 
 
-while getopts ":w:i:o:cs:rR:h" opt; do
-    case $opt in
+while getopts ":w:i:o:cs:raR:h" opt; do
+    case "$opt" in
         w  ) WD=$OPTARG ;;
         i  ) INPUT=$OPTARG ;;
         o  ) OUTPUT=$OPTARG ;;
@@ -64,6 +67,7 @@ while getopts ":w:i:o:cs:rR:h" opt; do
         r  ) RSSAC_FLAG="-r" ;;
         R  ) RESERVED_CPUS=$OPTARG ;;
         c  ) CRON=1 ;;
+        a  ) APPEND_LOG=1 ;;
         h  ) usage
              exit 1 ;;
         \? ) usage
@@ -71,33 +75,31 @@ while getopts ":w:i:o:cs:rR:h" opt; do
     esac
 done
 
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+USER=$(whoami)
+[ "$USER" != "$hhconfig_database_owner" ] && echo "Must be $hhconfig_database_owner to run this script." && exit 1
 
-DB_API_VERSION=`psql $DB_NAME  -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+DB_API_VERSION=$(psql -h $hhconfig_database_host "$DB_NAME"  -tc  "select version from dsc.version;")
+[ "$DB_API_VERSION" -ne "$REQUIRED_API_VERSION" ] && echo "Error: Database API version incorrect. Current version is $DB_API_VERSION, required version is $REQUIRED_API_VERSION" && exit 1
 
-if ! [[ $RESERVED_CPUS =~ ^[0-9]+$ ]] ; then
-	echo "Reserved CPUS ($RESERVED_CPUS) is not a positive number. Exiting"
+if ! [[ "$RESERVED_CPUS" =~ ^[0-9]+$ ]] ; then
+	echo "Reserved CPUS ($RESERVED_CPUS) is not a positive number. Exiting."
 	exit
 fi
 # Get number of real cores
-export REAL_CPUS=`lscpu | grep -i Socket | awk -F: ' { if (total==0) total=1; total=total * $2; print total } ' | tail -1`
-if [[ $RESERVED_CPUS -ge $REAL_CPUS ]] ; then
-	echo "Reserved CPUS ($RESERVED_CPUS) is greater than or equal to the number of available CPUS ($REAL_CPUS). Exiting.... "
+export REAL_CPUS=$(lscpu | awk -F: 'BEGIN { IGNORECASE=1; total=1 } /socket/ { total=total * $2 } END { print total }')
+if [ "$RESERVED_CPUS" -ge "$REAL_CPUS" ] ; then
+	echo "Reserved CPUS ($RESERVED_CPUS) is greater than or equal to the number of available CPUS ($REAL_CPUS). Exiting."
 	exit
 fi
 # This option allows some CPUS to be reserved for the web front end in the case that the import is running continuously
-CPUS=$((REAL_CPUS - RESERVED_CPUS ))
-echo "Using $CPUS CPUS. ($REAL_CPUS available, $RESERVED_CPUS reserved.)"
+CPUS=$(( REAL_CPUS - RESERVED_CPUS ))
+echo "Using $CPUS CPUS ($REAL_CPUS available, $RESERVED_CPUS reserved)."
 
 if [[ "$INPUT" = "XML" || "$INPUT" = "DAT" ]] && [ "$OUTPUT" = "DB" ]
 then
-    ARGS="-i ${INPUT} -o PG_DB -c ${CONNSTR} ${START_DATE} ${RSSAC_FLAG}"
-    LOG=`echo "$LOG" | sed 's/.out/-xml-db.out/'`
-    if [ "$INPUT" == "DAT" ]
-    then
-        LOG=`echo "$LOG" | sed 's/xml/dat/'`
-    fi
+    ARGS="-i ${INPUT} -o PG_DB -c \"${CONNSTR}\" ${START_DATE} ${RSSAC_FLAG}"
+    LOG=${LOG/.out/-xml-db.out}
+    [ "$INPUT" == "DAT" ] && LOG=${LOG/xml/dat}
 fi
 
 
@@ -108,25 +110,26 @@ then
     echo "LOG = $LOG"
     echo -n "Would you like to continue? y/N: "
     read c
-    if [ "$c" != "Y" ] && [ "$c" != "y" ]
-    then
-        exit 1
-    fi
+    [[ ! "$c" =~ ^(Y|y) ]] && exit 1
 fi
 
 #set -x #Print commands just before execution - with all expansions and substitutions done, and words marked - useful for debugging.
 
 cd "${WD}"
-exec >$PROG.stdout
+if [ $APPEND_LOG -eq 1 ]; then
+	exec >>"$PROG.stdout"
+else 
+	exec >"$PROG.stdout"
+fi
 #exec 2>&1
 
-echo "`date`-->SCRIPT COMMENCED"
+echo "$(date) SCRIPT COMMENCED"
 EXECDIR=@BIN@
 export EXECDIR SERVER
-for SERVER in `psql $hhconfig_database_name -tc "select display_name from server;"` ; do
-    test -L $SERVER && continue;
-    test -d $SERVER || continue;
-    ls "${SERVER}" | xargs -i --max-procs=$CPUS bash -c "[ -L \"${SERVER}/{}\" ] || ([ -d \"${SERVER}/{}\" ] && cd \"${SERVER}/{}\"; echo \"`date`-->START: ${SERVER}/{}\"; $EXECDIR/dsc-extractor ${ARGS} >> \"${LOG}\" 2>&1; echo \"`date`-->DONE: ${SERVER}/{}\")"
+for SERVER in $(psql -h $hhconfig_database_host "$hhconfig_database_name" -tc "select display_name from server;") ; do
+    [ -L "$SERVER" ] && continue
+    [ -d "$SERVER" ] || continue
+    ls "${SERVER}" | xargs -i --max-procs=$CPUS bash -c "[ -L \"${SERVER}/{}\" ] || ([ -d \"${SERVER}/{}\" ] && cd \"${SERVER}/{}\"; echo \"\$(date) START: ${SERVER}/{}\"; $EXECDIR/dsc-extractor ${ARGS} >> \"${LOG}\" 2>&1; echo \"\$(date) DONE: ${SERVER}/{}\")"
     # use below version instead to skip nodes that don't
     # have an incoming directory.  It is useful if you
     # receive pre-grokked data to this presenter, but
@@ -135,4 +138,4 @@ for SERVER in `psql $hhconfig_database_name -tc "select display_name from server
     # incoming subdirectory
     # ls "${SERVER}" | xargs -i --max-procs=$CPUS bash -c "[ -L \"${SERVER}/{}\" ] || ([ -d \"${SERVER}/{}\" ] && [ -d \"${SERVER}/{}/incoming\" ] && cd \"${SERVER}/{}\"; echo \"`date`-->START: ${SERVER}/{}\"; $EXECDIR/dsc-extractor ${ARGS} >> \"${LOG}\" 2>&1; echo \"`date`-->DONE: ${SERVER}/{}\")"
 done
-echo "`date`-->SCRIPT COMPLETE"
+echo "$(date) SCRIPT COMPLETE"

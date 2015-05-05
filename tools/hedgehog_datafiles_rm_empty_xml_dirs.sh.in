@@ -23,7 +23,7 @@
 # File:   hedgehog_datafiles_rm_empty_xml_dirs.bash
 #
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 DATE=`date --date="- 7 day" +%Y-%m-%d`
 INCOMING="incoming"
 
@@ -49,16 +49,20 @@ while getopts ":d:h" opt; do
 done
 
 echo "`date`: $0 COMMENCED"
-
+USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
 [ -z $DATE ] && usage && exit 1
 
 # Validate the start date
-date "+%Y-%m-%d" -d $DATE >/dev/null 2>&1
+if [[ ! $DATE =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$ ]] ; then
+		echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+		exit 1
+fi
+date "+%Y-%m-%d" --date="$DATE" >/dev/null 2>&1
 is_valid=$?
 if [ ${is_valid} -ne 0 ] ; then
-	echo "Error: The start date is not in the required format of YYYY-MM-DD" 
+	echo "Error: The start date is invalid" 
 	exit 1
 fi
 

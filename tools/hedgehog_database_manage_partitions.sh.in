@@ -23,10 +23,11 @@
 # File:   hedgehog_database_manage_partitions.sh
 #
 
-eval $(@BIN@/hedgehog_conf_read.sh)
+eval $(@BIN@/hedgehog_conf_read.pl)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name
+export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
 	echo
@@ -51,21 +52,25 @@ while getopts ":p:h" opt; do
 done
 
 echo "`date`: $0 COMMENCED"
-
+USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-DB_API_VERSION=`psql $DB_NAME  -tc  "select version from dsc.version;"`
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME  -tc  "select version from dsc.version;"`
 [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 if [ -z $PDATE ] ; then
     NOW=`date --date="+1 month" +%Y_%m`
     NEXT=`date --date="+2 month" +%Y_%m`
 else
+	if [[ ! $PDATE =~ ^[0-9]{4}-[0-1][0-9]$ ]] ; then
+			echo "Error: The start date is not in the required format of YYYY-MM" 
+			exit 1
+	fi
 	# Validate the input date. Add day since (oddly) date won't parse just year and month
-	date "+%Y-%m-%d" -d ${PDATE}-01 >/dev/null 2>&1
+	date "+%Y-%m-%d" --date="${PDATE}-01" >/dev/null 2>&1
 	is_valid=$?
 	if [ ${is_valid} -ne 0 ] ; then
-		echo "Error: The start date is not in the required format of YYYY-MM" 
+		echo "Error: The start date is invalid" 
 		exit 1
 	fi
 	
@@ -81,19 +86,19 @@ else
     fi
 fi
 
-SERVERS=`psql -td $DB_NAME -c "SELECT name FROM dsc.server;"`
-PLOTS=`psql -td $DB_NAME -c "SELECT name FROM dsc.dataset;"`
+SERVERS=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT name FROM dsc.server;"`
+PLOTS=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT name FROM dsc.dataset;"`
 
 for server in $SERVERS
 do
-    s_id=`psql -td $DB_NAME -c "SELECT id FROM dsc.server WHERE name = '$server';"`
+    s_id=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT id FROM dsc.server WHERE name = '$server';"`
     for plot in $PLOTS
     do
-      p_id=`psql -td $DB_NAME -c "SELECT id FROM dsc.dataset WHERE name = '$plot';"`
+      p_id=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT id FROM dsc.dataset WHERE name = '$plot';"`
       
-      psql $DB_NAME <<EOF
+      psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
-set client_min_messages to WARNING;
+
 CREATE TABLE dsc.data_${server}_${plot}_${NOW} (
   CHECK (starttime >= TIMESTAMP '$NOW-01 00:00:00' AT TIME ZONE 'UTC' AND starttime < TIMESTAMP '$NEXT-01 00:00:00' AT TIME ZONE 'UTC'),
   CHECK (plot_id = $p_id),
@@ -104,6 +109,7 @@ ALTER TABLE dsc.data_${server}_${plot}_${NOW}
         ADD CONSTRAINT pk_data_${server}_${plot}_${NOW} PRIMARY KEY (server_id, node_id , plot_id , starttime , key1, key2 ),
         ADD CONSTRAINT fk_data_${server}_${plot}_${NOW}_node FOREIGN KEY (node_id) REFERENCES dsc.node (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
         ADD CONSTRAINT fk_data_${server}_${plot}_${NOW}_plot FOREIGN KEY (plot_id) REFERENCES dsc.dataset (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+CREATE INDEX idx_data_${server}_${plot}_${NOW}_node_id ON dsc.data_${server}_${plot}_${NOW} (node_id);
 COMMIT;
 EOF
     done

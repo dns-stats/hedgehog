@@ -1,0 +1,153 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   hedgehog_database_init.sh
+#
+
+eval $(@BIN@/hedgehog_conf_read.pl)
+
+# DSTART defaults to the current month
+DSTART=$(date --date="$(date +%Y-%m-01)" +%Y-%m)
+SQ="'"
+
+usage () {
+	echo
+	echo "Create and populate the database tables with plot options and nodes."
+	echo
+	echo "This calls the hedeghog_database_update_nodes.sh script which will populate the DB with the"
+	echo "specified nodes and create a directory structure for them in the working data directory."
+	echo
+	echo "Usage: $0 options"
+	echo
+	echo "Supported options:"
+	echo "  -m Start month of oldest data to be imported (default is current month, format YYYY-MM)"
+	echo "  -h Show this help"
+}
+
+while getopts ":u:m:ph" opt; do
+    case $opt in
+        m  ) DSTART=$OPTARG ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+# Validate the input date. Add day since (oddly) date won't parse just year and month
+if [[ ! $DSTART =~ ^[0-9]{4}-[0-1][0-9]$ ]] ; then
+		echo "Error: The start date is not in the required format of YYYY-MM" 
+		exit 1
+fi
+date "+%Y-%m-%d" --date="${DSTART}-01" >/dev/null 2>&1
+is_valid=$?
+if [ ${is_valid} -ne 0 ] ; then
+	echo "Error: The start date is invalid" 
+	exit 1
+fi
+
+echo "Running with the following options:"
+echo "  Host of database....................... $hhconfig_database_host"
+echo "  Port of database....................... $hhconfig_database_port"
+echo "  Name of database....................... $hhconfig_database_name"
+echo "  Owner of database...................... $hhconfig_database_owner"
+echo "  Reader of database..................... $hhconfig_database_read_user"
+echo "  Start date of oldest data.............. $DSTART"
+echo
+  echo -n "are you sure you want to continue? y/N: "
+  read c
+  if [ "$c" != "y" ] && [ "$c" != "Y" ]
+  then
+    echo "Script halted by user - script exiting."
+    exit 1
+  fi
+
+export PGPASSWORD=$hhconfig_database_owner_pass
+
+psql -h $hhconfig_database_host -d $hhconfig_database_name <<EOF
+  CREATE SCHEMA dsc AUTHORIZATION "$hhconfig_database_owner";
+  REVOKE ALL ON DATABASE "$hhconfig_database_name" FROM public;
+  ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT SELECT ON TABLES TO hh_read;
+  GRANT CONNECT ON DATABASE "$hhconfig_database_name" TO hh_read;
+  GRANT USAGE ON SCHEMA dsc to hh_read;
+  ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT SELECT ON TABLES TO hh_write;
+  ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT INSERT ON TABLES TO hh_write;
+  ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT UPDATE ON TABLES TO hh_write;
+  ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT DELETE ON TABLES TO hh_write;
+  GRANT CONNECT ON DATABASE $hhconfig_database_name TO hh_write;
+  GRANT USAGE ON SCHEMA dsc to hh_write;
+EOF
+
+#################  CREATE TABLES  #########################
+###########################################################
+# Create the base tables, views, functions and constraints
+echo "Initialising the database (creating base tables, views, functions and constraints)"
+psql -h $hhconfig_database_host -d $hhconfig_database_name < @DATA@/hedgehog/sql/initialise_database.sql
+echo
+
+# You have to grant privileges on sequences after creating them
+echo "Granting privileges on sequences to hh_write"
+psql -h $hhconfig_database_host -d $hhconfig_database_name <<EOF
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA dsc TO hh_write;
+\q
+EOF
+echo
+###########################################################
+
+###################  POPULATE TABLES  #####################
+###########################################################
+# Populate the dsc.plot and dsc.iana_lookup tables
+echo "Populating lookup tables (dsc.plot, dsc.iana_lookup)"
+psql -h $hhconfig_database_host -d $hhconfig_database_name  < @DATA@/hedgehog/sql/insert_lookup_data.sql #> /dev/null
+
+echo "Populate servers and nodes"
+@BIN@/hedgehog_database_update_nodes.sh -s
+###########################################################
+
+###################  RUN DDL scripts  #####################
+###########################################################
+# Run any scripts needed to update the DB
+echo "Running DDL scripts"
+@BIN@/DDL_updates/000008_ddl_traffic_difference.sh
+# Skip the index creation as hedgehog_database_manage_partitions.sh will do it
+# for us. Still need to run the script too ensure database versions are correct.
+@BIN@/DDL_updates/000009_ddl_node_index.sh -s
+###########################################################
+
+#############  PARTITION DATA TABLES  #####################
+###########################################################
+# Partition the dsc.data table: create 1 table per month per server per plot
+# TODO: replace this will a call to the manage_partitions.sh script
+echo "Creating partitioned tables for dsc.data (1 table per month per server per plot type)"
+echo "This may take some time if there is a lot of historic data to import"
+i=1
+DNOW_FIRST=`date +%Y%m01`
+DNOW=`date +%Y-%m`
+DSTART=`date --date="${DSTART}-01" +%Y%m%d`
+while [ $DNOW_FIRST -ge $DSTART ]
+do
+  DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y-%m`
+  @BIN@/hedgehog_database_manage_partitions.sh -p ${DNOW}
+  DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`
+  DNOW=`date --date="$DNOW_FIRST" +%Y-%m`
+done
+###########################################################

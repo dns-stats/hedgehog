@@ -44,6 +44,17 @@ $(document).ready(function() {
 
     // populate plot and server dropdowns and nodetabs then generate default plot    
     $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeTabsHtml"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nt, dp){
+
+        if(db[0].indexOf("Error: Database version mismatch.") > -1) {
+            setDbVersionlMsg(true);
+            $("#outerplot").html('<div class="sixteen columns" id="plot"><hr /><img src="plots/no_connection.png" /><hr /></div>');
+            return;
+        }else if(db[0].indexOf("Error: Could not connect to the database") > -1) {
+            setDbFailMsg(true);
+            $("#outerplot").html('<div class="sixteen columns" id="plot"><hr /><img src="plots/no_connection.png" /><hr /></div>');
+            return;
+        }
+
         //initialise plot radio selection
         if (rp[0].indexOf('interactive') !== -1) {
             $('#googleviz').prop('checked', true);
@@ -58,6 +69,15 @@ $(document).ready(function() {
         $("#servers").html(ss[0]);
         $("#servers").val(1);
 
+        // check we have at least 1 server
+        var servers_ok = server_list_has_content();
+        if(!servers_ok) {
+            alert("Error: No servers are configured in the database");
+            $("#outerplot").html('<div class="sixteen columns" id="plot"><hr /><img src="plots/no_results.png" /><hr /></div>');
+            setNoResultsMsg(true);
+            return;
+	    }
+
         // initialise node tabs
         $("#nodetabs").html(nt[0]);
         setServersGroups();
@@ -65,18 +85,9 @@ $(document).ready(function() {
         serverTab();
 
         // generate default plot
-        if(db[0].indexOf("Error: Database version mismatch.") > -1) {
-            setDbVersionlMsg(true);
-            $("#outerplot").html('<div class="sixteen columns" id="plot"><hr /><img src="plots/no_connection.png" /><hr /></div>');
-        } else {
-           var db_fail = check_db();
-           if(!db_fail) {
-               genDSCGraph();
-               setInitHelpMsg(true);
-           } else {
-              setDbFailMsg(true);
-           }
-        }
+       genDSCGraph();
+       setInitHelpMsg(true);
+
     });
     
     // register callback function for when the static / interactive radio buttons are clicked
@@ -295,13 +306,10 @@ function setUserMsg(msg) {
     }
 }
 
-function check_db() {
+function server_list_has_content() {
     if ($("#servers option:selected").text() == '') {
-        setDbFailMsg(true);
-        $("#outerplot").html('<div class="sixteen columns" id="plot"><hr /><img src="plots/no_connection.png" /><hr /></div>');
-        return true;
-    } else {
-        setDbFailMsg(false);
         return false;
+    } else {
+        return true;
     }
 }

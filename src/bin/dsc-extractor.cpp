@@ -22,6 +22,7 @@
 /// a PostgreSQL database. It can also convert from XML to DAT.
 
 #include "config.h"
+#include <iostream>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>

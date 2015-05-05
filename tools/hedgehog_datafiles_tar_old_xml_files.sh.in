@@ -14,72 +14,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-#
-# Developed by Sinodun IT (www.sinodun.com)
-#
-
-# 
-# File:   hedgehog_datafiles_tar_old_xml.sh
-#
-
-eval $(@BIN@/hedgehog_conf_read.sh)
-DONE="done"
-DSCDATA="dscdata"
-
 usage () {
-	echo
-	echo "Pack old xml files already processed into a .tar package to store and archive."
-	echo "The xml files are packed according to their date and node and server."
-	echo 
-    echo "Usage: $0 options"
-    echo
-    echo "Supported options:"
-    echo "  -h Show this help."
+  echo
+  echo "Pack old xml files already processed into a .tar package to store and archive."
+  echo "The xml files are packed according to their date and node and server."
+  echo "The filename has the following format done-PID-date.tar.bz (e.g. done-14143-2015-05-01.tar.bz2)."
+  echo 
+  echo "Usage: $0 options"
+  echo
+  echo "Supported options:"
+  echo "  -h Show this help."
+  exit 1
 }
 
 while getopts ":h" opt; do
     case $opt in
-        h  ) usage
-             exit 1 ;;
-        \? ) usage
-             exit 1 ;;
+        h  ) usage ;;
+        \? ) usage ;;
     esac
 done
 
 echo "`date`: $0 COMMENCED"
 
+USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-cd $hhconfig_directories_data
+eval $(@BIN@/hedgehog_conf_read.pl)
 
-export SERVER NODE
-for SERVER in * ; do
-    test -L $SERVER && continue;
-    test -d $SERVER || continue;
-    cd $hhconfig_directories_data/$SERVER
-    for NODE in * ; do
-		test -L $NODE && continue;
-        test -d $NODE || continue;
-        test -L $NODE/$DONE && continue;
-        test -d $NODE/$DONE || continue;
-        cd $hhconfig_directories_data/$SERVER/$NODE/$DONE
-		for MYDATE in * ; do
-            test -L $MYDATE && continue;
-            test -d $MYDATE || continue;
-            test -L $MYDATE/$DSCDATA && continue;
-            test -d $MYDATE/$DSCDATA || continue;
-            cd $hhconfig_directories_data/$SERVER/$NODE/$DONE/$MYDATE/$DSCDATA
-            COUNT=`ls -1 *.xml 2>/dev/null | wc  -l`
-            if [ $COUNT -gt 0 ] ; then
-				echo "Creating $hhconfig_directories_data/$SERVER/$NODE/$DONE/$MYDATE/$DSCDATA/xml-`date +%Y%m%d%H%M`.tar.bz2"
-				tar --remove-files -cjf xml-`date +%Y%m%d%H%M`.tar.bz2 *.xml
-            fi
-            cd $hhconfig_directories_data/$SERVER/$NODE/$DONE
-        done
-       cd $hhconfig_directories_data/$SERVER
-    done
-    cd $hhconfig_directories_data
+for i in $(find $hhconfig_directories_data -maxdepth 3 -name done -type d) ; do
+    for j in $(find $i -mindepth 1 -maxdepth 1 -type d) ; do
+    short=$(echo $j | sed "s|$hhconfig_directories_data||")
+    DIR_FOUND=$(echo $short | awk -F\/ ' { print $5 } ')
+    TODAY=$(date +%Y-%m-%d)
+    if [ $DIR_FOUND == $TODAY ] ; then
+      continue
+    else
+      echo "tar -cj --remove-files -f $i/done-$$-$DIR_FOUND.tar.bz2 $j"
+      nice -n 19 tar -cj --remove-files -f $i/done-$$-$DIR_FOUND.tar.bz2 $j
+    fi
+  done
 done
 
 echo "`date`: $0 COMPLETED"
