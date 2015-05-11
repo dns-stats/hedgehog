@@ -1,0 +1,7 @@
+usr/share/hedgehog/sql/
+usr/bin/hedgehogctl
+usr/bin/refile_and_grok
+usr/lib/hedgehog/*
+etc/hedgehog/*sample /usr/share/doc/hedgehog/examples/
+etc/hedgehog/nodes.csv
+etc/hedgehog/*.yaml

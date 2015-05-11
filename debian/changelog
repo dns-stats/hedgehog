@@ -1,0 +1,5 @@
+hedgehog (2.0.0~rc1-1) unstable; urgency=low
+
+  * Initial release (Closes: #785027)
+
+ -- Ondřej Surý <ondrej@debian.org>  Fri, 12 Jun 2015 11:30:52 +0200
