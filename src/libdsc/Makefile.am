@@ -10,13 +10,8 @@ libdsc_a_SOURCES =   DSCDataManager.cpp \
                       Format2DSCStrategy.cpp \
                       Format3aDSCStrategy.cpp \
                       Format3bDSCStrategy.cpp \
-                      Format4DSCStrategy.cpp
-
-AM_CXXFLAGS = -I$(srcdir)
-
-libdsc_a_CXXFLAGS = @BOOST_CPPFLAGS@ @LIBPQXX_INCLUDES@
-
-include_HEADERS =     DSCDataManager.h \
+                      Format4DSCStrategy.cpp \
+                      DSCDataManager.h \
                       DSCStrategyFactory.h \
                       DSCStrategy.h \
                       DSCIOManager.h \
@@ -26,3 +21,7 @@ include_HEADERS =     DSCDataManager.h \
                       Format3bDSCStrategy.h \
                       Format4DSCStrategy.h \
                       dsc_types.h
+
+AM_CXXFLAGS = -I$(srcdir)
+
+libdsc_a_CXXFLAGS = @BOOST_CPPFLAGS@ @LIBPQXX_INCLUDES@
