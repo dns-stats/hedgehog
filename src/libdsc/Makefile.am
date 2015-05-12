@@ -1,5 +1,3 @@
-MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
-
 noinst_LIBRARIES = libdsc.a
 
 libdsc_a_SOURCES =   DSCDataManager.cpp \

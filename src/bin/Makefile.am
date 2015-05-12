@@ -1,5 +1,3 @@
-MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
-
 bin_PROGRAMS = dsc-extractor
 
 dsc_extractor_SOURCES = dsc-extractor.cpp
