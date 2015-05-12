@@ -1,8 +1,8 @@
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
 
-lib_LTLIBRARIES = libdsc.la
+noinst_LIBRARIES = libdsc.a
 
-libdsc_la_SOURCES =   DSCDataManager.cpp \
+libdsc_a_SOURCES =   DSCDataManager.cpp \
                       DSCIOManager.cpp \
                       DSCStrategyFactory.cpp \
                       DSCStrategy.cpp \
@@ -14,15 +14,7 @@ libdsc_la_SOURCES =   DSCDataManager.cpp \
 
 AM_CXXFLAGS = -I$(srcdir)
 
-libdsc_la_CXXFLAGS = @BOOST_CPPFLAGS@ @LIBPQXX_INCLUDES@
-
-libdsc_la_LIBADD =        @BOOST_SYSTEM_LDFLAGS@ \
-                          @BOOST_SYSTEM_LIBS@ \
-                          @BOOST_FILESYSTEM_LDFLAGS@ \
-                          @BOOST_FILESYSTEM_LIBS@ \
-                          @BOOST_PROGRAM_OPTIONS_LDFLAGS@ \
-                          @BOOST_PROGRAM_OPTIONS_LIBS@ \
-                          @LIBPQXX_LIBS@
+libdsc_a_CXXFLAGS = @BOOST_CPPFLAGS@ @LIBPQXX_INCLUDES@
 
 include_HEADERS =     DSCDataManager.h \
                       DSCStrategyFactory.h \
