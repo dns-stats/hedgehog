@@ -25,7 +25,7 @@
 
 PROG=$(basename "$0" .sh)
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@BIN@/conf_read)
 
 set -e # exit if any command yields a non 0 exit status
 WD="$hhconfig_directories_data"

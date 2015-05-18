@@ -25,7 +25,7 @@
 
 #TODO: Add option to select all servers or just one server
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@BIN@/conf_read)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name

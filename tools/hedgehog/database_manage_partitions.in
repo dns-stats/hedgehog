@@ -23,7 +23,7 @@
 # File:   hedgehog_database_manage_partitions.sh
 #
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@BIN@/conf_read)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name

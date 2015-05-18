@@ -23,7 +23,7 @@
 # File:   hedgehog_database_init.sh
 #
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@BIN@/conf_read)
 
 # DSTART defaults to the current month
 DSTART=$(date --date="$(date +%Y-%m-01)" +%Y-%m)

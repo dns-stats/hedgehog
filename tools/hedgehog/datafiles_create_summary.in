@@ -23,7 +23,7 @@
 # File:   hedgehog_datafiles_create_summary.sh
 #
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@BIN@/conf_read)
 
 DATADIR=$hhconfig_directories_data
 LOG_FILE="dsc-extractor-xml-db.out"
