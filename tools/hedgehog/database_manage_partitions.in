@@ -34,7 +34,7 @@ usage () {
 	echo "Create a new set of partitioned data tables in the database to hold imported data."
 	echo "The partitions are created per month of data."
 	echo
-	echo "Usage: $0 options"
+	echo "Usage: $(basename $0) options"
 	echo
 	echo "Supported options:"
 	echo "	-p Date of partitions to create in YYYY-MM format (default is next month)."

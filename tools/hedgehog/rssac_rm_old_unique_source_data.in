@@ -49,7 +49,7 @@ usage () {
     echo "This script is intended to be run monthly to free disk space on systems where the raw"
     echo "unique sources data becomes unmanagably large."
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
     echo "  -s Month from which to delete all raw unique source data (default ${START}: format YYYY-MM)"

@@ -36,7 +36,7 @@ usage () {
 	echo "This calls the hedeghog_database_update_nodes.sh script which will populate the DB with the"
 	echo "specified nodes and create a directory structure for them in the working data directory."
 	echo
-	echo "Usage: $0 options"
+	echo "Usage: $(basename $0) options"
 	echo
 	echo "Supported options:"
 	echo "  -m Start month of oldest data to be imported (default is current month, format YYYY-MM)"

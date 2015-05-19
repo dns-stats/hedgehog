@@ -37,7 +37,7 @@ usage () {
     echo
     echo "Process the raw unique source data into a summary table for a specified 24 hour period"
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
     echo "  -s Date on which to compress data (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"

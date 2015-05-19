@@ -35,7 +35,7 @@ usage () {
     echo "This script is interactive if the -a option is not selected."
     echo "You will be asked to select which cached plot types you'd like to remove"
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
     echo "  -a Remove all cached plots"

@@ -10,7 +10,7 @@ usage () {
 	echo
 	echo "Run a Hedgehog command"
 	echo
-	echo "Usage: $0 [help|list] [COMMAND] [command_options]"
+	echo "Usage: $(basename $0) [help|list] [COMMAND] [command_options]"
 	echo
   exit 1
 }

@@ -47,7 +47,7 @@ usage () {
 	echo " - See the comments in that file for details of the format."
 	echo " - No action is taken on servers/nodes that are in the database but are not in the input files."
 	echo 
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
 	echo "  -p Run in prediction mode. Output findings but don't act on the DB"

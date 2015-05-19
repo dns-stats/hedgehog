@@ -37,7 +37,7 @@ usage () {
 	echo
 	echo "Generate a processing report based on the information in the log files"
 	echo 
-	echo "Usage: $0 options"
+	echo "Usage: $(basename $0) options"
 	echo
 	echo "Supported options:"
 	echo "	-s Only report on the server with this name (default is all servers)"

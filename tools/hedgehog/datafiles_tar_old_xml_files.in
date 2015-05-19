@@ -20,7 +20,7 @@ usage () {
   echo "The xml files are packed according to their date and node and server."
   echo "The filename has the following format done-PID-date.tar.bz (e.g. done-14143-2015-05-01.tar.bz2)."
   echo 
-  echo "Usage: $0 options"
+  echo "Usage: $(basename $0) options"
   echo
   echo "Supported options:"
   echo "  -h Show this help."

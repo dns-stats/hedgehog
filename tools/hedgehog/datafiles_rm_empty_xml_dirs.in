@@ -31,7 +31,7 @@ usage () {
 	echo
 	echo "Remove empty incoming xml directories older than a certain date (default is all the processed directories older than 7 days ago)"
 	echo 
-	echo "Usage: $0 options"
+	echo "Usage: $(basename $0) options"
 	echo
 	echo "Supported options:"
 	echo "	-d Date before which to remove empty xml directories (default: 7 days ago, format YYYY-MM-DD)"

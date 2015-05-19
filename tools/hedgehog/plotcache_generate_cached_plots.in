@@ -37,7 +37,7 @@ usage () {
     echo "Create cached plots for each chosen period (day/week/month) between Start and End range of time"
     echo "You must add at least one option for which plot window to generate [-D|-W|-M]"
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
     echo "  -s Start date of time range from which to create cached plots (default: \"${FROM}\")"

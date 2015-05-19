@@ -40,7 +40,7 @@ usage () {
     echo
     echo "Create RSSAC reports for a specified 24 hour period"
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
     echo "  -s Date on which to create RSSAC reports (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
