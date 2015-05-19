@@ -21,7 +21,8 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
 				hedgehog/DDL_updates/000009_ddl_node_index
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
-				$(srcdir)/hedgehog/sql/insert_lookup_data.sql
+				$(srcdir)/hedgehog/sql/insert_lookup_data.sql \
+				$(srcdir)/hedgehog/sql/database_create
 
 subst_S_BIN = sed -e "s|@BIN@|@libexecdir@/hedgehog|" -e "s|@DATA@|@datadir@|"
 subst_DB_VERSION = sed -e "s|DB_VERSION|@DB_SCHEMA_VERSION@|"
