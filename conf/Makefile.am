@@ -1,5 +1,3 @@
-MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
-
 CLEANFILES = $(localstate_DATA) $(noinst_DATA)
 
 sysconfdir = @sysconfdir@/hedgehog
@@ -8,7 +6,7 @@ noinst_DATA = hedgehog.yaml
 
 hedgehog.yaml: $(srcdir)/hedgehog.yaml.in Makefile
 	$(subst_HH_DIRS) < $(srcdir)/hedgehog.yaml.in > hedgehog.yaml
-	
+
 EXTRA_DIST = (srcdir)/hedgehog.yaml.in
 
 install-data-hook:
