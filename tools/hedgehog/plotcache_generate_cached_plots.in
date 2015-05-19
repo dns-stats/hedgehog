@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   plotcache_generate_cached_plots.sh
+# File:   plotcache_generate_cached_plots
 #
 
 eval $(@BIN@/conf_read)

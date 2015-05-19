@@ -20,10 +20,10 @@
 #
 
 #
-# File: refile_and_grok.sh  
+# File: refile_and_grok  
 #
 
-PROG=$(basename "$0" .sh)
+PROG=$(basename "$0" )
 
 eval $(@BIN@/conf_read)
 

@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   datafiles_create_summary.sh
+# File:   datafiles_create_summary
 #
 
 eval $(@BIN@/conf_read)

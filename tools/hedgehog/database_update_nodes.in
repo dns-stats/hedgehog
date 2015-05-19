@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   database_update_nodes.sh
+# File:   database_update_nodes
 #
 
 #TODO(asap): Add option to generate the nodes.csv file from the directory structure if it already exists (won't have group info)
@@ -166,7 +166,7 @@ if [ ${NEW_SERVER} -eq 1 ] && [ $SUPPRESS_WARNINGS -eq 0 ] ; then
 	echo
 	echo "********************************************************************************"
 	echo "New servers have been added to Hedgehog! To enable the import of data for this"
-	echo "server the 'manage_partitions.sh' script MUST be run manually now."
+	echo "server the 'manage_partitions' script MUST be run manually now."
 	echo "********************************************************************************"
 	echo
 fi

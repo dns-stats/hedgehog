@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   database_manage_partitions.sh
+# File:   database_manage_partitions
 #
 
 eval $(@BIN@/conf_read)

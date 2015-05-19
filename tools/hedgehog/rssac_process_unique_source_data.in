@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   rssac_process_unique_source_data.sh
+# File:   rssac_process_unique_source_data
 #
 
 eval $(@BIN@/conf_read)

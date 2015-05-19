@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   hh_database_create.sh
+# File:   hh_database_create
 #
 
 DB_NAME=hedgehog
