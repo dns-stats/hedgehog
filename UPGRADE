@@ -87,7 +87,7 @@ Some files were moved or deleted between b1 and b2. To clean the install
 directory run the following commands
 
 sudo rm -rf <prefix>/sbin/hedgehog_database_create.d/
-sudo rm     <prefix>/bin/conf_read.sh
+sudo rm     <prefix>/bin/hedgehog_conf_read.sh
 
 2.3 Update configuration settings
 
