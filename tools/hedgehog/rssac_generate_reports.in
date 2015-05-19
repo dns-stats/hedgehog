@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   hedgehog_rssac_generate_reports.sh
+# File:   rssac_generate_reports.sh
 #
 
 #TODO(asap): Add a flag to allow the user to specify a single server to run the report for
@@ -103,9 +103,9 @@ echo "Creating RSSAC reports from ${START} to ${STOP} in ${TOP_OUTPUTDIR}"
 echo
 
 if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
-	echo "Calling hedgehog_process_unique_source_data.sh script"
-	echo "@BIN@/hedgehog_process_unique_source_data.sh -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}"
-	@BIN@/hedgehog_rssac_process_unique_source_data.sh -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}
+	echo "Calling process_unique_source_data.sh script"
+	echo "@BIN@/process_unique_source_data.sh -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}"
+	@BIN@/rssac_process_unique_source_data.sh -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}
 	echo
 fi
 

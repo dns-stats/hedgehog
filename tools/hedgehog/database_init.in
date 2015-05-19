@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   hedgehog_database_init.sh
+# File:   database_init.sh
 #
 
 eval $(@BIN@/conf_read)
@@ -120,7 +120,7 @@ echo "Populating lookup tables (dsc.plot, dsc.iana_lookup)"
 psql -h $hhconfig_database_host -d $hhconfig_database_name  < @DATA@/hedgehog/sql/insert_lookup_data.sql #> /dev/null
 
 echo "Populate servers and nodes"
-@BIN@/hedgehog_database_update_nodes.sh -s
+@BIN@/database_update_nodes.sh -s
 ###########################################################
 
 ###################  RUN DDL scripts  #####################
@@ -128,7 +128,7 @@ echo "Populate servers and nodes"
 # Run any scripts needed to update the DB
 echo "Running DDL scripts"
 @BIN@/DDL_updates/000008_ddl_traffic_difference.sh
-# Skip the index creation as hedgehog_database_manage_partitions.sh will do it
+# Skip the index creation as database_manage_partitions.sh will do it
 # for us. Still need to run the script too ensure database versions are correct.
 @BIN@/DDL_updates/000009_ddl_node_index.sh -s
 ###########################################################
@@ -146,7 +146,7 @@ DSTART=`date --date="${DSTART}-01" +%Y%m%d`
 while [ $DNOW_FIRST -ge $DSTART ]
 do
   DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y-%m`
-  @BIN@/hedgehog_database_manage_partitions.sh -p ${DNOW}
+  @BIN@/database_manage_partitions.sh -p ${DNOW}
   DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`
   DNOW=`date --date="$DNOW_FIRST" +%Y-%m`
 done

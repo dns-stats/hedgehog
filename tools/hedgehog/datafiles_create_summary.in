@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   hedgehog_datafiles_create_summary.sh
+# File:   datafiles_create_summary.sh
 #
 
 eval $(@BIN@/conf_read)

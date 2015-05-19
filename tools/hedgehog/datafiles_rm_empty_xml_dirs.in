@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   hedgehog_datafiles_rm_empty_xml_dirs.bash
+# File:   datafiles_rm_empty_xml_dirs.bash
 #
 
 eval $(@BIN@/conf_read)

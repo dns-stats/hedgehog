@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   hedgehog_plotcache_rm_cached_plots.sh
+# File:   plotcache_rm_cached_plots.sh
 #
 
 eval $(@BIN@/conf_read)
