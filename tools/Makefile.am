@@ -1,5 +1,3 @@
-MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
-
 CLEANFILES = $(bin_SCRIPTS)
 
 bin_SCRIPTS = refile_and_grok \
@@ -37,7 +35,7 @@ refile_and_grok: refile_and_grok.in Makefile
 hedgehog/conf_read: $(srcdir)/hedgehog/conf_read.in Makefile
 	mkdir -p hedgehog
 	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog/conf_read.in > hedgehog/conf_read
-	
+
 hedgehog/database_init: $(srcdir)/hedgehog/database_init.in Makefile
 	mkdir -p hedgehog
 	$(subst_S_BIN) < $(srcdir)/hedgehog/database_init.in > hedgehog/database_init
@@ -45,15 +43,15 @@ hedgehog/database_init: $(srcdir)/hedgehog/database_init.in Makefile
 hedgehog/database_manage_partitions: $(srcdir)/hedgehog/database_manage_partitions.in Makefile
 	mkdir -p hedgehog
 	$(subst_DB_VERSION) < $(srcdir)/hedgehog/database_manage_partitions.in | $(subst_S_BIN) > hedgehog/database_manage_partitions
-	
+
 hedgehog/database_update_nodes: $(srcdir)/hedgehog/database_update_nodes.in Makefile
 	mkdir -p hedgehog
 	$(subst_DB_VERSION) < $(srcdir)/hedgehog/database_update_nodes.in | $(subst_S_BIN) > hedgehog/database_update_nodes
-	
+
 hedgehog/datafiles_create_summary: $(srcdir)/hedgehog/datafiles_create_summary.in Makefile
 	mkdir -p hedgehog
 	$(subst_S_BIN) < $(srcdir)/hedgehog/datafiles_create_summary.in > hedgehog/datafiles_create_summary
-	
+
 hedgehog/datafiles_rm_empty_xml_dirs: $(srcdir)/hedgehog/datafiles_rm_empty_xml_dirs.in Makefile
 	mkdir -p hedgehog
 	$(subst_S_BIN) < $(srcdir)/hedgehog/datafiles_rm_empty_xml_dirs.in > hedgehog/datafiles_rm_empty_xml_dirs
@@ -69,19 +67,19 @@ hedgehog/plotcache_generate_cached_plots: $(srcdir)/hedgehog/plotcache_generate_
 hedgehog/plotcache_rm_cached_plots: $(srcdir)/hedgehog/plotcache_rm_cached_plots.in Makefile
 	mkdir -p hedgehog
 	$(subst_S_BIN) < $(srcdir)/hedgehog/plotcache_rm_cached_plots.in | $(subst_DB_VERSION) > hedgehog/plotcache_rm_cached_plots
-	
+
 hedgehog/rssac_generate_reports: $(srcdir)/hedgehog/rssac_generate_reports.in Makefile
 	mkdir -p hedgehog
 	$(subst_DB_VERSION) < $(srcdir)/hedgehog/rssac_generate_reports.in | $(subst_S_BIN) > hedgehog/rssac_generate_reports
-	
+
 hedgehog/rssac_process_unique_source_data: $(srcdir)/hedgehog/rssac_process_unique_source_data.in Makefile
 	mkdir -p hedgehog
 	$(subst_DB_VERSION) < $(srcdir)/hedgehog/rssac_process_unique_source_data.in | $(subst_S_BIN) > hedgehog/rssac_process_unique_source_data
-	
+
 hedgehog/rssac_rm_old_unique_source_data: $(srcdir)/hedgehog/rssac_rm_old_unique_source_data.in Makefile
 	mkdir -p hedgehog
 	$(subst_DB_VERSION) < $(srcdir)/hedgehog/rssac_rm_old_unique_source_data.in | $(subst_S_BIN) > hedgehog/rssac_rm_old_unique_source_data
-	
+
 hedgehog/DDL_updates/000008_ddl_traffic_difference: $(srcdir)/hedgehog/DDL_updates/000008_ddl_traffic_difference.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_DB_VERSION) < $(srcdir)/hedgehog/DDL_updates/000008_ddl_traffic_difference.in | $(subst_S_BIN) > hedgehog/DDL_updates/000008_ddl_traffic_difference
@@ -103,7 +101,7 @@ EXTRA_DIST = 	refile_and_grok.in \
 				rssac_generate_reports.in \
 				rssac_process_unique_source_data.in \
 				rssac_rm_old_unique_source_data.in 
-	
+
 install-data-hook:
 	mkdir -p ${DESTDIR}$(localstatedir)/hedgehog
 	chmod -R 775 ${DESTDIR}$(localstatedir)/hedgehog
