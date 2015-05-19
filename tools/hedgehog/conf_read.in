@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   hedgehog_conf_read.pl
+# File:   conf_read
 #
 
 use YAML::Tiny;

@@ -23,7 +23,7 @@
 # File:   000009_ddl_traffic_difference.sh
 #
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@BIN@/conf_read)
 
 DB_NAME=$hhconfig_database_name
 DATA_DIR=$hhconfig_directories_data
@@ -42,7 +42,7 @@ DSC_SCHEMA="dsc"
 
 usage () {
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
     echo "  -h Show this help."

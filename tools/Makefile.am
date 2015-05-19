@@ -1,92 +1,108 @@
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
 
-CLEANFILES = $(bin_SCRIPTS) $(sbin_SCRIPTS)
+CLEANFILES = $(bin_SCRIPTS)
 
-bin_SCRIPTS = 	refile_and_grok.sh \
-				hedgehog_conf_read.pl \
-				hedgehog_database_manage_partitions.sh \
-				hedgehog_database_update_nodes.sh \
-				hedgehog_datafiles_create_summary.sh \
-				hedgehog_datafiles_rm_empty_xml_dirs.sh \
-				hedgehog_datafiles_tar_old_xml_files.sh \
-				hedgehog_plotcache_generate_cached_plots.sh \
-				hedgehog_plotcache_rm_cached_plots.sh \
-				hedgehog_rssac_generate_reports.sh \
-				hedgehog_rssac_process_unique_source_data.sh \
-				hedgehog_rssac_rm_old_unique_source_data.sh \
-				hedgehog_database_init.sh
+bin_SCRIPTS = refile_and_grok \
+				hedgehogctl
 
-sbin_SCRIPTS = hedgehog_database_create.sh
-
-nobase_bin_SCRIPTS = DDL_updates/000008_ddl_traffic_difference.sh \
-				DDL_updates/000009_ddl_node_index.sh
+nobase_libexec_SCRIPTS = hedgehog/conf_read \
+				hedgehog/database_manage_partitions \
+				hedgehog/database_update_nodes \
+				hedgehog/datafiles_create_summary \
+				hedgehog/datafiles_rm_empty_xml_dirs \
+				hedgehog/datafiles_tar_old_xml_files \
+				hedgehog/plotcache_generate_cached_plots \
+				hedgehog/plotcache_rm_cached_plots \
+				hedgehog/rssac_generate_reports \
+				hedgehog/rssac_process_unique_source_data \
+				hedgehog/rssac_rm_old_unique_source_data \
+				hedgehog/database_init \
+				hedgehog/DDL_updates/000008_ddl_traffic_difference \
+				hedgehog/DDL_updates/000009_ddl_node_index
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
-				$(srcdir)/hedgehog/sql/insert_lookup_data.sql
+				$(srcdir)/hedgehog/sql/insert_lookup_data.sql \
+				$(srcdir)/hedgehog/sql/database_create
 
-subst_S_BIN = sed -e "s,@SBIN@,@sbindir@,"  -e "s,@BIN@,@bindir@," -e "s,@DATA@,@datadir@,"
+subst_S_BIN = sed -e "s|@BIN@|@libexecdir@/hedgehog|" -e "s|@DATA@|@datadir@|"
 subst_DB_VERSION = sed -e "s|DB_VERSION|@DB_SCHEMA_VERSION@|"
+subst_libexec = sed -e "s|@LIBEXEC@|@libexecdir@|"
 
-refile_and_grok.sh: refile_and_grok.sh.in Makefile
-	$(subst_S_BIN) < $(srcdir)/refile_and_grok.sh.in | $(subst_DB_VERSION) > refile_and_grok.sh
+hedgehogctl: hedgehogctl.in Makefile
+	${subst_libexec} < $(srcdir)/hedgehogctl.in > hedgehogctl
 
-hedgehog_conf_read.pl: hedgehog_conf_read.pl.in Makefile
-	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog_conf_read.pl.in > hedgehog_conf_read.pl
-	
-hedgehog_database_init.sh: hedgehog_database_init.sh.in Makefile
-	$(subst_S_BIN) < $(srcdir)/hedgehog_database_init.sh.in > hedgehog_database_init.sh
+refile_and_grok: refile_and_grok.in Makefile
+	$(subst_S_BIN) < $(srcdir)/refile_and_grok.in | $(subst_DB_VERSION) > refile_and_grok
 
-hedgehog_database_manage_partitions.sh: hedgehog_database_manage_partitions.sh.in Makefile
-	$(subst_DB_VERSION) < $(srcdir)/hedgehog_database_manage_partitions.sh.in | $(subst_S_BIN) > hedgehog_database_manage_partitions.sh
+hedgehog/conf_read: $(srcdir)/hedgehog/conf_read.in Makefile
+	mkdir -p hedgehog
+	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog/conf_read.in > hedgehog/conf_read
 	
-hedgehog_database_update_nodes.sh: hedgehog_database_update_nodes.sh.in Makefile
-	$(subst_DB_VERSION) < $(srcdir)/hedgehog_database_update_nodes.sh.in | $(subst_S_BIN) > hedgehog_database_update_nodes.sh
-	
-hedgehog_datafiles_create_summary.sh: hedgehog_datafiles_create_summary.sh.in Makefile
-	$(subst_S_BIN) < $(srcdir)/hedgehog_datafiles_create_summary.sh.in > hedgehog_datafiles_create_summary.sh
-	
-hedgehog_datafiles_rm_empty_xml_dirs.sh: hedgehog_datafiles_rm_empty_xml_dirs.sh.in Makefile
-	$(subst_S_BIN) < $(srcdir)/hedgehog_datafiles_rm_empty_xml_dirs.sh.in > hedgehog_datafiles_rm_empty_xml_dirs.sh
+hedgehog/database_init: $(srcdir)/hedgehog/database_init.in Makefile
+	mkdir -p hedgehog
+	$(subst_S_BIN) < $(srcdir)/hedgehog/database_init.in > hedgehog/database_init
 
-hedgehog_datafiles_tar_old_xml_files.sh: hedgehog_datafiles_tar_old_xml_files.sh.in Makefile
-	$(subst_S_BIN) < $(srcdir)/hedgehog_datafiles_tar_old_xml_files.sh.in > hedgehog_datafiles_tar_old_xml_files.sh
-
-hedgehog_plotcache_generate_cached_plots.sh: hedgehog_plotcache_generate_cached_plots.sh.in Makefile
-	$(subst_DB_VERSION) < $(srcdir)/hedgehog_plotcache_generate_cached_plots.sh.in | $(subst_S_BIN) > hedgehog_plotcache_generate_cached_plots.sh
-
-hedgehog_plotcache_rm_cached_plots.sh: hedgehog_plotcache_rm_cached_plots.sh.in Makefile
-	$(subst_S_BIN) < $(srcdir)/hedgehog_plotcache_rm_cached_plots.sh.in | $(subst_DB_VERSION) > hedgehog_plotcache_rm_cached_plots.sh
+hedgehog/database_manage_partitions: $(srcdir)/hedgehog/database_manage_partitions.in Makefile
+	mkdir -p hedgehog
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/database_manage_partitions.in | $(subst_S_BIN) > hedgehog/database_manage_partitions
 	
-hedgehog_rssac_generate_reports.sh: hedgehog_rssac_generate_reports.sh.in Makefile
-	$(subst_DB_VERSION) < $(srcdir)/hedgehog_rssac_generate_reports.sh.in | $(subst_S_BIN) > hedgehog_rssac_generate_reports.sh
+hedgehog/database_update_nodes: $(srcdir)/hedgehog/database_update_nodes.in Makefile
+	mkdir -p hedgehog
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/database_update_nodes.in | $(subst_S_BIN) > hedgehog/database_update_nodes
 	
-hedgehog_rssac_process_unique_source_data.sh: hedgehog_rssac_process_unique_source_data.sh.in Makefile
-	$(subst_DB_VERSION) < $(srcdir)/hedgehog_rssac_process_unique_source_data.sh.in | $(subst_S_BIN) > hedgehog_rssac_process_unique_source_data.sh
+hedgehog/datafiles_create_summary: $(srcdir)/hedgehog/datafiles_create_summary.in Makefile
+	mkdir -p hedgehog
+	$(subst_S_BIN) < $(srcdir)/hedgehog/datafiles_create_summary.in > hedgehog/datafiles_create_summary
 	
-hedgehog_rssac_rm_old_unique_source_data.sh: hedgehog_rssac_rm_old_unique_source_data.sh.in Makefile
-	$(subst_DB_VERSION) < $(srcdir)/hedgehog_rssac_rm_old_unique_source_data.sh.in | $(subst_S_BIN) > hedgehog_rssac_rm_old_unique_source_data.sh
-	
-DDL_updates/000008_ddl_traffic_difference.sh: $(srcdir)/DDL_updates/000008_ddl_traffic_difference.sh.in Makefile
-	mkdir -p DDL_updates
-	$(subst_DB_VERSION) < $(srcdir)/DDL_updates/000008_ddl_traffic_difference.sh.in | $(subst_S_BIN) > DDL_updates/000008_ddl_traffic_difference.sh
+hedgehog/datafiles_rm_empty_xml_dirs: $(srcdir)/hedgehog/datafiles_rm_empty_xml_dirs.in Makefile
+	mkdir -p hedgehog
+	$(subst_S_BIN) < $(srcdir)/hedgehog/datafiles_rm_empty_xml_dirs.in > hedgehog/datafiles_rm_empty_xml_dirs
 
-DDL_updates/000009_ddl_node_index.sh: $(srcdir)/DDL_updates/000009_ddl_node_index.sh.in Makefile
-	mkdir -p DDL_updates
-	$(subst_DB_VERSION) < $(srcdir)/DDL_updates/000009_ddl_node_index.sh.in | $(subst_S_BIN) > DDL_updates/000009_ddl_node_index.sh
+hedgehog/datafiles_tar_old_xml_files: $(srcdir)/hedgehog/datafiles_tar_old_xml_files.in Makefile
+	mkdir -p hedgehog
+	$(subst_S_BIN) < $(srcdir)/hedgehog/datafiles_tar_old_xml_files.in > hedgehog/datafiles_tar_old_xml_files
 
-EXTRA_DIST = 	refile_and_grok.sh.in \
-				hedgehog_conf_read.sh.in \
-				hedgehog_database_init.sh.in \
-				hedgehog_database_manage_partitions.sh.in \
-				hedgehog_database_update_nodes.sh.in \
-				hedgehog_datafiles_create_summary.sh.in \
-				hedgehog_datafiles_rm_empty_xml_dirs.sh.in \
-				hedgehog_datafiles_tar_old_xml_files.sh.in \
-				hedgehog_plotcache_generate_cached_plots.sh.in \
-				hedgehog_plotcache_rm_cached_plots.sh.in \
-				hedgehog_rssac_generate_reports.sh.in \
-				hedgehog_rssac_process_unique_source_data.sh.in \
-				hedgehog_rssac_rm_old_unique_source_data.sh.in 
+hedgehog/plotcache_generate_cached_plots: $(srcdir)/hedgehog/plotcache_generate_cached_plots.in Makefile
+	mkdir -p hedgehog
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/plotcache_generate_cached_plots.in | $(subst_S_BIN) > hedgehog/plotcache_generate_cached_plots
+
+hedgehog/plotcache_rm_cached_plots: $(srcdir)/hedgehog/plotcache_rm_cached_plots.in Makefile
+	mkdir -p hedgehog
+	$(subst_S_BIN) < $(srcdir)/hedgehog/plotcache_rm_cached_plots.in | $(subst_DB_VERSION) > hedgehog/plotcache_rm_cached_plots
+	
+hedgehog/rssac_generate_reports: $(srcdir)/hedgehog/rssac_generate_reports.in Makefile
+	mkdir -p hedgehog
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/rssac_generate_reports.in | $(subst_S_BIN) > hedgehog/rssac_generate_reports
+	
+hedgehog/rssac_process_unique_source_data: $(srcdir)/hedgehog/rssac_process_unique_source_data.in Makefile
+	mkdir -p hedgehog
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/rssac_process_unique_source_data.in | $(subst_S_BIN) > hedgehog/rssac_process_unique_source_data
+	
+hedgehog/rssac_rm_old_unique_source_data: $(srcdir)/hedgehog/rssac_rm_old_unique_source_data.in Makefile
+	mkdir -p hedgehog
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/rssac_rm_old_unique_source_data.in | $(subst_S_BIN) > hedgehog/rssac_rm_old_unique_source_data
+	
+hedgehog/DDL_updates/000008_ddl_traffic_difference: $(srcdir)/hedgehog/DDL_updates/000008_ddl_traffic_difference.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/DDL_updates/000008_ddl_traffic_difference.in | $(subst_S_BIN) > hedgehog/DDL_updates/000008_ddl_traffic_difference
+
+hedgehog/DDL_updates/000009_ddl_node_index: $(srcdir)/hedgehog/DDL_updates/000009_ddl_node_index.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/DDL_updates/000009_ddl_node_index.in | $(subst_S_BIN) > hedgehog/DDL_updates/000009_ddl_node_index
+
+EXTRA_DIST = 	refile_and_grok.in \
+				conf_read.in \
+				database_init.in \
+				database_manage_partitions.in \
+				database_update_nodes.in \
+				datafiles_create_summary.in \
+				datafiles_rm_empty_xml_dirs.in \
+				datafiles_tar_old_xml_files.in \
+				plotcache_generate_cached_plots.in \
+				plotcache_rm_cached_plots.in \
+				rssac_generate_reports.in \
+				rssac_process_unique_source_data.in \
+				rssac_rm_old_unique_source_data.in 
 	
 install-data-hook:
 	mkdir -p ${DESTDIR}$(localstatedir)/hedgehog

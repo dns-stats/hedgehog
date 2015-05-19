@@ -20,10 +20,10 @@
 #
 
 # 
-# File:   hedgehog_database_init.sh
+# File:   database_init
 #
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@BIN@/conf_read)
 
 # DSTART defaults to the current month
 DSTART=$(date --date="$(date +%Y-%m-01)" +%Y-%m)
@@ -33,10 +33,10 @@ usage () {
 	echo
 	echo "Create and populate the database tables with plot options and nodes."
 	echo
-	echo "This calls the hedeghog_database_update_nodes.sh script which will populate the DB with the"
+	echo "This calls the hedeghog_database_update_nodes script which will populate the DB with the"
 	echo "specified nodes and create a directory structure for them in the working data directory."
 	echo
-	echo "Usage: $0 options"
+	echo "Usage: $(basename $0) options"
 	echo
 	echo "Supported options:"
 	echo "  -m Start month of oldest data to be imported (default is current month, format YYYY-MM)"
@@ -120,23 +120,23 @@ echo "Populating lookup tables (dsc.plot, dsc.iana_lookup)"
 psql -h $hhconfig_database_host -d $hhconfig_database_name  < @DATA@/hedgehog/sql/insert_lookup_data.sql #> /dev/null
 
 echo "Populate servers and nodes"
-@BIN@/hedgehog_database_update_nodes.sh -s
+@BIN@/database_update_nodes -s
 ###########################################################
 
 ###################  RUN DDL scripts  #####################
 ###########################################################
 # Run any scripts needed to update the DB
 echo "Running DDL scripts"
-@BIN@/DDL_updates/000008_ddl_traffic_difference.sh
-# Skip the index creation as hedgehog_database_manage_partitions.sh will do it
+@BIN@/DDL_updates/000008_ddl_traffic_difference
+# Skip the index creation as database_manage_partitions will do it
 # for us. Still need to run the script too ensure database versions are correct.
-@BIN@/DDL_updates/000009_ddl_node_index.sh -s
+@BIN@/DDL_updates/000009_ddl_node_index -s
 ###########################################################
 
 #############  PARTITION DATA TABLES  #####################
 ###########################################################
 # Partition the dsc.data table: create 1 table per month per server per plot
-# TODO: replace this will a call to the manage_partitions.sh script
+# TODO: replace this will a call to the manage_partitions script
 echo "Creating partitioned tables for dsc.data (1 table per month per server per plot type)"
 echo "This may take some time if there is a lot of historic data to import"
 i=1
@@ -146,7 +146,7 @@ DSTART=`date --date="${DSTART}-01" +%Y%m%d`
 while [ $DNOW_FIRST -ge $DSTART ]
 do
   DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y-%m`
-  @BIN@/hedgehog_database_manage_partitions.sh -p ${DNOW}
+  @BIN@/database_manage_partitions -p ${DNOW}
   DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`
   DNOW=`date --date="$DNOW_FIRST" +%Y-%m`
 done

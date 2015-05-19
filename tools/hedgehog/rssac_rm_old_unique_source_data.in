@@ -20,12 +20,12 @@
 #
 
 # 
-# File:   hedgehog_rssac_rm_old_unique_source_data.sh
+# File:   rssac_rm_old_unique_source_data
 #
 
 #TODO: Add option to select all servers or just one server
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@BIN@/conf_read)
 
 REQUIRED_API_VERSION=DB_VERSION
 DB_NAME=$hhconfig_database_name
@@ -49,7 +49,7 @@ usage () {
     echo "This script is intended to be run monthly to free disk space on systems where the raw"
     echo "unique sources data becomes unmanagably large."
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
     echo "  -s Month from which to delete all raw unique source data (default ${START}: format YYYY-MM)"

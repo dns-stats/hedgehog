@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   hh_database_create.sh
+# File:   database_create
 #
 
 DB_NAME=hedgehog
@@ -31,7 +31,7 @@ usage () {
 	echo
 	echo "Create database and roles/users."
 	echo
-	echo "Usage: $0 options"
+	echo "Usage: $(basename $0) options"
 	echo
 	echo "Supported options:"
 	echo "  -o Owner of the database  (Default: $DB_OWNER)"
