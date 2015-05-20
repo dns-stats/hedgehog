@@ -1,4 +1,10 @@
-bin_PROGRAMS = dsc-extractor
+if IMPORTER
+IMP = dsc-extractor
+else
+IMP =
+endif
+
+bin_PROGRAMS = $(IMP)
 
 dsc_extractor_SOURCES = dsc-extractor.cpp \
                           DSCDataManager.cpp \
@@ -30,3 +36,5 @@ dsc_extractor_LDADD = @BOOST_SYSTEM_LDFLAGS@ \
                           @BOOST_PROGRAM_OPTIONS_LDFLAGS@ \
                           @BOOST_PROGRAM_OPTIONS_LIBS@ \
                           @LIBPQXX_LIBS@
+
+

@@ -14,10 +14,16 @@
 # limitations under the License.
 #
 
-AC_DEFUN([AX_OPTIMIZER],
+AC_DEFUN([ACX_COMPONENTS],
 [
-    AC_ARG_ENABLE([optimizer],
-                AS_HELP_STRING([--disable-optimizer],
-                [Disable the optimizer (-O2) - enabled by default.]), [CXXFLAGS="-g"])
+    AC_ARG_ENABLE([web],
+                AS_HELP_STRING([--disable-web],
+                [Dont build the web interface - enabled by default.]),
+                [AS_IF([test "x$enableval" == "xno"], [WEB=0])])
+                
+    AC_ARG_ENABLE([importer],
+                AS_HELP_STRING([--disable-importer],
+                [Dont build the importer - enabled by default.]),
+                [AS_IF([test "x$enableval" == "xno"], [IMPORTER=0])])
 
 ])
