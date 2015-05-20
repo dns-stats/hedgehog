@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = conf src/libdsc src/bin tools www
+SUBDIRS = conf src tools www
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
 
