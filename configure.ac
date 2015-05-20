@@ -19,7 +19,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(Hedgehog, 2.0.0b2,  dns-stats-users@dns-stats.org)
-AC_CONFIG_SRCDIR([src/libdsc/DSCDataManager.cpp])
+AC_CONFIG_SRCDIR([src/DSCDataManager.cpp])
 AC_CONFIG_HEADER([config.h])
 
 AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[7],[Database version])
@@ -85,5 +85,5 @@ CXXFLAGS="${CXXFLAGS} -Wall -pedantic \
          -pedantic-errors -Wextra"
 
 AX_OPTIMIZER
-AC_CONFIG_FILES(Makefile conf/Makefile src/bin/Makefile src/libdsc/Makefile tools/Makefile www/Makefile )
+AC_CONFIG_FILES(Makefile conf/Makefile src/Makefile tools/Makefile www/Makefile )
 AC_OUTPUT
