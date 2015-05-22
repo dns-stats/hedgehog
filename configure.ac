@@ -54,7 +54,6 @@ AS_IF([test $WEB -eq 1],[AC_MSG_NOTICE([Building Web Component...])
 
 AS_IF([test $IMPORTER -eq 1],[AC_MSG_NOTICE([Building Importer Component...])
 
-
   # Checks for header files.
   AC_CHECK_HEADERS([arpa/inet.h fcntl.h netinet/in.h stdlib.h string.h sys/param.h unistd.h])
 
@@ -87,7 +86,6 @@ AS_IF([test $IMPORTER -eq 1],[AC_MSG_NOTICE([Building Importer Component...])
   BOOST_FOREACH
   BOOST_STRING_ALGO
   BOOST_TOKENIZER
-
   
   # Checks for libraries.
   ACX_POSTGRES
