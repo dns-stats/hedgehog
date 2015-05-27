@@ -17,10 +17,15 @@
 Hedgehog 2.0.0rc1 - 2014-05-15
 ------------------------------
 
-* Created a wrapper script for the tools.
-* Installed tools in libexec/hedgehog
+* Installed tools in libexec/hedgehog/
 * Add missing check for SED in configure
-
+* Allow building of just the importer or just the web interface by adding
+  --disable-web and --disable-importer options to configure
+* Improved install instructions
+* removed hedgehog prefix from all the tools
+* Created a hedgehogctl control script to wrap the tools.
+* removed the install-rpg target and made installation of the RPostgreSQLHelper
+  consistent with other R packages that need installing.
 
 Hedgehog 2.0.0b2 - 2014-05-05
 -----------------------------
