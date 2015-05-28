@@ -23,7 +23,7 @@
 # File:   database_init
 #
 
-eval $(@BIN@/conf_read)
+eval $(@LIBEXEC@/conf_read)
 
 # DSTART defaults to the current month
 DSTART=$(date --date="$(date +%Y-%m-01)" +%Y-%m)
@@ -73,7 +73,11 @@ echo "  Owner of database...................... $hhconfig_database_owner"
 echo "  Reader of database..................... $hhconfig_database_read_user"
 echo "  Start date of oldest data.............. $DSTART"
 echo
-  echo -n "are you sure you want to continue? y/N: "
+  echo  "*** This script will read nodes.csv file in order to  *** "
+  echo  "*** populate the database with servers and nodes.     *** "
+  echo  "*** Ensure this file is up to date before proceeding. *** "
+  echo
+  echo -n "Are you sure you want to continue? y/N: "
   read c
   if [ "$c" != "y" ] && [ "$c" != "Y" ]
   then
@@ -120,17 +124,17 @@ echo "Populating lookup tables (dsc.plot, dsc.iana_lookup)"
 psql -h $hhconfig_database_host -d $hhconfig_database_name  < @DATA@/hedgehog/sql/insert_lookup_data.sql #> /dev/null
 
 echo "Populate servers and nodes"
-@BIN@/database_update_nodes -s
+@LIBEXEC@/database_update_nodes -s
 ###########################################################
 
 ###################  RUN DDL scripts  #####################
 ###########################################################
 # Run any scripts needed to update the DB
 echo "Running DDL scripts"
-@BIN@/DDL_updates/000008_ddl_traffic_difference
+@LIBEXEC@/DDL_updates/000008_ddl_traffic_difference
 # Skip the index creation as database_manage_partitions will do it
 # for us. Still need to run the script too ensure database versions are correct.
-@BIN@/DDL_updates/000009_ddl_node_index -s
+@LIBEXEC@/DDL_updates/000009_ddl_node_index -s
 ###########################################################
 
 #############  PARTITION DATA TABLES  #####################
@@ -146,7 +150,7 @@ DSTART=`date --date="${DSTART}-01" +%Y%m%d`
 while [ $DNOW_FIRST -ge $DSTART ]
 do
   DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y-%m`
-  @BIN@/database_manage_partitions -p ${DNOW}
+  @LIBEXEC@/database_manage_partitions -p ${DNOW}
   DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`
   DNOW=`date --date="$DNOW_FIRST" +%Y-%m`
 done

@@ -20,14 +20,14 @@
 #
 
 # 
-# File:   rssac_rm_old_unique_source_data
+# File:   database_rm_old_rssac_data
 #
 
 #TODO: Add option to select all servers or just one server
 
-eval $(@BIN@/conf_read)
+eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=DB_VERSION
+REQUIRED_API_VERSION=@DB_VERSION@
 DB_NAME=$hhconfig_database_name
 DEFAULT_DAY=`date --date="$(date +%Y-%m-15)" +%Y%m%d`
 NOW=`date --date="now" +%Y%m%d`
@@ -44,23 +44,23 @@ fi
 
 usage () {
     echo
-    echo "Delete all the raw unique_source data in the database for a given month. All data older "
+    echo "Delete all the raw RSSAC unique_source data in the database for a given month. All data older"
     echo "than this is also deleted."
     echo "This script is intended to be run monthly to free disk space on systems where the raw"
-    echo "unique sources data becomes unmanagably large."
+    echo "RSSAC unique sources data becomes unmanagably large."
     echo
     echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
-    echo "  -s Month from which to delete all raw unique source data (default ${START}: format YYYY-MM)"
+    echo "  -m Month from which to delete all raw unique source data (default ${START}: format YYYY-MM)"
     echo "       (default is 2 months ago when in the first half of the current month and"
     echo "        1 month ago when in the second half of the current month)"
     echo "  -h Show this help"
 }
 
-while getopts ":s:h" opt; do
+while getopts ":m:h" opt; do
     case $opt in
-        s  ) START=$OPTARG ;;
+        m  ) START=$OPTARG ;;
         h  ) usage
              exit 1 ;;
         \? ) usage

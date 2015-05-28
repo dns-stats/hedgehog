@@ -23,7 +23,7 @@
 # File:   datafiles_rm_empty_xml_dirs.bash
 #
 
-eval $(@BIN@/conf_read)
+eval $(@LIBEXEC@/conf_read)
 DATE=`date --date="- 7 day" +%Y-%m-%d`
 INCOMING="incoming"
 

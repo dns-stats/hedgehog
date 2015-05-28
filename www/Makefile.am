@@ -75,6 +75,8 @@ EXTRA_DIST = 	$(srcdir)/hedgehog/www/hedgehog.html.in \
 				$(srcdir)/hedgehog/www/brew/hedgehog.brew.in
 
 install-data-hook:
+	mkdir -p ${DESTDIR}$(localstatedir)/hedgehog/www
+	chmod -R 775 ${DESTDIR}$(localstatedir)/hedgehog/www
 	test -f ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml || \
 		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}
 		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml.sample

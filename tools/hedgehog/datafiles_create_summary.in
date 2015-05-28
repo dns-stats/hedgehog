@@ -23,7 +23,7 @@
 # File:   datafiles_create_summary
 #
 
-eval $(@BIN@/conf_read)
+eval $(@LIBEXEC@/conf_read)
 
 DATADIR=$hhconfig_directories_data
 LOG_FILE="dsc-extractor-xml-db.out"

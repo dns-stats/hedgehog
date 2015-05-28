@@ -23,7 +23,7 @@
 # File:   000009_ddl_traffic_difference.sh
 #
 
-eval $(@BIN@/conf_read)
+eval $(@LIBEXEC@/conf_read)
 
 DB_NAME=$hhconfig_database_name
 DATA_DIR=$hhconfig_directories_data

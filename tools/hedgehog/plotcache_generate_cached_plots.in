@@ -23,14 +23,14 @@
 # File:   plotcache_generate_cached_plots
 #
 
-eval $(@BIN@/conf_read)
+eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=DB_VERSION
+REQUIRED_API_VERSION=@DB_VERSION@
 DB_NAME=$hhconfig_database_name
 FROM=`date --date="- 1 day" +%Y-%m-%dT00:00`
 TO=`date --date="- 1 day" +%Y-%m-%dT23:59`
 SQ="'"
-export PGPASSWORD=$hhconfig_database_owner_pass
+export PGPASSWORD=$hhconfig_database_read_pass
 
 usage () {
     echo
@@ -40,8 +40,8 @@ usage () {
     echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
-    echo "  -s Start date of time range from which to create cached plots (default: \"${FROM}\")"
-    echo "  -e End date of time range from which to create cached plots (default: \"${TO}\")"
+    echo "  -s Start date and time for which to create cached plots (default: \"${FROM}\")"
+    echo "  -e End date and time for which to create cached plots (default: \"${TO}\")"
     echo "  -D Generate daily cached plots"
     echo "  -W Generate weekly cached plots"
     echo "  -M Generate monthly cached plots"
@@ -64,7 +64,7 @@ done
 
 echo "`date`: $0 COMMENCED"
 USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+[ $USER != $hhconfig_database_reader ] && echo "Must be $hhconfig_database_reader to run this script" && exit 1
 
 # Validate the start date
 if [[ ! $FROM =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]$ ]] ; then
