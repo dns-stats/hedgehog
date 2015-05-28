@@ -24,10 +24,10 @@ TOOLS=( database_init \
         plotcache_generate_cached_plots \
         plotcache_rm_cached_plots \
         rssac_generate_reports \
-        rssac_process_unique_source_data \
-        rssac_rm_old_unique_source_data )
+        database_process_rssac_data \
+        database_rm_old_rssac_data )
 
-SCRIPT_DIR=@LIBEXEC@/hedgehog
+SCRIPT_DIR=@LIBEXEC@
 HELP=0
 FIRST_COMMAND_ARG=2
 COMMAND=${1}

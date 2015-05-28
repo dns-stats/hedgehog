@@ -20,12 +20,12 @@
 #
 
 # 
-# File:   rssac_process_unique_source_data
+# File:   database_process_rssac_data
 #
 
-eval $(@BIN@/conf_read)
+eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=DB_VERSION
+REQUIRED_API_VERSION=@DB_VERSION@
 DB_NAME=$hhconfig_database_name
 DEFAULT_DAY=`date --date="- 7 day" +%Y-%m-%d`
 START=${DEFAULT_DAY}
@@ -35,20 +35,21 @@ export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
     echo
-    echo "Process the raw unique source data into a summary table for a specified 24 hour period"
+    echo "Process the raw RSSAC unique source data into a summary table for a specified 24 hour period"
+    echo "(Must be run prior to generating the RSSAC reports for this day with the rssac_generate_reports script)"
     echo
     echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
-    echo "  -s Date on which to compress data (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
+    echo "  -d Date on which to process data (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
 	echo "  -f Force overwrite of existing summary data"
 	echo "  -D Also delete the raw data (default: no delete)"
     echo "  -h Show this help"
 }
 
-while getopts ":s:fDh" opt; do
+while getopts ":d:fDh" opt; do
     case $opt in
-        s  ) START=$OPTARG ;;
+        d  ) START=$OPTARG ;;
         f  ) FORCE_SUM_DEL=1 ;;
         D  ) DELETE_RAW=1 ;;
         h  ) usage

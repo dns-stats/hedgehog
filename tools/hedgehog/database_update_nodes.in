@@ -27,9 +27,9 @@
 #TODO(asap): Add option to delete servers/nodes/groups
 #TODO: Add reporting if nodes found in the database that are not in the nodes.csv file
 
-eval $(@BIN@/conf_read)
+eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=DB_VERSION
+REQUIRED_API_VERSION=@DB_VERSION@
 DB_NAME=$hhconfig_database_name
 DATA_DIR=$hhconfig_directories_data
 NODES_FILE=$hhconfig_directories_conf/"nodes.csv"
