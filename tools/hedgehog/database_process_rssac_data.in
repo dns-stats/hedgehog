@@ -43,7 +43,7 @@ usage () {
     echo "Supported options:"
     echo "  -d Date on which to process data (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
 	echo "  -f Force overwrite of existing summary data"
-	echo "  -D Also delete the raw data (default: no delete)"
+	echo "  -D Also delete the raw unique_source data from the database to save space (default: no delete)"
     echo "  -h Show this help"
 }
 
