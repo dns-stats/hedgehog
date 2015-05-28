@@ -14,18 +14,20 @@
 # limitations under the License.
 #
 
-Hedgehog 2.0.0rc1 - 2014-05-15
+Hedgehog 2.0.0rc1 
 ------------------------------
 
-* Installed tools in libexec/hedgehog/
-* Add missing check for SED in configure
 * Allow building of just the importer or just the web interface by adding
   --disable-web and --disable-importer options to configure
-* Improved install instructions
-* removed hedgehog prefix from all the tools
+* Installed tools in libexec/hedgehog/ and removed hedgehog prefix and 
+  .sh extension
 * Created a hedgehogctl control script to wrap the tools.
-* removed the install-rpg target and made installation of the RPostgreSQLHelper
+* Renamed several tools and made arguments consistent. Separate the RSSAC report
+  scripts to better align with split installs
+* Improved install instructions
+* Removed the install-rpg target and made installation of the RPostgreSQLHelper
   consistent with other R packages that need installing.
+* Add missing check for SED in configure
 
 Hedgehog 2.0.0b2 - 2014-05-05
 -----------------------------

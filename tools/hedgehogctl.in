@@ -17,15 +17,15 @@ usage () {
 
 TOOLS=( database_init \
         database_manage_partitions \
+        database_process_rssac_data \
+        database_rm_old_rssac_data \
         database_update_nodes \
         datafiles_create_summary \
         datafiles_rm_empty_xml_dirs \
         datafiles_tar_old_xml_files \
         plotcache_generate_cached_plots \
         plotcache_rm_cached_plots \
-        rssac_generate_reports \
-        database_process_rssac_data \
-        database_rm_old_rssac_data )
+        rssac_generate_reports )
 
 SCRIPT_DIR=@LIBEXEC@
 HELP=0
@@ -43,6 +43,9 @@ fi
 if [[  " ${1} " == " help " ]] ; then
   COMMAND=${2}
   HELP=1
+  if [ -z ${COMMAND} ] ; then
+    usage
+  fi
 fi
 
 if [[ ! " ${TOOLS[*]} " =~ " ${COMMAND} " ]] ; then

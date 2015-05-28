@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   000009_ddl_traffic_difference.sh
+# File:   000009_ddl_traffic_difference
 #
 
 eval $(@LIBEXEC@/conf_read)
