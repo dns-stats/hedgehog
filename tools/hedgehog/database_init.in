@@ -150,7 +150,7 @@ DSTART=`date --date="${DSTART}-01" +%Y%m%d`
 while [ $DNOW_FIRST -ge $DSTART ]
 do
   DNEXT=`date --date="$DNOW_FIRST + 1 month" +%Y-%m`
-  @LIBEXEC@/database_manage_partitions -p ${DNOW}
+  @LIBEXEC@/database_manage_partitions -m ${DNOW}
   DNOW_FIRST=`date --date="$DNOW_FIRST - 1 month" +%Y%m%d`
   DNOW=`date --date="$DNOW_FIRST" +%Y-%m`
 done
