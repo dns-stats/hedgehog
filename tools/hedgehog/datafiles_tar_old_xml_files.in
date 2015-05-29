@@ -18,9 +18,9 @@ usage () {
   echo
   echo "Pack old xml files already processed into a .tar package to store and archive."
   echo "The xml files are packed according to their date and node and server."
-  echo "The filename has the following format done-PID-date.tar.bz (e.g. done-14143-2015-05-01.tar.bz2)."
+  echo "The filename has the following format done-PID-date.tar.bz2 (e.g. done-14143-2015-05-01.tar.bz2)."
   echo 
-  echo "Usage: $0 options"
+  echo "Usage: $(basename $0) options"
   echo
   echo "Supported options:"
   echo "  -h Show this help."
@@ -39,7 +39,7 @@ echo "`date`: $0 COMMENCED"
 USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@LIBEXEC@/conf_read)
 
 for i in $(find $hhconfig_directories_data -maxdepth 3 -name done -type d) ; do
     for j in $(find $i -mindepth 1 -maxdepth 1 -type d) ; do

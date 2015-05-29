@@ -20,12 +20,12 @@
 #
 
 # 
-# File:   hedgehog_database_manage_partitions.sh
+# File:   database_manage_partitions
 #
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=DB_VERSION
+REQUIRED_API_VERSION=@DB_VERSION@
 DB_NAME=$hhconfig_database_name
 export PGPASSWORD=$hhconfig_database_owner_pass
 
@@ -34,16 +34,16 @@ usage () {
 	echo "Create a new set of partitioned data tables in the database to hold imported data."
 	echo "The partitions are created per month of data."
 	echo
-	echo "Usage: $0 options"
+	echo "Usage: $(basename $0) options"
 	echo
 	echo "Supported options:"
-	echo "	-p Date of partitions to create in YYYY-MM format (default is next month)."
-	echo "	-h Show this help."
+	echo " -m Month to create partitions for (default is next month, format YYYY-MM)."
+	echo " -h Show this help."
 }
 
-while getopts ":p:h" opt; do
+while getopts ":m:h" opt; do
     case $opt in
-        p  ) PDATE=$OPTARG ;;
+        m  ) PDATE=$OPTARG ;;
         h  ) usage
              exit 1 ;;
         \? ) usage

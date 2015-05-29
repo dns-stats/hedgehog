@@ -1,4 +1,3 @@
-#!/usr/bin/perl -w
 # 
 # Copyright 2014 Internet Corporation for Assigned Names and Numbers.
 # 
@@ -15,20 +14,16 @@
 # limitations under the License.
 #
 
-#
-# Developed by Sinodun IT (www.sinodun.com)
-#
+AC_DEFUN([ACX_COMPONENTS],
+[
+    AC_ARG_ENABLE([web],
+                AS_HELP_STRING([--disable-web],
+                [Don't build the web interface - enabled by default.]),
+                [AS_IF([test "x$enableval" == "xno"], [WEB=0])])
+                
+    AC_ARG_ENABLE([data-manager],
+                AS_HELP_STRING([--disable-data-manager],
+                [Don't build the data manager - enabled by default.]),
+                [AS_IF([test "x$enableval" == "xno"], [DM=0])])
 
-# 
-# File:   hedgehog_conf_read.pl
-#
-
-use YAML::Tiny;
-$yaml = YAML::Tiny->read("@HH_CONF_FILE@");
-foreach $key (keys  $yaml->[0]{database}){
-  next if (!$yaml->[0]{database}{$key}); 
-  print "hhconfig_database_$key=\"$yaml->[0]{database}{$key}\"\n";
-}
-foreach $key (keys  $yaml->[0]{directories}){
-  print "hhconfig_directories_$key=\"$yaml->[0]{directories}{$key}\"\n";
-}
+])

@@ -7,147 +7,195 @@ An online version of this is available at:
 https://github.com/dns-stats/hedgehog/wiki/Installation
 
 Table of Contents:
-1. Installation
 1.1. Requirements
-1.1.1. Platform support
-1.1.2. Database
-1.2. Hedgehog dependencies
-1.2.1. Required packages
-1.2.2. Additional R packages
-1.3. Install Hedgehog
-1.3.1. Install and build code
-1.3.2. System users and groups
-1.3.3. Configure Hedgehog
-1.3.4. Configure apache
-1.3.5. Create the database
-1.3.6  Create and the database tables etc.
-1.3.7. Test the Hedgehog front end
-2. Running Hedgehog
-2.1. Import data
-2.1.1. Importing historical .DAT data
-2.1.2. Importing real-time .XML data
-2.1.2.1. Manually
-2.1.2.2. Automatically
-2.2. Maintenance
-2.2.1. Cron jobs
+ 1.1.1. Platform support
+ 1.1.2. Database support
+ 1.1.3. Hedgehog source code
+1.2. Hedgehog components
+1.3. Hedgehog dependencies
+1.4. Build Hedgehog
+1.5. Create a database
+1.6. Create system users and groups
+1.7. Configure Hedgehog
+1.8. Data Manager
+ 1.8.1. Specify the nodes/servers
+ 1.8.2. Directory permissions
+ 1.8.3. Create the database tables
+1.9. Web component
+ 1.9.1. Install R packages
+ 1.9.2. Web configuration
+ 1.9.3. Directory permissions
+ 1.9.4. Configure apache
+1.10. Importing data
+ 1.10.1. Importing historical .DAT data
+ 1.10.2. Importing real-time .XML data
+  1.10.2.1. Manually
+  1.10.2.2. Automatically
+1.11. Cron jobs
+ 1.11.1. Data Manager
+ 1.11.2. Web component
 
-
-The following instructions describe how to install Hedgehog on Ubuntu 14.04 Server and set up imports of data.
-
-Note: The server and PostgreSQL must both be configured to use UTC!
-
-1. Installation
+The following instructions describe how to install Hedgehog 2.0.0rc1 on Ubuntu 14.04 Server and set up imports of data.
+ 
 1.1. Requirements
+
 1.1.1. Platform support
 
-Hedgehog is currently only supported on Ubuntu 14.04 LTS Server.
+Version 2.0.0rc1 of Hedgehog is currently only supported on Ubuntu 14.04.2 LTS Server.
 
 1.1.2. Database support
 
-Hedgehog has been tested with PostgreSQL 9.3.X
+Hedgehog has been tested with PostgreSQL 9.3.X. The installation of this of this is not covered in detail since it may
+or may not be co-located with the other hedgehog components. If required, it can be installed using
+sudo apt-get install postgresql
 
-1.2. Hedgehog dependencies
+WARNING: The Hedgehog servers and PostgreSQL must both be configured to use UTC!
 
-1.2.1. Required packages
+1.1.3. Hedgehog source code
 
+Download the 2.0.0rc1 release from github: https://github.com/dns-stats/hedgehog/archive/2.0.0rc1.tar.gz
+(If you downloaded the above URL with wget the tarball will be called 2.0.0rc1.tar.gz)
+
+1.2. Hedgehog components
+
+Hedgehog comprises 2 components which can be run on the same or different machines:
+ * Data Manager
+    - Scripts for database creation and management
+    - XML/DAT processing
+ * Web front-end
+
+Both components can be configured to connect to a remote database server, so the database does not need to be co-located with either component.
+
+1.3. Hedgehog dependencies
+
+NOTE: It is necessary to only select the dependencies require for the specific components being installed.
+
+# common dependencies
+sudo apt-get install autoconf libtool make postgresql-client libyaml-tiny-perl
+# data manager dependencies
+sudo apt-get install g++ libboost-program-options-dev \
+                     libboost-system-dev libboost-filesystem-dev libpqxx-dev
+# web front-end dependencies
 sudo add-apt-repository ppa:opencpu/rapache
 sudo apt-get update
-sudo apt-get install r-base r-base-core r-base-dev libcairo2-dev libxt-dev r-cran-ggplot2 r-cran-dbi \
-                     r-cran-cairodevice r-cran-reshape r-cran-digest postgresql postgresql-client \
-                     postgresql-server-dev-9.3 postgresql-contrib pgbouncer libboost-all-dev libtool \
-                     libpqxx-dev apache2-mpm-prefork apache2-prefork-dev git libapache2-mod-r-base libyaml-tiny-perl
+sudo apt-get install libapache2-mod-r-base r-cran-ggplot2 r-cran-dbi \
+                     r-cran-cairodevice r-cran-reshape r-cran-digest \
+                     r-base r-base-core libcairo2-dev libxt-dev
 
-1.2.2. Additional R packages
+1.4. Build Hedgehog
+ 
+* By default, both components are built. 
+* Use the --disable-web and/or --disable-data-manager configure options to select which components are actually built.
+* All installs get the hedgehog.yaml configuration file.
 
-Hedgehog is tested against version 3.1.1. of R.
+Building Hedgehog
 
-Some R packages are needed that are not available through apt, they can be installed via R.
-You will be prompted to choose a mirror site, or you can specify a repo by using a command of the form
-
-install.packages("name", repos='http://cran.rstudio.com/')
-
-Install:
-
-sudo R
-install.packages(c("brew","Cairo","googleVis","RPostgreSQL","R.utils","yaml", "dplyr"))
-q()
-
-If you are prompted to save workspace image y/n/c, choose no.
-
-The package versions that Hedgehog has been tested against are listed below alongside each package.
-R Package Supported Version
-brew	1.0-6
-Cairo	1.5-6
-googleVis	0.5.5
-RPostgreSQL	0.4
-R.utils	1.33.0
-yaml	2.1.13
-dplyr	0.4.1
-
-1.3. Install Hedgehog
-1.3.1. Install and build code
-
-Download the code from github:
-
-wget https://github.com/dns-stats/hedgehog/archive/2.0.0b2.tar.gz
-
-tar -xzf 2.0.0b2.tar.gz
-cd hedgehog-2.0.0b2
+tar -xzf hedgehog-2.0.0rc1.tar.gz
+cd hedgehog-2.0.0rc1
 ./autogen.sh
 mkdir build
 cd build
-../configure
+../configure [--prefix=] [--disable-web] [--disable-data-manager]
 make
 sudo make install
-sudo make install-rpg
-cd
+ 
+1.5. Create a database
 
-Note: 'make install-rpg' is required in addition to make install. It installs an R package to assist with the database connection.
+Ask your DBA to create the necessary database. This is a script to help them. It create the DATABASE, USERS and ROLES needed to run hedgehog (using default values), and can optionally accept a user specified database name and read/write user names.
+<prefix>/libexec/hedgehog/database_create
+ 
+1.6. Create system users and groups
 
-You may notice the following message during the installation step: "Error in find.package(pkgs, lib) : there is no package called ‘RPostgreSQLHelper’ Execution halted". This can be safely ignored.
-
-For large installations it may be preferable to store the data files on a separate partition to the database. See the *User guide for an overview of the Hedgehog directory structure.
-In this case you may wish to mount a disk here or make use of a symbolic link at this stage of the installation.
-
-1.3.2. System users and groups
-
-Two system users are required for Hedgehog:
-Database owner - this is the user that will own the database created by hedgehog and the top level datafile directories (default user in this example is 'hedgehog')
-Read user - this should be the apache user which requires only read access to the database (default apache user in this example is called 'www-data')
+Two system users are required for Hedgehog, depending on what components are installed:
+User                Default     Component       Note
+Database owner      hedgehog    Data Manage     This is the user that will own the 
+                                                database created by hedgehog and the 
+                                                top level datafile directories.
+Database read user  www-data    Web front-end   This defaults to the same as the default apache user
 
 # create a system user and group called hedgehog
 sudo addgroup --system hedgehog
 sudo adduser --system --ingroup hedgehog hedgehog
-# put www-data user in group hedgehog
-sudo adduser www-data hedgehog
-# put hedgehog user in group www-data
-sudo adduser hedgehog www-data
 
-1.3.3. Configure Hedgehog
+1.7. Configure Hedgehog
 
-Edit the <prefix>/etc/hedgehog/hedgehog.yaml configuration file to make sure the user names match the users specified in the previous step. 
-Also configure the database parameters (port, name) as required. (Note a limitation of 2.0 is that the database and web front end must run on the same machine)
+* For all installs, edit the <prefix>/etc/hedgehog/hedgehog.yaml configuration file to make sure the user names match the users specified in the previous steps.
+* Also configure the database parameters (port, name etc...) as required.
+* If using passwords stored in this file, be aware that this file is readable by all users.
 
 database:
-  host         : /var/run/postgresql # specify a host for the postgresql DB. If this begins with a slash,
-                                     # it specifies the directory in which the socket file is stored.
+  host         : /var/run/postgresql # specify a host for the postgresql DB. If
+                                     # this begins with a slash, it specifies the
+                                     # directory in which the socket file is 
+                                     # stored.
   port         : 5432      # specify port for the postgresql DB.
   name         : hedgehog  # specify dbname for the postgresql DB.
-  owner        : hedgehog  # specify an owner for the postgresql DB. This user will also run refile_and_grok
+  owner        : hedgehog  # specify a user to own the postgresql DB. 
+                           # [Required for Data Manager components]
+                           # [Required for web-front end RSSAC reporting]
   owner_pass   :           # specify a password for the owner user if needed.
-  read_user    : www-data  # specify a read user for the postgresql DB. This is typically the apache user.
+  read_user    : www-data  # specify a read user for the postgresql DB. 
+                           # [Required for web-front end component]
   read_pass    :           # specify a password for the read user if needed.
 
-! Do not edit the 'directories' section of this file as in 2.0 it is auto-generated.
+WARNING: Do not edit the 'directories' section of this file as in 2.0 it is auto-generated.
 
-Note that there is also a sample conf file in the same directory to retrieve default settings: <prefix>/etc/hedgehog/hedgehog.yaml.sample.
+1.8. Data Manager
 
-Change the ownership of the directory specified below so it is owned by the same user as the database, so for example in a default install:
+1.8.1. Specify the nodes/servers
 
-sudo chown -R hedgehog:hedgehog <prefix>/var/hedgehog/
+NOTE: For this version of Hedgehog the servers and nodes to be processed and displayed must be specified manually.
 
-Also check the parameters in the <prefix>/etc/hedgehog/hedgehog_gui.yaml file, which specifies parameters controlling the behaviour of the web front end. 
-See the "Plot Caching" section in the user guide for a more detailed description of when plots are cached.
+* Edit the the <prefix>/etc/hedgehog/nodes.csv file to specify the servers, nodes and grouping to be used (example format is provided with entries commented out).
+* Note that the current GUI layout is optimised for nodes with short names (<6 characters) of the same length
+
+1.8.2. Directory permissions
+
+Change the ownership of the directory specified below so it is owned by the same user as the database:
+
+sudo chown -R <DB_OWNER>:<DB_OWNER> <prefix>/var/hedgehog/data
+
+You may also need to alter the permissions on this directory to allow uploads via your chosen mechanism.
+ 
+1.8.3. Create the database tables
+
+Run the command below noting the following:
+* If you have historic data to import then use the -m flag to specify the month of the oldest data that will need importing. Otherwise the database tables will be created to hold data from this month onwards.
+* Note that this script will also create the directory structure for all the specified servers and nodes under the data directory if it does not exist
+
+sudo -u <DB_OWNER> <prefix>/bin/hedgehogctl database_init
+ 
+1.9. Web component
+
+1.9.1. Install R packages
+
+These instructions are for R packages that must be installed using R's built-in compilation tools (there is no Ubuntu package for them). To install interactively:
+
+sudo R
+install.packages(c("brew","Cairo","googleVis","RPostgreSQL","R.utils","yaml","dplyr"))
+# you will be prompted to choose a mirror site for the repo before proceeding...
+install.packages("<prefix>/share/hedgehog/R_packages/RPostgreSQLHelper", repos=NULL)
+q()
+# If you are prompted to save workspace image y/n/c, choose no.
+
+For scripting purposes a repo can be specified by using a command of the form
+
+install.packages("name", repos='http://cran.rstudio.com/')
+
+Hedgehog is tested against version 3.1.1 of R. The package versions that Hedgehog has been tested against are listed below alongside each package.
+R Package    Supported Version
+brew	1.0-6
+Cairo	1.5-6
+googleVis	0.5.8
+RPostgreSQL	0.4
+R.utils	2.0.2
+yaml	2.1.13
+dplyr	
+0.4.1
+
+1.9.2. Web configuration
+
+Check the parameters in the <prefix>/etc/hedgehog/hedgehog_gui.yaml file, which specifies parameters controlling the behaviour of the web front end. See the "Plot Caching" section in the user guide for a more detailed description of when plots are cached.
 
 ---
 # YAML config for hedgehog GUI.
@@ -156,85 +204,68 @@ www:
   default_plot_type             : interactive # 'static'      -> png plots
                                               # 'interactive' -> googlevis plots
   default_interactive_plot_type : svg         # 'flash' -> plot requires flash
-                                              # 'svg'   -> plot is SVG/VML and does not require flash
-                                              # (but with svg plots some legends do not wrap properly)
-  use_plot_caching              : 1           # '1' -> true, use cached plots when possible
-                                              # '0' -> false, never use cached plots
-  caching_delay_in_hours        : 1           # If 'use_plot_caching=1' then only plots with an end time
-                                              # earlier than this number of hours ago are cached.
-                                              # More recent plots are not cached as data may still be
-                                              # being imported
-  presentation_delay_in_hours   : 0           # Number of hours behind now for which the GUI will 
-                                              # display data
+                                              # 'svg'   -> plot is SVG/VML and 
+                                              # does not require flash (but with
+                                              # svg plots some legends do not wrap 
+                                              # properly)
+  use_plot_caching              : 1           # '1' -> true, use cached plots when 
+                                              # possible
+                                              # '0' -> false, never use cached 
+                                              # plots
+  caching_delay_in_hours        : 1           # If 'use_plot_caching=1' then only 
+                                              # plots with an end time earlier 
+                                              # than this number of hours ago are
+                                              # cached. More recent plots are not 
+                                              # cached as data may still be being
+                                              # imported
+  presentation_delay_in_hours   : 0           # Number of hours behind now for  
+                                              # which the GUI will display data
+1.9.3. Directory permissions
 
-1.3.4. Configure apache
+Change the ownership of the directory specified below so it is owned by the read user of the database:
 
-Depending on your exact installation choices and apache configuration:
-* You will probably need to edit the /etc/apache2/apache2.conf file to enable access to the Hedgehog directories by adding <Directory> elements for <prefix>/share/hedgehog> and <prefix>/var/hedgehog/www> 
-* You may want to disable the default site using the following command:
+sudo chown -R <DB_READ_USER>:<DB_READ_USER> <prefix>/var/hedgehog/www
+ 
+1.9.4. Configure apache
+
+You will probably need to edit the /etc/apache2/apache2.conf file to enable access to the Hedgehog directories by adding <Directory> elements for
+* <prefix>/share/hedgehog> and
+* <prefix>/var/hedgehog/www> 
+ 
+Depending on your exact installation choices and apache configuration you may want to disable the default site using the following command:
 
 sudo a2dissite 000-default.conf
-
+ 
 Add the Hedgehog configuration files to apache and enable the site (this file name can be changed if required to match any local apache policy):
 
 sudo cp <prefix>/share/hedgehog/conf/hedgehog.conf /etc/apache2/sites-available/
 sudo a2ensite hedgehog.conf
 
-Alter the permissions (add the line 'umask 002' to the apache envvars file):
-
-sudo vi /etc/apache2/envvars
-# Enable extra permissions for Hedgehog
-umask 002
-
 apache/rapache write some of their logs to user.* so it can be useful to change the syslog config:
-sudo vi /etc/rsyslog.d/50-default.conf
-Uncomment the line beginning 'user.*'. 
 
+sudo vi /etc/rsyslog.d/50-default.conf
+
+Uncomment the line beginning 'user.*'. 
+ 
 Finally, restart apache:
 
 sudo service apache2 restart
-
-1.3.5. Create the database
-
-Ask your DBA to create the necessary database. This is a script to help them. It create the DATABASE, USERS and ROLES needed to run hedgehog (using default values), and can optionally accept a user specified database name and read/write user names.
-
-<prefix>/sbin/hedgehog_database_create.sh
  
-Ensure that the user names and passwords match those in hedgehog.yaml and match the users you created above. If required, also edit the pg_hba.conf file to allow the users access.
+At this point you should test that you can see the servers and nodes in the web front end at the URL http://<server-name>/hedgehog
 
-1.3.6 Create the database tables etc.
-
-NOTE: For this version of Hedgehog the servers and nodes to be processed and displayed must be specified manually.
-
-Edit the the <prefix>/etc/hedgehog/nodes.csv to specify the servers, nodes and grouping to be used.
- - Note that the current GUI layout is optimised for nodes with short names (<6 characters) of the same length
-
-Then run the command below noting the following:
-- If you have historic data to import then use the -m flag to specify the month of the oldest data that will need importing. Otherwise the database tables will be created to hold data from this month onwards.
-- Note that this script will also create the directory structure for all the specified servers and nodes under the data directory if it does not exist
-
-sudo -u hedgehog <prefix>/sbin/hedgehog_database_init.sh
-
-1.3.7. Test the Hedgehog front end
-
-At this point you should be able to see the servers and nodes in the web front end at the URL http://<server-name>/hedgehog
-
-2. Running Hedgehog
-2.1. Import data
-
+1.10. Importing data
 Hedgehog can process data in the following 3 ways:
-Source format     Output format
-
-XML	Database	For real time uploads
-DAT	Database	For import of historic data
-XML	DAT	For backwards compatibility with DSC
-
-In each case the <prefix>/bin/refile_and_grok.sh script is used, it is simply given different parameters:
-
-> refile_and_grok.sh -h
-
+Source format   Output format
+ 
+XML             Database    For real time uploads
+DAT             Database    For import of historic data
+XML             DAT         For backwards compatibility with DSC
+ 
+In each case the <prefix>/bin/refile_and_grok script is used, it is simply given different parameters:
+> refile_and_grok -h
+ 
 refile_and_grok - finds all input files in the working directory and processes to output format
-
+ 
 -w Working directory to search for input files (default: <prefix>/var/hedgehog/data)
 -i Input file format <XML|DAT> (default: XML)
 -o Output file format <DAT|DB> (default: DB)
@@ -243,50 +274,62 @@ refile_and_grok - finds all input files in the working directory and processes t
 -r Disable processing of rssac datasets. Default is to process all datasets.
 -R Reserved processors. Number of CPUS processors to exclude from import (default 0).
 -h Show this help.
+ 
+1.10.1. Importing historical .DAT data
 
-2.1.1. Importing historical .DAT data
-
-sudo -u hedgehog <prefix>/bin/refile_and_grok.sh -i DAT
+sudo -u <DB_OWNER> <prefix>/bin/refile_and_grok -i DAT
 
 Be aware that this can take a long time if there is a significant amount of historic data and it may be advisable to run this in stages.
 
-2.1.2. Importing real-time .XML data
-2.1.2.1. Manually
+1.10.2. Importing real-time .XML data
 
-This can be done manually by running the refile_and_grok.sh script (consider running this nohup as it may take a while depending on how much data there is to process).
+1.10.2.1. Manually
 
-sudo -u hedgehog <prefix>/bin/refile_and_grok.sh
+This can be done manually by running the refile_and_grok script (consider running this nohup as it may take a while depending on how much data there is to process).
+
+sudo -u <DB_OWNER> <prefix>/bin/refile_and_grok
 
 A snapshot of the progress of the data import can be generated by running the command below:
 
-sudo -u hedgehog <prefix>/bin/hedgehog_import_create_summary.sh
+sudo -u <DB_OWNER> <prefix>/bin/hedgehogctl datafiles_create_summary
+ 
+1.10.2.2. Automatically
 
-2.1.2.2. Automatically
+Configure a regular cron job for refile_and_grok as shown below
 
-Configure a regular cron job for refile_and_grok.sh as shown below
+1.11. Cron jobs
 
-2.2. Maintenance
-2.2.1. Cron jobs
+In 2.0 several cron jobs need to be configured.
 
-In 2.0 several cron jobs need to be configured. They should run as the 'hedgehog' system user.
+1.11.1. Data Manager
 
-sudo -u hedgehog crontab -e
-
-Below is an example crontab for a typical system Note that the hedgehog_manage_partitions_cron.sh script MUST be configured to run at least once a month.
+Below is an example crontab for a typical data manager install (sudo -u <DB_OWNER> crontab -e).
+WARNING: Note that the database_manage_partitions script MUST be run at least once a month or the import will fail.
 
 # REQUIRED: 
 # Import XML data every 15 mins
-00,15,30,45 * * * * <prefix>/bin/refile_and_grok.sh -c >> /home/hedgehog/refile_and_grok_xml_to_db.sh.log 2>&1
-# Twice monthly job to make sure the DB tables for next month are created ahead of time
-0 6 15,28 * * <prefix>/bin/hedgehog_manage_partitions.sh >> /home/hedgehog/hedgehog_manage_partitions.sh.log 2>&1
+00,15,30,45 * * * * <prefix>/bin/refile_and_grok -c >> /home/hedgehog/refile_and_grok_xml_to_db.og 2>&1
+# Twice monthly job to make sure the DB tables for next month are created 
+# ahead of time
+0 6 15,28 * * <prefix>/bin/hedgehogctl database_manage_partitions >> /home/hedgehog/database_manage_partitions.log 2>&1
+ 
+# OPTIONAL:
+# Daily job to process RSSAC data. By default data is processed
+# for a single day 1 week ago
+0 1 * * * <prefix>/bin/hedgehogctl database_process_rssac_data -D >> /home/hedgehog/database_process_rssac_data.log 2>&1
+# Monthly job to tar up processed xml directories
+0 2 1 * * <prefix>/bin/hedgehogctl datafiles_rm_empty_xml_dirs -D >> /home/hedgehog/datafiles_rm_empty_xml_dirs.log 2>&1
+# Monthly job to remove empty xml directories that are older than 7 days old
+0 2 7 * * <prefix>/bin/hedgehogctl datafiles_tar_old_xml -D >> /home/hedgehog/datafiles_tar_old_xml.log 2>&1
+
+1.11.2. Web component
+
+Below is an example crontab for a typical web front-end install (sudo -u <DB_READ_USER> crontab -e)
 
 # OPTIONAL:
-# Daily job to create cached plots for the previous day to make loading common plots quicker. Run a few hours after midnight so all data is uploaded.
-0 4 * * * <prefix>/bin/hedgehog_plotcache_generate_cached_plots.sh -D >> /home/hedgehog/hedgehog_plotcache_generate_cached_plots.sh.log -D 2>&1
-# Daily job to generate RSSAC reports. By default report is generated for a single day 1 week ago
-0 1 * * * <prefix>/bin/hedgehog_rssace_generate_reports.sh -D >> /home/hedgehog/hedgehog_rssac_generate_reports.sh.log 2>&1
-# Monthly job to tar up processed xml directories
-0 2 1 * * <prefix>/bin/hedgehog_datafiles_rm_empty_xml_dirs.sh -D >> /home/hedgehog/hedgehog_datafiles_rm_empty_xml_dirs.sh.log 2>&1
-# Monthly job to remove empty xml directories that are older than 7 days old
-0 2 7 * * <prefix>/bin/hedgehog_datafiles_tar_old_xml.sh -D >> /home/hedgehog/hedgehog_datafiles_tar_old_xml.sh.log 2>&1
-
+# Daily job to create cached plots for the previous day to make loading common plots 
+# quicker. Run a few hours after midnight so all data is uploaded.
+0 4 * * * <prefix>/bin/hedgehogctl plotcache_generate_cached_plots -D >> /home/hedgehog/plotcache_generate_cached_plots.log -D 2>&1
+# Daily job to generate RSSAC reports. By default report is generated
+# for a single day 1 week ago
+0 2 * * * <prefix>/bin/hedgehogctl rssac_generate_reports -D >> /home/hedgehog/rssac_generate_reports.log 2>&1

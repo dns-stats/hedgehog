@@ -1,8 +1,6 @@
 # TODO: Split this makefile up
 # TODO: misleading error message when trying to remove RPostgreSQLHelper if not there: sudo R CMD REMOVE RPostgreSQLHelper || true
 
-MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
-
 CLEANFILES = $(data_DATA) $(nobase_data_DATA)
 
 sysconfdir = @sysconfdir@/hedgehog
@@ -50,25 +48,25 @@ subst_DB_SCHEMA_VERSION = sed -e 's|DB_SCHEMA_VERSION|@DB_SCHEMA_VERSION@|'
 hedgehog/conf/hedgehog.conf: $(srcdir)/hedgehog/conf/hedgehog.conf.in Makefile
 	mkdir -p hedgehog/conf/
 	$(subst_HH_DIRS) < $(srcdir)/hedgehog/conf/hedgehog.conf.in > hedgehog/conf/hedgehog.conf
-	
+
 hedgehog/conf/Rapache_hedgehog.load: $(srcdir)/hedgehog/conf/Rapache_hedgehog.load.in Makefile
 	mkdir -p hedgehog/conf/
 	$(subst_HH_DIRS) < $(srcdir)/hedgehog/conf/Rapache_hedgehog.load.in > hedgehog/conf/Rapache_hedgehog.load
-	
+
 hedgehog/www/R/startup.R: $(srcdir)/hedgehog/www/R/startup.R.in Makefile
 	mkdir -p hedgehog/www/R/
 	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog/www/R/startup.R.in > hedgehog/www/R/startup.R	
-	
+
 hedgehog/www/hedgehog.html: $(srcdir)/hedgehog/www/hedgehog.html.in Makefile
 	$(subst_PACKAGEVERSION) < $(srcdir)/hedgehog/www/hedgehog.html.in > hedgehog/www/hedgehog.html
-	
+
 hedgehog/www/about.html: $(srcdir)/hedgehog/www/about.html.in Makefile
 	$(subst_PACKAGEVERSION) < $(srcdir)/hedgehog/www/about.html.in > hedgehog/www/about.html
-	
+
 hedgehog/www/brew/hedgehog.brew: $(srcdir)/hedgehog/www/brew/hedgehog.brew.in Makefile
 	mkdir -p hedgehog/www/brew/
 	$(subst_DB_SCHEMA_VERSION) < $(srcdir)/hedgehog/www/brew/hedgehog.brew.in | $(subst_HH_DIRS)  > hedgehog/www/brew/hedgehog.brew
-	
+
 EXTRA_DIST = 	$(srcdir)/hedgehog/www/hedgehog.html.in \
 				$(srcdir)/hedgehog/www/about.html.in \
 				$(srcdir)/hedgehog/www/R/startup.R.in \
@@ -77,11 +75,8 @@ EXTRA_DIST = 	$(srcdir)/hedgehog/www/hedgehog.html.in \
 				$(srcdir)/hedgehog/www/brew/hedgehog.brew.in
 
 install-data-hook:
+	mkdir -p ${DESTDIR}$(localstatedir)/hedgehog/www
+	chmod -R 775 ${DESTDIR}$(localstatedir)/hedgehog/www
 	test -f ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml || \
 		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}
 		${INSTALL_DATA} -m 644 $(srcdir)/$(hh_web_conf_dir)/hedgehog_gui.yaml ${DESTDIR}${sysconfdir}/hedgehog_gui.yaml.sample
-
-install-rpg:
-	R CMD REMOVE RPostgreSQLHelper || true
-	R CMD INSTALL $(datadir)/hedgehog/R_packages/RPostgreSQLHelper
-.PHONY: install-rpg

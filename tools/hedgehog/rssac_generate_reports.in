@@ -20,40 +20,41 @@
 #
 
 # 
-# File:   hedgehog_rssac_generate_reports.sh
+# File:   rssac_generate_reports
 #
 
 #TODO(asap): Add a flag to allow the user to specify a single server to run the report for
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=DB_VERSION
+REQUIRED_API_VERSION=@DB_VERSION@
 DB_NAME=$hhconfig_database_name
 DEFAULT_DAY=`date --date="- 7 day" +%Y-%m-%d`
 START=`date --date="${DEFAULT_DAY}" +%Y-%m-%dT00:00`
 INPUT_START=""
-DELETE_RAW_DATA_FLAG=""
-PROCESS_UNIQUE_SOURCES=1;
-export PGPASSWORD=$hhconfig_database_owner_pass
+# DELETE_RAW_DATA_FLAG=""
+# PROCESS_UNIQUE_SOURCES=1;
+export PGPASSWORD=$hhconfig_database_read_pass
 
 usage () {
     echo
     echo "Create RSSAC reports for a specified 24 hour period"
+    echo "(Requires data to have been processed using the database_process_rssac_data script)"
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
-    echo "  -s Date on which to create RSSAC reports (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
-    echo "  -u Don't process the unique source data before generating the report"
-    echo "  -D Also delete the raw unique_source data from the database to save space (default: no delete)"
+    echo "  -d Date on which to create RSSAC reports (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
+    # echo "  -u Don't process the unique source data before generating the report"
+    # echo "  -D Also delete the raw unique_source data from the database to save space (default: no delete)"
     echo "  -h Show this help"
 }
 
-while getopts ":s:Duh" opt; do
+while getopts ":d:Duh" opt; do
     case $opt in
-        s  ) INPUT_START=$OPTARG ;;
-		D  ) DELETE_RAW_DATA_FLAG=" -D " ;;
-		u  ) PROCESS_UNIQUE_SOURCES=0 ;;
+        d  ) INPUT_START=$OPTARG ;;
+        # D  ) DELETE_RAW_DATA_FLAG=" -D " ;;
+        # u  ) PROCESS_UNIQUE_SOURCES=0 ;;
         h  ) usage
              exit 1 ;;
         \? ) usage
@@ -63,7 +64,7 @@ done
 
 echo "`date`: $0 COMMENCED"
 USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+[ $USER != $hhconfig_database_reader ] && echo "Must be $hhconfig_database_reader to run this script" && exit 1
 
 # Validate the input date
 if [ ! -z ${INPUT_START} ] ; then
@@ -102,12 +103,12 @@ echo
 echo "Creating RSSAC reports from ${START} to ${STOP} in ${TOP_OUTPUTDIR}" 
 echo
 
-if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
-	echo "Calling hedgehog_process_unique_source_data.sh script"
-	echo "@BIN@/hedgehog_process_unique_source_data.sh -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}"
-	@BIN@/hedgehog_rssac_process_unique_source_data.sh -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}
-	echo
-fi
+# if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
+# 	echo "Calling process_unique_source_data script"
+# 	echo "@LIBEXEC@/process_unique_source_data -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}"
+# 	@LIBEXEC@/database_process_rssac_data -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}
+# 	echo
+# fi
 
 PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' and name != '$TRAFFIC_VOLUME_DIFF' ORDER BY id DESC;" | psql -h $hhconfig_database_host -td $DB_NAME`
 SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME `

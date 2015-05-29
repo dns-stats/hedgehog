@@ -20,16 +20,16 @@
 #
 
 # 
-# File:   hedgehog_database_update_nodes.sh
+# File:   database_update_nodes
 #
 
 #TODO(asap): Add option to generate the nodes.csv file from the directory structure if it already exists (won't have group info)
 #TODO(asap): Add option to delete servers/nodes/groups
 #TODO: Add reporting if nodes found in the database that are not in the nodes.csv file
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=DB_VERSION
+REQUIRED_API_VERSION=@DB_VERSION@
 DB_NAME=$hhconfig_database_name
 DATA_DIR=$hhconfig_directories_data
 NODES_FILE=$hhconfig_directories_conf/"nodes.csv"
@@ -47,7 +47,7 @@ usage () {
 	echo " - See the comments in that file for details of the format."
 	echo " - No action is taken on servers/nodes that are in the database but are not in the input files."
 	echo 
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
 	echo "  -p Run in prediction mode. Output findings but don't act on the DB"
@@ -166,7 +166,7 @@ if [ ${NEW_SERVER} -eq 1 ] && [ $SUPPRESS_WARNINGS -eq 0 ] ; then
 	echo
 	echo "********************************************************************************"
 	echo "New servers have been added to Hedgehog! To enable the import of data for this"
-	echo "server the 'hedgehog_manage_partitions.sh' script MUST be run manually now."
+	echo "server the 'manage_partitions' script MUST be run manually now."
 	echo "********************************************************************************"
 	echo
 fi

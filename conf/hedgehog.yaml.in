@@ -23,9 +23,11 @@ database:
                                      # it specifies the directory in which the socket file is stored.
   port         : 5432      # specify port for the postgresql DB.
   name         : hedgehog  # specify dbname for the postgresql DB.
-  owner        : hedgehog  # specify a user to own the postgresql DB. This user will run refile_and_grok.
+  owner        : hedgehog  # specify a user to own the postgresql DB.
+                           # [Required for Data Manager component]
   owner_pass   :           # specify a password for the owner user if needed.
-  read_user    : www-data  # specify a read user for the postgresql DB. This should be the apache user.
+  read_user    : www-data  # specify a read user for the postgresql DB.
+                           # [Required for Web front-end component]
   read_pass    :           # specify a password for the read user if needed.
     
 # Directory structure

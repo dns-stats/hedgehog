@@ -1,3 +1,4 @@
+#!/usr/bin/perl -w
 # 
 # Copyright 2014 Internet Corporation for Assigned Names and Numbers.
 # 
@@ -14,10 +15,20 @@
 # limitations under the License.
 #
 
-AC_DEFUN([AX_OPTIMIZER],
-[
-    AC_ARG_ENABLE([optimizer],
-                AS_HELP_STRING([--disable-optimizer],
-                [Disable the optimizer (-O2) - enabled by default.]), [CXXFLAGS="-g"])
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
 
-])
+# 
+# File:   conf_read
+#
+
+use YAML::Tiny;
+$yaml = YAML::Tiny->read("@HH_CONF_FILE@");
+foreach $key (keys  $yaml->[0]{database}){
+  next if (!$yaml->[0]{database}{$key}); 
+  print "hhconfig_database_$key=\"$yaml->[0]{database}{$key}\"\n";
+}
+foreach $key (keys  $yaml->[0]{directories}){
+  print "hhconfig_directories_$key=\"$yaml->[0]{directories}{$key}\"\n";
+}

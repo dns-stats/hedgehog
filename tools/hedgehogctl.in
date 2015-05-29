@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# Wrapper script to run the other tools
+# The other tools will be installed in libexecdir
+
+set -e
+# set -x 
+
+usage () {
+	echo
+	echo "Run a Hedgehog command"
+	echo
+	echo "Usage: $(basename $0) [help|list] [COMMAND] [command_options]"
+	echo
+  exit 1
+}
+
+TOOLS=( database_init \
+        database_manage_partitions \
+        database_process_rssac_data \
+        database_rm_old_rssac_data \
+        database_update_nodes \
+        datafiles_create_summary \
+        datafiles_rm_empty_xml_dirs \
+        datafiles_tar_old_xml_files \
+        plotcache_generate_cached_plots \
+        plotcache_rm_cached_plots \
+        rssac_generate_reports )
+
+SCRIPT_DIR=@LIBEXEC@
+HELP=0
+FIRST_COMMAND_ARG=2
+COMMAND=${1}
+shopt -s nocasematch
+
+if [[  " ${1} " == " list " ]] ; then
+  echo "Valid commands are:"
+  printf '  %s\n' "${TOOLS[@]}"
+  echo
+  exit 0
+fi
+
+if [[  " ${1} " == " help " ]] ; then
+  COMMAND=${2}
+  HELP=1
+  if [ -z ${COMMAND} ] ; then
+    usage
+  fi
+fi
+
+if [[ ! " ${TOOLS[*]} " =~ " ${COMMAND} " ]] ; then
+  echo
+  echo "Invalid command: ${COMMAND}"
+  usage
+fi
+
+if [[ ${HELP} -eq 1 ]] ; then
+  ${SCRIPT_DIR}/${COMMAND} -h
+  exit 0
+fi
+
+exec ${SCRIPT_DIR}/${COMMAND} ${@:$FIRST_COMMAND_ARG} 

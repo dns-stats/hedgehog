@@ -8,20 +8,15 @@ echo "::::::::::::: CREATE USERS :::::::::::::"
 # create a system user and group called hedgehog
 addgroup --system hedgehog
 adduser --system --ingroup hedgehog hedgehog
-# put www-data user in group hedgehog
-adduser www-data hedgehog
-# put hedgehog user in group www-data
-adduser hedgehog www-data
 
-chown -R hedgehog:hedgehog /usr/local/var/hedgehog/
+chown -R hedgehog:hedgehog /usr/local/var/hedgehog/data
+chown -R www-data:www-data /usr/local/var/hedgehog/www
 
 echo "::::::::::::: CONFIGURE APACHE :::::::::::::"
 a2dissite 000-default.conf
 
 cp /usr/local/share/hedgehog/conf/hedgehog.conf /etc/apache2/sites-available/
 a2ensite hedgehog.conf
-
-echo "umask 002" >> /etc/apache2/envvars
 
 echo "
 <Directory /usr/local/share/hedgehog>
@@ -40,8 +35,8 @@ Require all granted
 service apache2 restart
 
 #Edit the the <prefix>/etc/hedgehog/nodes.csv to specify the servers, nodes and grouping to be used (example format is provided with entries commented out).
-#sudo -u postgres /usr/local/sbin/hedgehog_database_create.sh
-#sudo -u hedgehog /usr/local/bin/hedgehog_database_init.sh
+#sudo -u postgres /usr/local/bin/database_create
+#sudo -u hedgehog /usr/local/bin/hedgehogctl database_init
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
 cd /vagrant

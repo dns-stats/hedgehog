@@ -20,22 +20,22 @@
 #
 
 # 
-# File:   hedgehog_plotcache_rm_cached_plots.sh
+# File:   plotcache_rm_cached_plots
 #
 
-eval $(@BIN@/hedgehog_conf_read.pl)
+eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=DB_VERSION
+REQUIRED_API_VERSION=@DB_VERSION@
 DB_NAME=$hhconfig_database_name
 REMOVE_ALL=0
-export PGPASSWORD=$hhconfig_database_owner_pass
+export PGPASSWORD=$hhconfig_database_reader_pass
 
 usage () {
     echo
     echo "This script is interactive if the -a option is not selected."
     echo "You will be asked to select which cached plot types you'd like to remove"
     echo
-    echo "Usage: $0 options"
+    echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
     echo "  -a Remove all cached plots"
@@ -54,7 +54,7 @@ done
 
 echo "`date`: $0 COMMENCED"
 USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+[ $USER != $hhconfig_database_reader ] && echo "Must be $hhconfig_database_reader to run this script" && exit 1
 
 if [ $REMOVE_ALL -eq 1 ] ; then
 	echo "Removing all cached plots from $hhconfig_directories_plotcache"

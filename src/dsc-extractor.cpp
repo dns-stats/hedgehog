@@ -39,8 +39,7 @@ using namespace std;
 static void
 usage (void)
 {
-    fprintf(stderr, "Usage: dsc-xml-extractor [OPTION]...\n");
-    fprintf(stderr, "DSC++ \n\n");
+    fprintf(stderr, "Usage: dsc-extractor [OPTION]...\n");
     fprintf(stderr,
         "Supported options:\n"
                 "  -h                   Show this usage. \n"
