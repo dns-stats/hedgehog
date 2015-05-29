@@ -1,10 +1,10 @@
-if IMPORTER
-IMP = dsc-extractor
+if DM
+D = dsc-extractor
 else
-IMP =
+D =
 endif
 
-bin_PROGRAMS = $(IMP)
+bin_PROGRAMS = $(D)
 
 dsc_extractor_SOURCES = dsc-extractor.cpp \
                           DSCDataManager.cpp \

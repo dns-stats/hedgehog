@@ -1,9 +1,9 @@
 ACLOCAL_AMFLAGS = -I m4
 
-if IMPORTER
-IMP = src
+if DM
+D = src
 else
-IMP =
+D =
 endif
 
 if WEB
@@ -12,7 +12,7 @@ else
 W =
 endif
 
-SUBDIRS = conf tools $(W) $(IMP)
+SUBDIRS = conf tools $(W) $(D)
 
 MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
 

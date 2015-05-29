@@ -45,14 +45,14 @@ LT_INIT
 AC_CONFIG_FILES(Makefile conf/Makefile tools/Makefile)
 
 WEB=1
-IMPORTER=1
+DM=1
 ACX_COMPONENTS
 AS_IF([test $WEB -eq 1],[AC_MSG_NOTICE([Building Web Component...])
   AC_CONFIG_FILES(www/Makefile)
 
 ],[AC_MSG_NOTICE([Not building Web Component...])])
 
-AS_IF([test $IMPORTER -eq 1],[AC_MSG_NOTICE([Building Importer Component...])
+AS_IF([test $DM -eq 1],[AC_MSG_NOTICE([Building Data Manager Component...])
 
   # Checks for header files.
   AC_CHECK_HEADERS([arpa/inet.h fcntl.h netinet/in.h stdlib.h string.h sys/param.h unistd.h])
@@ -96,9 +96,9 @@ AS_IF([test $IMPORTER -eq 1],[AC_MSG_NOTICE([Building Importer Component...])
 
   AC_CONFIG_FILES(src/Makefile)
   
-],[AC_MSG_NOTICE([Not building Importer Component...])])
+],[AC_MSG_NOTICE([Not building Data Manager Component...])])
 
-AM_CONDITIONAL([IMPORTER], [test $IMPORTER -eq 1])
+AM_CONDITIONAL([DM], [test $DM -eq 1])
 AM_CONDITIONAL([WEB], [test $WEB -eq 1])
 
 AC_OUTPUT

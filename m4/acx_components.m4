@@ -18,12 +18,12 @@ AC_DEFUN([ACX_COMPONENTS],
 [
     AC_ARG_ENABLE([web],
                 AS_HELP_STRING([--disable-web],
-                [Dont build the web interface - enabled by default.]),
+                [Don't build the web interface - enabled by default.]),
                 [AS_IF([test "x$enableval" == "xno"], [WEB=0])])
                 
-    AC_ARG_ENABLE([importer],
-                AS_HELP_STRING([--disable-importer],
-                [Dont build the importer - enabled by default.]),
-                [AS_IF([test "x$enableval" == "xno"], [IMPORTER=0])])
+    AC_ARG_ENABLE([data-manager],
+                AS_HELP_STRING([--disable-data-manager],
+                [Don't build the data manager - enabled by default.]),
+                [AS_IF([test "x$enableval" == "xno"], [DM=0])])
 
 ])
