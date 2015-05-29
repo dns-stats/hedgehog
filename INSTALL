@@ -85,7 +85,7 @@ sudo apt-get install libapache2-mod-r-base r-cran-ggplot2 r-cran-dbi \
 1.4. Build Hedgehog
  
 * By default, both components are built. 
-* Use the --disable-web and/or --disable-importer configure options to select which components are actually built.
+* Use the --disable-web and/or --disable-data-manager configure options to select which components are actually built.
 * All installs get the hedgehog.yaml configuration file.
 
 Building Hedgehog
@@ -95,7 +95,7 @@ cd hedgehog-2.0.0rc1
 ./autogen.sh
 mkdir build
 cd build
-../configure [--prefix=] [--disable-web] [--disable-importer]
+../configure [--prefix=] [--disable-web] [--disable-data-manager]
 make
 sudo make install
  
@@ -131,7 +131,7 @@ database:
   port         : 5432      # specify port for the postgresql DB.
   name         : hedgehog  # specify dbname for the postgresql DB.
   owner        : hedgehog  # specify a user to own the postgresql DB. 
-                           # [Required for Database and Importer components]
+                           # [Required for Data Manager components]
                            # [Required for web-front end RSSAC reporting]
   owner_pass   :           # specify a password for the owner user if needed.
   read_user    : www-data  # specify a read user for the postgresql DB. 
@@ -306,19 +306,17 @@ In 2.0 several cron jobs need to be configured.
 Below is an example crontab for a typical data manager install (sudo -u <DB_OWNER> crontab -e).
 WARNING: Note that the database_manage_partitions script MUST be run at least once a month or the import will fail.
 
-# REQUIRED [IMPORTER]: 
+# REQUIRED: 
 # Import XML data every 15 mins
 00,15,30,45 * * * * <prefix>/bin/refile_and_grok -c >> /home/hedgehog/refile_and_grok_xml_to_db.og 2>&1
-# REQUIRED [DATABASE]:
 # Twice monthly job to make sure the DB tables for next month are created 
 # ahead of time
 0 6 15,28 * * <prefix>/bin/hedgehogctl database_manage_partitions >> /home/hedgehog/database_manage_partitions.log 2>&1
  
-# OPTIONAL [DATABASE]:
+# OPTIONAL:
 # Daily job to process RSSAC data. By default data is processed
 # for a single day 1 week ago
 0 1 * * * <prefix>/bin/hedgehogctl database_process_rssac_data -D >> /home/hedgehog/database_process_rssac_data.log 2>&1
-# OPTIONAL [IMPORTER]:
 # Monthly job to tar up processed xml directories
 0 2 1 * * <prefix>/bin/hedgehogctl datafiles_rm_empty_xml_dirs -D >> /home/hedgehog/datafiles_rm_empty_xml_dirs.log 2>&1
 # Monthly job to remove empty xml directories that are older than 7 days old
@@ -328,7 +326,7 @@ WARNING: Note that the database_manage_partitions script MUST be run at least on
 
 Below is an example crontab for a typical web front-end install (sudo -u <DB_READ_USER> crontab -e)
 
-# OPTIONAL [WEB]:
+# OPTIONAL:
 # Daily job to create cached plots for the previous day to make loading common plots 
 # quicker. Run a few hours after midnight so all data is uploaded.
 0 4 * * * <prefix>/bin/hedgehogctl plotcache_generate_cached_plots -D >> /home/hedgehog/plotcache_generate_cached_plots.log -D 2>&1
