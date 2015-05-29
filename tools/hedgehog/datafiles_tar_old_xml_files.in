@@ -18,7 +18,7 @@ usage () {
   echo
   echo "Pack old xml files already processed into a .tar package to store and archive."
   echo "The xml files are packed according to their date and node and server."
-  echo "The filename has the following format done-PID-date.tar.bz (e.g. done-14143-2015-05-01.tar.bz2)."
+  echo "The filename has the following format done-PID-date.tar.bz2 (e.g. done-14143-2015-05-01.tar.bz2)."
   echo 
   echo "Usage: $(basename $0) options"
   echo
