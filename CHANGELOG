@@ -14,11 +14,11 @@
 # limitations under the License.
 #
 
-Hedgehog 2.0.0rc1 
+Hedgehog 2.0.0rc1 - 2015-05-29
 ------------------------------
 
 * Allow building of just the importer or just the web interface by adding
-  --disable-web and --disable-importer options to configure
+  --disable-web and --disable-data-manager options to configure
 * Installed tools in libexec/hedgehog/ and removed hedgehog prefix and 
   .sh extension
 * Created a hedgehogctl control script to wrap the tools.
@@ -29,7 +29,7 @@ Hedgehog 2.0.0rc1
   consistent with other R packages that need installing.
 * Add missing check for SED in configure
 
-Hedgehog 2.0.0b2 - 2014-05-05
+Hedgehog 2.0.0b2 - 2015-05-05
 -----------------------------
 
 * Support for Vagrant Provisioning (thanks melalj)
