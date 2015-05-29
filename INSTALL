@@ -41,11 +41,12 @@ The following instructions describe how to install Hedgehog 2.0.0rc1 on Ubuntu 1
 
 1.1.1. Platform support
 
-Version 2.0.0rc1 of Hedgehog is currently only supported on Ubuntu 14.04.1 LTS Server.
+Version 2.0.0rc1 of Hedgehog is currently only supported on Ubuntu 14.04.2 LTS Server.
 
 1.1.2. Database support
 
-Hedgehog has been tested with PostgreSQL 9.3.X. The installation of this of this is not covered in detail since it may or may not be co-located with the other hedgehog components. If required, it can be installed using
+Hedgehog has been tested with PostgreSQL 9.3.X. The installation of this of this is not covered in detail since it may
+or may not be co-located with the other hedgehog components. If required, it can be installed using
 sudo apt-get install postgresql
 
 WARNING: The Hedgehog servers and PostgreSQL must both be configured to use UTC!
@@ -69,12 +70,12 @@ Both components can be configured to connect to a remote database server, so the
 
 NOTE: It is necessary to only select the dependencies require for the specific components being installed.
 
-# common dependancies
+# common dependencies
 sudo apt-get install autoconf libtool make postgresql-client libyaml-tiny-perl
-# data manager dependancies
+# data manager dependencies
 sudo apt-get install g++ libboost-program-options-dev \
                      libboost-system-dev libboost-filesystem-dev libpqxx-dev
-# web front-end dependancies
+# web front-end dependencies
 sudo add-apt-repository ppa:opencpu/rapache
 sudo apt-get update
 sudo apt-get install libapache2-mod-r-base r-cran-ggplot2 r-cran-dbi \
@@ -89,8 +90,8 @@ sudo apt-get install libapache2-mod-r-base r-cran-ggplot2 r-cran-dbi \
 
 Building Hedgehog
 
-tar -xzf hedgehog-2.0.0b2.tar.gz
-cd hedgehog-2.0.0b2
+tar -xzf hedgehog-2.0.0rc1.tar.gz
+cd hedgehog-2.0.0rc1
 ./autogen.sh
 mkdir build
 cd build
