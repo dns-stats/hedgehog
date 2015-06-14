@@ -1,0 +1,15 @@
+create table tld_types (id serial primary key,
+                        type_name text);
+
+insert into tld_types (type_name) values
+  ('New-gTLD'),
+  ('Legaacy-gTLD'),
+  ('ccTLD');
+  
+create table tlds (id serial primary key,
+                   alabel text,
+                   ulabel text
+                   english text
+                   type int REFERENCES tld_types (id);
+
+#insert into tlds (alabel, ulabel, english) values
