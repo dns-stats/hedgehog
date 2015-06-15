@@ -462,7 +462,7 @@ COOKING, null, null, New-gTLD
 MOE, null, null, New-gTLD
 RODEO, null, null, New-gTLD
 COUNTRY, null, null, New-gTLD
-xn--czru2d 商城, mall, New-gTLD
+xn--czru2d, 商城, mall, New-gTLD
 HORSE, null, null, New-gTLD
 FISHING, null, null, New-gTLD
 VEGAS, null, null, New-gTLD
@@ -500,7 +500,7 @@ xn--d1acj3b, дети, kids, New-gTLD
 ACTOR, null, null, New-gTLD
 SUPPLIES, null, null, New-gTLD
 FISH, null, null, New-gTLD
-xn―cg4bki, 삼성, Samsung, New-gTLD
+xn--cg4bki, 삼성, Samsung, New-gTLD
 VACATIONS, null, null, New-gTLD
 INDUSTRIES, null, null, New-gTLD
 SUPPLY, null, null, New-gTLD

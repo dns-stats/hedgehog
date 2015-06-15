@@ -71,7 +71,7 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
   echo "Processing file: " $TLD_FILE
   while read line || [[ -n "$line" ]]; do
 
-  	trimmed_line=`echo $line | sed -e 's/^ *//' -e 's/ *$//'`
+  	trimmed_line=$(echo $line | sed -e 's/^ *//' -e 's/ *$//')
 
   	if [[ -z ${trimmed_line} ]] || [[ "${trimmed_line}" =~ ^# ]] ; then
   		continue
@@ -81,10 +81,10 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
   	IFS=','
   	read -ra arrline <<< "$trimmed_line"
   	IFS=$OIFS
-  	ALABEL=`echo ${arrline[0]} | sed -e 's/^ *//' -e 's/ *$//'`
-  	ULABEL=`echo ${arrline[1]} | sed -e 's/^ *//' -e 's/ *$//'`
-  	ENGLISH=`echo ${arrline[2]} | sed -e 's/^ *//' -e 's/ *$//'`
-    TLDTYPE`echo ${arrline[3]} | sed -e 's/^ *//' -e 's/ *$//'`
+  	ALABEL=$(echo ${arrline[0]} | sed -e 's/^ *//' -e 's/ *$//')
+  	ULABEL=$(echo ${arrline[1]} | sed -e 's/^ *//' -e 's/ *$//')
+  	ENGLISH=$(echo ${arrline[2]} | sed -e 's/^ *//' -e 's/ *$//')
+    TLDTYPE=$(echo ${arrline[3]} | sed -e 's/^ *//' -e 's/ *$//')
     
   	# First, validate the input	
   	if [ -z "$ALABEL" ] ; then
@@ -102,7 +102,7 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
   		continue
   	fi
 
-  	if [ -z $ENGLISH ] ; then
+  	if [ -z "$ENGLISH" ] ; then
     	echo "Missing english field for alabel $ALABEL - alabel ignored"
     	continue
     fi
@@ -113,15 +113,14 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     fi
 
     # Check if this tld already exists
-    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tlds where alabel ='${ALABEL}')
+    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tlds where alabel ='${ALABEL}'")
     [ ! $CHECK -eq 0 ] && continue
-    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name ='${TLDTYPE}')
+    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name ='${TLDTYPE}'")
     [ ! $CHECK -eq 1 ] && continue
     
-    $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, ulabel, english, type) values \ 
-       ('${ALABEL}', '${ULABEL}', '${ENGLISH}', select id from  tld_types where type_name='${TLDTYPE}'))
+    echo $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, ulabel, english, type) select '${ALABEL}', '${ULABEL}', '${ENGLISH}', id from  tld_types where type_name='${TLDTYPE}'")
 
   done < ${TLD_FILE}
 done
 
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"

@@ -18,7 +18,8 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/database_process_rssac_data \
                          hedgehog/database_rm_old_rssac_data \
                          hedgehog/DDL_updates/000008_ddl_traffic_difference \
-                         hedgehog/DDL_updates/000009_ddl_node_index
+                         hedgehog/DDL_updates/000009_ddl_node_index \
+                         hedgehog/DDL_updates/000010_ddl_tlds
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
                    $(srcdir)/hedgehog/sql/insert_lookup_data.sql
@@ -92,6 +93,10 @@ hedgehog/DDL_updates/000008_ddl_traffic_difference: $(srcdir)/hedgehog/DDL_updat
 hedgehog/DDL_updates/000009_ddl_node_index: $(srcdir)/hedgehog/DDL_updates/000009_ddl_node_index.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000009_ddl_node_index.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000009_ddl_node_index
+
+hedgehog/DDL_updates/000010_ddl_tlds: $(srcdir)/hedgehog/DDL_updates/000010_ddl_tlds.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000010_ddl_tlds.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000010_ddl_tlds
 
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
