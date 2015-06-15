@@ -8,6 +8,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/database_init \
                          hedgehog/database_manage_partitions \
                          hedgehog/database_update_nodes \
+                         hedgehog/database_update_tlds \
                          hedgehog/datafiles_create_summary \
                          hedgehog/datafiles_rm_empty_xml_dirs \
                          hedgehog/datafiles_tar_old_xml_files \
@@ -47,6 +48,10 @@ hedgehog/database_manage_partitions: $(srcdir)/hedgehog/database_manage_partitio
 hedgehog/database_update_nodes: $(srcdir)/hedgehog/database_update_nodes.in Makefile
 	mkdir -p hedgehog
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_nodes.in | $(subst_DB_VERSION) > hedgehog/database_update_nodes
+
+hedgehog/database_update_tlds: $(srcdir)/hedgehog/database_update_tlds.in Makefile
+	mkdir -p hedgehog
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_tlds.in | $(subst_DB_VERSION) > hedgehog/database_update_tlds
 
 hedgehog/datafiles_create_summary: $(srcdir)/hedgehog/datafiles_create_summary.in Makefile
 	mkdir -p hedgehog

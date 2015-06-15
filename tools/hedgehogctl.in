@@ -20,6 +20,7 @@ TOOLS=( database_init \
         database_process_rssac_data \
         database_rm_old_rssac_data \
         database_update_nodes \
+        database_update_tlds \
         datafiles_create_summary \
         datafiles_rm_empty_xml_dirs \
         datafiles_tar_old_xml_files \
