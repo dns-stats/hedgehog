@@ -16,3 +16,12 @@ install-data-hook:
 		${INSTALL_DATA} -m 644 hedgehog.yaml ${DESTDIR}${sysconfdir}/hedgehog.yaml.sample
 	test -f ${DESTDIR}${sysconfdir}/nodes.csv || \
 		${INSTALL_DATA} -m 644 $(srcdir)/nodes.csv ${DESTDIR}${sysconfdir}
+	test -d ${DESTDIR}${sysconfdir}/tlds.d || mkdir -p ${DESTDIR}${sysconfdir}/tlds.d
+	test -f ${DESTDIR}${sysconfdir}/tlds.d/cctlds.csv || \
+		${DESTDIR}${sysconfdir}/tlds.d/cctlds.csv
+	test -f ${DESTDIR}${sysconfdir}/tlds.d/idn_cctlds.csv || \
+		${DESTDIR}${sysconfdir}/tlds.d/idn_cctlds.csv
+	test -f ${DESTDIR}${sysconfdir}/tlds.d/legacy_glds.csv || \
+		${DESTDIR}${sysconfdir}/tlds.d/legacy_glds.csv
+	test -f ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds.csv || \
+		${DESTDIR}${sysconfdir}/tlds.d/new_glds.csv
