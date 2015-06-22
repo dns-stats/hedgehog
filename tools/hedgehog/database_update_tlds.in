@@ -111,14 +111,23 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     	echo "Missing TLD type field for alabel $ALABEL - alabel ignored"
     	continue
     fi
-
+    
+    shopt -s nocasematch
+    if [[ x$ULABEL == "xnull" ]] ; then
+      ULABEL=$ALABEL
+    fi
+    if [[ x$ENGLISH == "xnull" ]] ; then
+      ENGLISH=$ALABEL
+    fi
+    shopt -u nocasematch
+    
     # Check if this tld already exists
-    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tlds where alabel ='${ALABEL}'")
+    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tlds where alabel = lower('${ALABEL}')")
     [ ! $CHECK -eq 0 ] && continue
-    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name ='${TLDTYPE}'")
+    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name = '${TLDTYPE}'")
     [ ! $CHECK -eq 1 ] && continue
     
-    echo $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, ulabel, english, type) select '${ALABEL}', '${ULABEL}', '${ENGLISH}', id from  tld_types where type_name='${TLDTYPE}'")
+    echo $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, ulabel, english, type) select lower('${ALABEL}'), lower('${ULABEL}'), lower('${ENGLISH}'), id from  tld_types where type_name='${TLDTYPE}'")
 
   done < ${TLD_FILE}
 done

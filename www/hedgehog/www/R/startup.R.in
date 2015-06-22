@@ -20,6 +20,10 @@
 
 #system('logger -p user.notice Call to Hedgehog startup.R')
 
+# Set the locale - For some reason this is set in R on the command line
+# but not in Rapache!
+Sys.setlocale("LC_ALL", 'en_US.UTF-8')
+
 suppressPackageStartupMessages(library(Cairo))
 suppressPackageStartupMessages(library(brew))
 suppressPackageStartupMessages(library(DBI))

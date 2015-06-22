@@ -112,7 +112,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }else{
       nKeys <- length(unique(df$key))
       df$x <- as.POSIXct(df$x)
-      png(f, type="cairo-png", width = W, height = H)
+      png(f, width = W, height = H)
       p <- ggplot(data=df, aes(x=x, y=y, group=key, colour=key)) +
                   geom_line() +
                   labs(title=title, x=xlabel, y=ylabel) +
@@ -129,7 +129,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       dev.off()
 
       fstack <- sub(".png", "-stack.png", f)
-      png(fstack, type="cairo-png", width = W, height = H)
+      png(fstack, width = W, height = H)
       ps <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
                    geom_area(stat="identity") +
                    labs(title=title, x=xlabel, y=ylabel) +
@@ -146,7 +146,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       dev.off()
 
       flog <- sub(".png", "-log.png", f)
-      png(flog, type="cairo-png", width = W, height = H)
+      png(flog, width = W, height = H)
       p <- p + scale_y_log10() + ylab(paste("log(",ylabel,")",sep=""))
       print(p)
       dev.off()
@@ -178,7 +178,7 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
       if (vertical == 0) {
           df$x <- factor(df$x, levels=rev(as.character(df$x)))
       }
-      png(f, type="cairo-png", width = W, height = H)
+      png(f, width = W, height = H)
 
       p <- ggplot(data=df, aes(x=x, y=y)) +
                   geom_bar(fill=GREY, colour=GREY, stat="identity") +
@@ -232,7 +232,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       }
 
       nKeys <- length(unique(df$key))
-      png(f, type="cairo-png", width = W, height = H)
+      png(f, width = W, height = H)
 
       p <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
                   geom_bar(stat="identity") + 
@@ -254,7 +254,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       if (vertical == 0) {
         p <- p +
              coord_flip() +
-             theme(panel.grid.major.x = element_line(colour = GRIDGREY), panel.grid.minor.x = element_line(colour = GRIDGREY, linetype = "dotted"), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank())
+             theme(panel.grid.major.x = element_line(colour = GRIDGREY), panel.grid.minor.x = element_line(colour = GRIDGREY, linetype = "dotted"), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.text.y=element_text(size=15))
       } else {
           p <- p +
                geom_bar(width=1, stat="identity")
@@ -292,7 +292,7 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }else{
       	df$x <- as.POSIXct(df$x)
       nKeys <- length(unique(df$key))
-      png(f, type="cairo-png", width = W, height = H)
+      png(f, width = W, height = H)
 
       p <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
                   geom_area(stat="identity") + 
@@ -322,7 +322,7 @@ facetedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, bar_width) {
         stackedBarPlot(df, f, title, xlabel, ylabel, gvis, pltnm = 'N/A', vertical = 1, gbar_width = bar_width)
     }else{
         nKeys <- length(unique(df$key))
-        png(f, type="cairo-png", width = W, height = H)
+        png(f, width = W, height = H)
 
         p <- ggplot(data=df, aes(x=x, y=y)) + 
                     geom_bar(stat="identity", width=bar_width, fill=DARKERRED) +
@@ -355,7 +355,7 @@ facetedLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
         linePlot(df, f, title, xlabel, ylabel, gvis)
     }else{
         nKeys <- length(unique(df$key))
-        png(f, type="cairo-png", width = W, height = H)
+        png(f, width = W, height = H)
         df$x <- as.POSIXct(df$x)
         rkey1 <- sub("dns-(.*)-.*-.*-(.*)", "\\1-\\2", df$key)
         df["rkey"] <- rkey1
@@ -395,7 +395,7 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     nKeys <- length(unique(df$key))
     df$x <- as.POSIXct(df$x)
     rkey1 <- sub("dns-(.*)-.*-.*-(.*)", "\\1-\\2", df$key)
-    png(f, type="cairo-png", width=W, height=H)
+    png(f, width=W, height=H)
     df["rkey"] = rkey1
 
     dfx <- dplyr::arrange(df, x, rkey, desc(key))
@@ -629,7 +629,7 @@ initPlotOptions <- function() {
 	format3                 <<- c("client_subnet_accum", "ipv6_rsn_abusers_accum")
 	formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
     
-	formatother             <<- c("qtype_vs_tld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node")
+	formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node")
 
 	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
     
@@ -639,7 +639,7 @@ initPlotOptions <- function() {
 
 	# now create other useful groups    
 	passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
-	avgoverwindow           <<- c(format3, 'qtype_vs_tld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype')
+	avgoverwindow           <<- c(format3, 'qtype_vs_tld', 'qtype_vs_legacygtld', 'qtype_vs_cctld', 'qtype_vs_newgtld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype')
 	lineplots               <<- c(format1, format2, "by_node", "rcode_volume")
 	facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
 	facetedlineplots        <<- c("traffic_volume")
@@ -776,7 +776,7 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	else if (pltnm %in% format3) {
 		barPlot(df, plot_file, mytitle, "Subnet (IPv4/8 or IPv6/32)", "Average Query Rate (q/sec)", gvis)
 	}
-	else if (pltnm == 'qtype_vs_tld') { 
+	else if (pltnm == 'qtype_vs_tld' || pltnm == 'qtype_vs_legacygtld' || pltnm == 'qtype_vs_cctld' || pltnm == 'qtype_vs_newgtld') { 
 		stackedBarPlot(df, plot_file, mytitle, "TLD", "Average Query Rate (q/sec)", gvis, pltnm)
 	}
 	else if (pltnm == 'client_addr_vs_rcode_accum' || pltnm == 'client_subnet2_accum') {
