@@ -91,6 +91,10 @@ Developed by Sinodun IT (www.sinodun.com)
             <div class="sixteen columns" id="copyright" >
                 <hr />
                 &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
+            
+              <hr style='margin-top:5px;' />
+              This product includes GeoLite2 data created by MaxMind, available from
+              <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
             </div>
         </div>
     </body>

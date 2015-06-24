@@ -19,6 +19,7 @@ TOOLS=( database_init \
         database_manage_partitions \
         database_process_rssac_data \
         database_rm_old_rssac_data \
+        database_update_geoip \
         database_update_nodes \
         database_update_tlds \
         datafiles_create_summary \

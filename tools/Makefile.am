@@ -7,6 +7,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/database_create \
                          hedgehog/database_init \
                          hedgehog/database_manage_partitions \
+                         hedgehog/database_update_geoip \
                          hedgehog/database_update_nodes \
                          hedgehog/database_update_tlds \
                          hedgehog/datafiles_create_summary \
@@ -19,7 +20,8 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/database_rm_old_rssac_data \
                          hedgehog/DDL_updates/000008_ddl_traffic_difference \
                          hedgehog/DDL_updates/000009_ddl_node_index \
-                         hedgehog/DDL_updates/000010_ddl_tlds
+                         hedgehog/DDL_updates/000010_ddl_tlds \
+                         hedgehog/DDL_updates/000011_ddl_geoip
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
                    $(srcdir)/hedgehog/sql/insert_lookup_data.sql
@@ -45,6 +47,10 @@ hedgehog/database_init: $(srcdir)/hedgehog/database_init.in Makefile
 hedgehog/database_manage_partitions: $(srcdir)/hedgehog/database_manage_partitions.in Makefile
 	mkdir -p hedgehog
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_manage_partitions.in | $(subst_DB_VERSION) > hedgehog/database_manage_partitions
+
+hedgehog/database_update_geoip: $(srcdir)/hedgehog/database_update_geoip.in Makefile
+	mkdir -p hedgehog
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_geoip.in | $(subst_DB_VERSION) > hedgehog/database_update_geoip
 
 hedgehog/database_update_nodes: $(srcdir)/hedgehog/database_update_nodes.in Makefile
 	mkdir -p hedgehog
@@ -98,6 +104,10 @@ hedgehog/DDL_updates/000010_ddl_tlds: $(srcdir)/hedgehog/DDL_updates/000010_ddl_
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000010_ddl_tlds.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000010_ddl_tlds
 
+hedgehog/DDL_updates/000011_ddl_geoip: $(srcdir)/hedgehog/DDL_updates/000011_ddl_geoip.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000011_ddl_geoip.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000011_ddl_geoip
+  
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
              database_init.in \
