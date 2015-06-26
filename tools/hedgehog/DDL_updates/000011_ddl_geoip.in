@@ -47,7 +47,7 @@ usage () {
 }
 
 
-while getopts ":csh" opt; do
+while getopts ":h" opt; do
     case $opt in
         h  ) usage ;;
         \? ) usage ;;
@@ -70,15 +70,40 @@ echo "No ip4r extension installed. Ensure that the ip4r package is installed." &
 echo "Then connect to the $DB_NAME database as a superuser and run the command \"CREATE EXTENSION ip4r SCHEMA dsc;\"" && \
 exit 1
 
+DATASET=$(psql -qtc "SELECT id FROM dataset WHERE name = 'client_subnet_accum';")
+
 psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
-  
+
+DROP TABLE IF EXISTS geo;
+DROP SEQUENCE IF EXISTS geo_id_seq;
+
 CREATE TABLE geoip (
   ip_range iprange PRIMARY KEY,
   latitude real,
-  longitude real );
+  longitude real,
+  geoname integer );
 
 CREATE INDEX ix_ip_range ON geoip USING gist (ip_range);
+
+CREATE TABLE locations (
+  geoname_id integer PRIMARY KEY,
+  country_iso_code text,
+  city text );
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('geomap','10.GEO','Busiest Client Locations','Busiest Client Locations') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('geochart','10.GEO','Busiest Client Locations1','Busiest Client Locations1') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
 
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
 INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new geoip table and index', now() );

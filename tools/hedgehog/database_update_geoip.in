@@ -75,15 +75,31 @@ if [ ! -f GeoLite2-City-CSV.zip ] ; then
   
     unzip -oj GeoLite2-City-CSV.zip
   
-    awk -F, " BEGIN { printf \"BEGIN;\n delete from geoip;\n insert into geoip (ip_range, latitude, longitude) values \n\" } 
+    awk -F, " BEGIN { printf \"BEGIN;\n delete from geoip;\n insert into geoip (ip_range, geoname, latitude, longitude) values \n\" } 
         { if (\$1 ~ /network/) { next }} NR > 2 { printf \",\n\" } 
+        { \$2 ~ /^$/ ? a=\$3 : a=\$2 }
         { if (\$8 ~ /^$/ || \$9 ~ /^$/) {
-            printf \" ('%s', null, null)\", \$1 
+            printf \" ('%s', %i, null, null)\", \$1, a
           } else {
-            printf \" ('%s',%8.4f,%8.4f)\", \$1, \$8, \$9
+            printf \" ('%s',%i,%8.4f,%8.4f)\", \$1, a, \$8, \$9
           }
         }
         END { print \";\nCOMMIT;\" } " $TMP_DIR/GeoLite2-City-Blocks-IPv4.csv $TMP_DIR/GeoLite2-City-Blocks-IPv6.csv | psql -h $hhconfig_database_host $DB_NAME
+    
+    awk -F, " BEGIN { printf \"BEGIN;\n delete from locations;\n insert into locations (geoname_id, country_iso_code, city) values \n\" } 
+        NR == 1 { next }
+        NR > 2 { printf \",\n\" }
+        { gsub(/\"/,\"\",\$11) }
+        { gsub(/'/,\"\",\$11) }
+        { if (\$11 ~ /^$/) {
+           printf \" (%i, '%s', null)\", \$1, \$5
+          } else {
+           printf \" (%i, '%s', '%s')\", \$1, \$5, \$11
+          }
+        }
+        END { print \";\nCOMMIT;\" } " /tmp/GeoLite2-City-Locations-en.csv | psql -h $hhconfig_database_host $DB_NAME
+
+    
   fi
 fi
 echo "$(date): $0 COMPLETED"

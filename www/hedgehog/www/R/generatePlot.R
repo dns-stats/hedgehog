@@ -422,6 +422,34 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }
 }
 
+geomap <- function(df, f, title, xlabel, ylabel, gvis) {
+
+	if (hh_debug) {
+		system('logger -p user.notice In geomap')
+    msg <- paste('logger -p user.notice file =', f)
+    system(msg)
+	}
+  if(gvis == 1){
+    title <- sub("\n", " ", title)
+    p <- gvisMap(df, locationvar='location', tipvar='sum', options=list(colorAxis="{colors:['#FF0000', '#00FF00']}", displayMode='regions', height=500, width=920))
+    cat(p$html$chart,file=f)
+  }
+}
+
+geochart <- function(df, f, title, xlabel, ylabel, gvis) {
+
+	if (hh_debug) {
+		system('logger -p user.notice In geomap')
+    msg <- paste('logger -p user.notice file =', f)
+    system(msg)
+	}
+  if(gvis == 1){
+    title <- sub("\n", " ", title)
+# colorAxis="{colors:['#FF0000', '#00FF00']}",    
+    p <- gvisGeoChart(df, locationvar='location', colorvar='sum', options=list(displayMode='regions', height=500, width=920))
+    cat(p$html$chart,file=f)
+  }
+}
 
 getStmntParameters <- function(dsccon, dbdrv, dd_pltid, prepStmtNm, srvrid, start, stop) {
 
@@ -632,8 +660,10 @@ initPlotOptions <- function() {
 	formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node")
 
 	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
-    
-	formatother             <<- c(formatother, rssac)
+  
+  geo                     <<- c("geomap", "geochart")
+  
+	formatother             <<- c(formatother, rssac, geo)
 
 	unknown_graphs          <<- c("client_subnet_count", "idn_vs_tld", "ipv6_rsn_abusers_count")
 
@@ -799,6 +829,11 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	else if (pltnm == 'unique_sources') {
 		barPlot(df, plot_file, mytitle, "IP Version/Aggregation", "Number of Unique Sources", gvis, small=0)
 	}
-		
+	else if (pltnm == 'geomap') {
+	  geomap(df, plot_file, mytitle, "aaaa", "bbbbb", 1)
+	}
+  else if (pltnm == 'geochart') {
+	  geochart(df, plot_file, mytitle, "aaaa", "bbbbb", 1)
+	}
 	return(plot_file)
 }
