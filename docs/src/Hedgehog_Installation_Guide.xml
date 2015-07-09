@@ -1,16 +1,16 @@
 
 <h1><ac:structured-macro ac:name="toc" /></h1>
-<p>The following instructions describe how to install Hedgehog 2.0.0rc1 on Ubuntu 14.04 Server and set up imports of data.</p>
+<p>The following instructions describe how to install Hedgehog 2.0.0rc2 on Ubuntu 14.04 Server and set up imports of data.</p>
 <p>&nbsp;</p><ac:structured-macro ac:name="numberedheadings"><ac:rich-text-body>
 <h2>Requirements</h2>
 <h3>Platform support</h3>
-<p>Version 2.0.0rc1 of Hedgehog is currently only supported on Ubuntu 14.04.2 LTS Server.</p>
+<p>Version 2.0.0rc2 of Hedgehog is currently only supported on Ubuntu 14.04.2 LTS Server.</p>
 <h3>Database support</h3>
 <p>Hedgehog has been tested with PostgreSQL 9.3.X. The installation of this of this is not covered in detail since it may or may not be co-located with the other hedgehog components. If required, it can be installed using</p><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[sudo apt-get install postgresql]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:name="warning"><ac:rich-text-body>
 <p>The Hedgehog servers and PostgreSQL must both be configured to use UTC!</p></ac:rich-text-body></ac:structured-macro>
 <h3>Hedgehog source code</h3>
-<p>Download the 2.0.0rc1 release from github: <a href="https://github.com/dns-stats/hedgehog/archive/2.0.0b2.tar.gz">https://github.com/dns-stats/hedgehog/archive/2.0.0rc1.tar.gz</a></p>
-<p>(If you downloaded the above URL with wget the tarball will be called 2.0.0rc1.tar.gz)</p>
+<p>Download the 2.0.0rc2 release from github: <a href="https://github.com/dns-stats/hedgehog/archive/2.0.0rc2.tar.gz">https://github.com/dns-stats/hedgehog/archive/2.0.0rc2.tar.gz</a></p>
+<p>(If you downloaded the above URL with wget the tarball will be called 2.0.0rc2.tar.gz)</p>
 <h2>Hedgehog components</h2>
 <p><span>Hedgehog comprises 2 components which can be run on the same or different machines:</span></p>
 <ul>
@@ -38,8 +38,8 @@ sudo apt-get install libapache2-mod-r-base r-cran-ggplot2 r-cran-dbi \
 <li>By default, both components are built.&nbsp;</li>
 <li>Use the --disable-web and/or --disable-data-manager configure options to select which components are actually built.</li>
 <li>All installs get the hedgehog.yaml configuration file.</li></ul></ac:rich-text-body></ac:structured-macro>
-<p><strong style="line-height: 1.4285715;">Building Hedgehog</strong></p><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[tar -xzf hedgehog-2.0.0rc1.tar.gz
-cd hedgehog-2.0.0rc1
+<p><strong style="line-height: 1.4285715;">Building Hedgehog</strong></p><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[tar -xzf hedgehog-2.0.0rc2.tar.gz
+cd hedgehog-2.0.0rc2
 ./autogen.sh
 mkdir build
 cd build
