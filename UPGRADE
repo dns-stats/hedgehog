@@ -1,10 +1,12 @@
 A PFD version of this is available in the docs directory
 
 An online version of this is available at:
-https://github.com/dns-stats/hedgehog/wiki/Upgrade_2.0.0b2_to_2.0.0rc1
+https://github.com/dns-stats/hedgehog/wiki/Upgrade_2.0.0b2_to_2.0.0rc2
 
 
-This document describes how to upgrade a server from release 2.0.0.b2 to release 2.0.0.rc1 of Hedgehog
+This document describes how to upgrade a server from release 2.0.0.b2 to release 2.0.0.rc2 of Hedgehog
+
+NOTE: 2.0.0rc1 and 2.0.0rc2 differ only in the inclusion of documentation source code to support packaging. Users already on rc1 do not need to upgrade to rc2.
 
 TABLE OF CONTENTS
 1. Pre-installation
@@ -30,7 +32,7 @@ If desired, back up the existing installation (the directory structure in the Us
 
 NOTE: There have been several changes since the 2.0.0b2 release related to the tools.
 If you have cron jobs configured, please read the notes below and update as necessary. 
-The Installation Guide provides examples of setting up the 2.0.0rc1 cron jobs for the different users/components.
+The Installation Guide provides examples of setting up the 2.0.0rc2 cron jobs for the different users/components.
 
 * The Tools scripts have moved to <prefix>/libexec/hedgehog/
   * Note that refile_and_grok is still in <prefix>/bin
@@ -42,7 +44,7 @@ The Installation Guide provides examples of setting up the 2.0.0rc1 cron jobs fo
 
 The table below details the changes.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                    2.0.0b2                           |                2.0.0rc1                         |
+                    2.0.0b2                           |                2.0.0rc2                         |
 name                                    location under| name                             location under |   Notes                                   Script user
                                         <prefix>      |                                  <prefix>       |
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -72,11 +74,11 @@ sudo chown -R <DB_READ_USER>:<DB_READ_USER> <prefix>/var/hedgehog/www
 
 1.3 Download, configure and make new release
 
-Download the 2.0.0b2 release from github: https://github.com/dns-stats/hedgehog/archive/2.0.0rc1.tar.gz
-(If you downloaded the above URL with wget the tarball will be called 2.0.0rc1.tar.gz)
+Download the 2.0.0b2 release from github: https://github.com/dns-stats/hedgehog/archive/2.0.0rc2.tar.gz
+(If you downloaded the above URL with wget the tarball will be called 2.0.0rc2.tar.gz)
 
-tar -xzf hedgehog-2.0.0rc1.tar.gz
-cd hedgehog-2.0.0.rc1
+tar -xzf hedgehog-2.0.0rc2.tar.gz
+cd hedgehog-2.0.0.rc2
 ./autogen.sh
 mkdir build
 cd build
@@ -100,14 +102,14 @@ It is recommended to disable the web front end during upgrade e.g by enabling a 
 
 2.1 Install new release
 
-cd hedgehog-2.0.0rc1/build
+cd hedgehog-2.0.0rc2/build
 sudo make install
 
-Note that in rc1 'make install-rpg' step is no longer required on install.
+Note that in rc2 'make install-rpg' step is no longer required on install.
 
 2.2 Remove moved/deleted files
 
-Some files were moved or deleted between b2 and rc1. To clean the install directory run the following commands
+Some files were moved or deleted between b2 and rc2. To clean the install directory run the following commands
 
 cd <prefix>/include
 sudo rm DSCDataManager.h DSCIOManager.h \
