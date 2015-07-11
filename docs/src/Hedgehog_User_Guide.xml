@@ -1,0 +1,402 @@
+
+<p><ac:structured-macro ac:name="toc" /></p>
+<h1>Overview of Hedgehog</h1>
+<p>Hedgehog is a visualisation tool for DNS statistics that consumes data&nbsp;acquired with the DSC collector.</p>
+<p>Hedgehog was initially developed for ICANN by Sinodun IT and is now released&nbsp;open source under the Apache License, version 2.0. For more information on the development and support of Hedgehog see the <a href="http://www.dns-stats.org">http://www.dns-stats.org</a>&nbsp;website.</p>
+<h1>Components</h1>
+<p>Hedgehog comprises 2 components which can be run on the same or different machines:</p>
+<ul>
+<li>Data Manager
+<ul>
+<li>Scripts for database creation and management</li>
+<li>XML/DAT processing</li></ul></li>
+<li>Web front-end</li></ul>
+<h2>Installation options</h2>
+<p>Hedgehog can be installed to run on a single server with both components and the DB local to that server.&nbsp;</p>
+<p><ac:image ac:height="400"><ri:attachment ri:filename="Hedgehog_component_view.jpg" /></ac:image></p>
+<p>Alternatively the DB may be on a remote server and the Data Manager and Web front-end may be on different servers as shown below.</p>
+<p><ac:image ac:height="400"><ri:attachment ri:filename="Hedgehog_component_view_split.jpg" /></ac:image></p>
+<p>The installation is documented separately in the Installation guide PDF.</p>
+<h1>Datasets</h1>
+<p>An example dsc.conf file for the data sets that Hedgehog supports is given below:</p><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[# Basic data sets
+dataset qtype dns All:null Qtype:qtype queries-only;
+dataset rcode dns All:null Rcode:rcode replies-only;
+dataset opcode dns All:null Opcode:opcode queries-only;
+dataset rcode_vs_replylen dns Rcode:rcode ReplyLen:msglen replies-only;
+dataset client_subnet dns All:null ClientSubnet:cip4_net queries-only max-cells=200;
+dataset qtype_vs_qnamelen dns Qtype:qtype QnameLen:qnamelen queries-only;
+dataset qtype_vs_tld dns Qtype:qtype TLD:tld queries-only,popular-qtypes max-cells=200;
+dataset certain_qnames_vs_qtype dns CertainQnames:certain_qnames Qtype:qtype queries-only;
+dataset client_subnet2 dns Class:query_classification ClientSubnet:cip4_net queries-only max-cells=200;
+dataset client_addr_vs_rcode dns Rcode:rcode ClientAddr:client replies-only max-cells=50;
+dataset chaos_types_and_names dns Qtype:qtype Qname:qname chaos-class,queries-only;
+dataset idn_qname dns All:null IDNQname:idn_qname queries-only;
+dataset edns_version dns All:null EDNSVersion:edns_version queries-only;
+dataset do_bit dns All:null D0:do_bit queries-only;
+dataset rd_bit dns All:null RD:rd_bit queries-only;
+dataset ipv6_rsn_abusers dns All:null ClientAddr:client queries-only,aaaa-or-a6-only,root-servers-net-only max-cells=50;
+dataset transport_vs_qtype dns Transport:transport Qtype:qtype queries-only;
+dataset direction_vs_ipproto ip Direction:ip_direction IPProto:ip_proto any;
+dataset dns_ip_version_vs_qtype dns IPVersion:dns_ip_version Qtype:qtype queries-only;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[# Additional data sets for RSSAC
+dataset unique_sources dns IPVersion:dns_ip_version ClientAddr:client queries-only; 
+dataset traffic_volume_queries dns Transport:transport IPVersion:dns_ip_version queries-only; 
+dataset traffic_volume_responses dns Transport:transport IPVersion:dns_ip_version replies-only; 
+dataset traffic_sizes_queries dns Transport:transport MsgLen:msglen queries-only; 
+dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-only; ]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<h1>Plots</h1>
+<p>The relationship between the Hedgehog plots and those produced by DSC are listed here for convenience.</p>
+<table>
+<tbody>
+<tr>
+<th>Hedgehog plot category</th>
+<th colspan="1">Hedgehog plot display name</th>
+<th>DSC plot id</th>
+<th>DSC display name</th></tr>
+<tr>
+<td colspan="1"><strong>Node Statistics</strong></td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">By node</td>
+<td colspan="1">by_node</td>
+<td colspan="1">By node</td></tr>
+<tr>
+<td>
+<p class="p2"><span class="s1"><strong>Query Attributes</strong></span></p></td>
+<td colspan="1">
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p class="p2"><span class="s1">CHAOS queries</span></p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">chaos_types_and_names</span></p></td>
+<td colspan="1">CHAOS</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">DO bit</span></p></td>
+<td>
+<p class="p2"><span class="s1">do_bit</span></p></td>
+<td>Query Attributes &gt; DO bit</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">EDNS version</span></p></td>
+<td>
+<p class="p2"><span class="s1">edns_version</span></p></td>
+<td>Query Attributes &gt; EDNS version</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">IDN qnames</span></p></td>
+<td>
+<p class="p2"><span class="s1">idn_qname</span></p></td>
+<td>Query Attributes &gt; IDN Qnames</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">OPCODE</span></p></td>
+<td>
+<p class="p2"><span class="s1">opcode</span></p></td>
+<td>Opcodes</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p class="p2"><span class="s1">RD bit</span></p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">rd_bit</span></p></td>
+<td colspan="1">Query Attributes &gt; RD bit</td></tr>
+<tr>
+<td>
+<p class="p2"><span class="s1"><strong>QTYPE</strong></span></p></td>
+<td colspan="1">&nbsp;</td>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">DNS queries by QTYPE</span></p></td>
+<td>
+<p class="p2"><span class="s1">qtype</span></p></td>
+<td>Qtypes</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">DNSSEC queries by QTYPE</span></p></td>
+<td>
+<p class="p2"><span class="s1">dnssec_qtype</span></p></td>
+<td>DNSSEC Qtypes</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p class="p2"><span class="s1">Popular query names by QTYPE</span></p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">certain_qnames_vs_qtype</span></p></td>
+<td colspan="1">Popular Names</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p class="p2"><span class="s1">QTYPE for most popular TLDs</span></p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">qtype_vs_tld</span></p></td>
+<td colspan="1">TLDs</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">Query Name Lengths by QTYPE</span></p></td>
+<td>
+<p class="p2"><span class="s1">qtype_vs_qnamlen</span></p></td>
+<td>Qname Lengths</td></tr>
+<tr>
+<td>
+<p class="p2"><span class="s1"><strong>RCODE</strong></span></p></td>
+<td colspan="1">
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">Replies by RCODE</span></p></td>
+<td>
+<p class="p2"><span class="s1">rcode</span></p></td>
+<td>Rcodes</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">Reply lengths by RCODE </span></p></td>
+<td>
+<p class="p2"><span class="s1">rcode_vs_replylen</span></p></td>
+<td>Reply Lengths</td></tr>
+<tr>
+<td>
+<p class="p2"><span class="s1"><strong>IP Protocol</strong></span></p></td>
+<td colspan="1">
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">IP version</span></p></td>
+<td>
+<p class="p2"><span class="s1">dns_ip_version</span></p></td>
+<td>IP version</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p class="p2"><span class="s1">Queries by IP version, QTYPE</span></p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">dns_ip_version_vs_qtype</span></p></td>
+<td colspan="1">IP version &gt; Query types</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">Received packets by IP protocol</span></p></td>
+<td>
+<p class="p2"><span class="s1">direction_vs_ipproto</span></p></td>
+<td>IP protocols</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p2"><span class="s1">Transports carrying DNS queries</span></p></td>
+<td>
+<p class="p2"><span class="s1">transport_vs_qtype</span></p></td>
+<td>DNS transport</td></tr>
+<tr>
+<td colspan="1"><strong>PCAP statistics</strong></td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">PCAP statistics</td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td>
+<p class="p2"><span class="s1"><strong>Client Subnet Statistics</strong></span></p></td>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p2"><span class="s1">Busiest client subnets</span></p></td>
+<td>
+<p class="p2"><span class="s1">client_subnet_accum</span></p></td>
+<td>Client Geography</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p2"><span class="s1">RCODE by client subnet</span></p></td>
+<td>
+<p class="p2"><span class="s1">client_addr_vs_rcode_accum</span></p></td>
+<td>Rcodes by Client Address</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p2"><span class="s1">Root abusers</span></p></td>
+<td>
+<p class="p2"><span class="s1">ipv6_rsn_abusers_accum</span></p></td>
+<td>IPv6 root abusers</td></tr>
+<tr>
+<td>
+<p class="p2"><span class="s1"><strong>Classification</strong></span></p></td>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p2"><span class="s1">Query classification by client subnet (accum)</span></p></td>
+<td>
+<p class="p2"><span class="s1">client_subnet2_accum</span></p></td>
+<td>Classification</td></tr>
+<tr>
+<td>
+<p class="p1">&nbsp;</p></td>
+<td>
+<p class="p2"><span class="s1">Query classification by client subnet (count)</span></p></td>
+<td>
+<p class="p2"><span class="s1">client_subnet2_count</span></p></td>
+<td>Classification &gt; count</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p class="p2"><span class="s1">Query classifications</span></p></td>
+<td colspan="1">
+<p class="p2"><span class="s1">client_subnet2_trace</span></p></td>
+<td colspan="1">Classification &gt; trace</td></tr></tbody></table>
+<p>In addition Hedgehog is capable of displaying plots based on datasets defined in the RSSAC 002 document (see later for more details):</p>
+<table>
+<tbody>
+<tr>
+<th>Hedgehog plot category</th>
+<th>Hedgehog plot display name</th></tr>
+<tr>
+<td><strong>RSSAC</strong></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1"><span>RCODE volume</span></td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Traffic sizes</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Traffic volume</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Traffic volume differences</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Unique sources</td></tr></tbody></table>
+<h1>Directory Structure</h1>
+<p>Hedgehog uses the following directory structure under the install &lt;prefix&gt; directory (/usr/local/ by default)</p>
+<p><ac:image ac:width="550"><ri:attachment ri:filename="Hedgehog_directory_structure.jpg" /></ac:image></p>
+<h1>Tools</h1>
+<p>Hedgehog provides a set of Data Manager scripts to support the database and data file management, and Web scripts to generate cached plots and the RSSAC reports. They are documented separately in the Hedgehog Tools PDF.&nbsp;</p>
+<h1>Data Manager</h1>
+<h2>Upload of Data</h2>
+<p>It is assumed that the user has already deployed an upload mechanism used with the DSC collector and presenter. A common practice is to use ssh for the upload.</p>
+<p>Hedgehog also supports the use of WebDAV for uploads, validated with certificates. This is particularly useful for deployments with many nodes as it scales better than ssh.&nbsp;</p>
+<p>TODO: Document usage of WebDAV</p>
+<h2><span style="line-height: 1.25;">Import of data</span></h2>
+<p>Hedgehog provides a refile_and_grok script for this purpose. See the Installation guide for more details of how to configure this.</p>
+<h2>Monitoring data import</h2>
+<p>The import process produces two different logs for the user to track the progress of the data import:</p>
+<ul>
+<li>The<em> refile_and_grok</em>&nbsp;script writes output about which nodes it is processing to a <em>refile_and_grok.out</em> file in the Hedgehog <em>&lt;prefix&gt;/var/hedgehog/data</em> directory. This gives a high level view of the processing.&nbsp;<br />&nbsp;</li>
+<li>The import also generates a log file per node in the <em>&lt;prefix&gt;/var/hedgehog/data/&lt;server&gt;/&lt;node&gt;</em>&nbsp;directory called <em>dsc-extractor.out</em>. This lists more details on the processing of each XML file for a specific node.&nbsp;<br />&nbsp;</li>
+<li>A utility script is also provided: <em>&lt;prefix&gt;/bin/hedgehogctl datafiles_create_summary</em>&nbsp;which can be run to get an summary of the current state of processing.</li></ul>
+<h2>Adding or updating servers and nodes</h2>
+<p>If new servers or nodes need to be added to the system then the user should:</p>
+<ul>
+<li>update the <em>&lt;prefix&gt;/etc/hedgehog/nodes.csv</em> files as required to include the new servers/nodes<br />&nbsp;</li>
+<li>run the <em>&lt;prefix&gt;/bin/hedgehogctl database_update_nodes</em>&nbsp;script which will update the data in the database and create any required directory structures</li></ul><ac:structured-macro ac:name="note"><ac:rich-text-body>
+<p>In the event of adding new servers the user&nbsp;<strong>must</strong>&nbsp;also then run the&nbsp;<em>&lt;prefix&gt;/bin/hedgehogctl database_manage_partition</em> scripts to create the required database tables so that data can be imported for the new server.&nbsp;</p></ac:rich-text-body></ac:structured-macro>
+<h1>Web front-end</h1>
+<h2>Plot caching</h2>
+<p>Hedgehog caches plot image files as they are generated by the user. The plot files are cached in the directory listed in the <em>&lt;prefix&gt;/etc/hedgehog/hedgehog.yaml</em> file in the directories section for 'plotcache' (this path is auto-generated in 2.0 and should not be changed by the user).</p>
+<ul>
+<li>The reuse of cached plots can be enabled/disabled by changing the <em>use_plot_caching</em>&nbsp;option in the <em>&lt;prefix&gt;/share/www/conf/hedgehog_gui.yaml</em> configuration file<br />&nbsp;</li>
+<li>The <em>caching_delay_in_hours</em>&nbsp;option in the same file controls the delay applied to caching the most recently uploaded data. For example the default for this is 1 i.e. only plots for which the end time is more than one hour ago will be cached. This avoids caching plots where the data may still be being imported for some nodes if there were a delay in upload or processing for some reason.&nbsp;<br />&nbsp;</li>
+<li>If desired, a cron job can be created that will create cached plots for specific time periods, for example it may be useful to have a cron job to create daily plots for the previous day (see the section on Maintenance). This will make loading of the homepage faster.&nbsp;<br />&nbsp;</li>
+<li>If needed the cached files for selected or all plots may be deleted by running the<em> &lt;prefix&gt;/bin/hedgehogctl plotcache_rm_cached_plots</em>&nbsp;script.&nbsp;</li></ul>
+<h2>RSSAC reports</h2>
+<h3>Data collection</h3>
+<p>If the required datasets are collected via the DSC collector (see Datasets above), Hedgehog can produce RRSAC reports as described in the &quot;<span style="line-height: 1.4285715;">&nbsp;</span><a href="https://www.icann.org/en/system/files/files/rssac-002-measurements-root-20nov14-en.pdf"><span style="line-height: 1.4285715;">RSSAC Recommendation on Measurements of the Root Server System -&nbsp;</span><span style="line-height: 1.4285715;">RSSAC 002</span></a><span style="line-height: 1.4285715;">&nbsp;</span>&quot; document for the following metrics:</p>
+<ul>
+<li>traffic-volume</li>
+<li>traffic-size</li>
+<li>rcode-volume</li>
+<li>unique-sources&nbsp;</li></ul>
+<h3>Generating the reports</h3>
+<ul>
+<li>To produce the RSSAC reports 2 scripts must be run <span>(see the&nbsp;Hedgehog Tools guide for more information)</span>:
+<ol>
+<li><span>the&nbsp;</span><em>&lt;prefix&gt;/bin/hedgehogctl database_process_rssac_data</em><span>&nbsp;script via the Database tools component</span></li>
+<li>the <em>&lt;prefix&gt;/bin/hedgehogctl rssac_generate_reports</em>&nbsp;script on the Web front-end component that will store and display the results&nbsp;</li></ol></li>
+<li><span>The resulting yaml files (along with matching plot files) are stored in the directory listed in the&nbsp;</span><em>&lt;prefix&gt;/etc/hedgehog/hedgehog.yaml</em><span>&nbsp;file in the directories section for '</span><em>rssac</em><span>' (this path is auto-generated in 2.0 and should not be changed by the user).&nbsp;</span></li>
+<li>The generated files are served by the Hedgehog front end and can be found by clicking on the &quot;RSSAC reports&quot; link at the bottom left of the Hedgehog webpage.&nbsp;</li></ul><ac:structured-macro ac:name="info"><ac:rich-text-body>
+<p>Note that RSSAC reports can be run for any server, however the name of the server affects the value in the service field of the generated yaml: &nbsp;</p>
+<p>If the server name is of the pattern &quot;*-root&quot; where * is a letter, then the service will be &quot;*.<a href="http://root-servers.org">root-servers.org</a>&quot;. For all other server names the service will simply be the server name.&nbsp;</p></ac:rich-text-body></ac:structured-macro>
+<p>The script&nbsp;can either be run manually, or via a cron job as described in the Maintenance section of the installation guide.</p>
+<h3>Notes</h3>
+<p>Some notes on the RSSAC data:</p>
+<ul>
+<li>The DSC collector cannot collect extended RCODES and therefore Hedgehog cannot include this information in the rcode_volume report<br />&nbsp;</li>
+<li>As a result of the DSC collector mechanism (i.e collecting data in 1 minute windows) the total quantity of data collected in the 'unique_sources' dataset can be significant and can result in exceptionally large database tables for this dataset. However, this 'raw' data must be uploaded to the Hedgehog database so that it can be accumulated over the 24 hour report period.<br /><br />
+<ul>
+<li>Once the raw data for the entire 24 hours is uploaded, the RSSAC report can be generated to create the summary figures required in the report and the 'raw' data may be discarded to save disk space (see the Maintanance section of the Installation guide for details of the script to do this).<br />&nbsp;</li>
+<li>The 'Unique sources' plot in the Hedgehog GUI is generated from the summary data, not from the raw data and therefore the plot cannot be viewed until after the relevant RSSAC report has been generated via the <em>rssac_generate_reports</em> script.&nbsp;</li></ul></li></ul>
+<h1>Limitations/Known issues</h1>
+<p>Users should be aware of several limitations in the current version of Hedgehog as listed below. It is hoped they will be addressed in future versions</p>
+<ul>
+<li>&nbsp;The full list of possible plots are displayed via the drop down menu in the GUI, regardless of whether there is data in the database for the plot.<br />&nbsp;</li>
+<li>
+<p>There is a known issue with the SVG line plots where long legends are not wrapped properly:<br /> <a href="https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536">https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536</a>&nbsp;. This affects, for example, the 'Traffic volume' plot.&nbsp;<span>&nbsp;A configuration option is available (</span><em>default_interactive_plot_type</em><span>&nbsp;in&nbsp;</span><em>hedgehog_gui</em><span>.yaml) which can specify the system to produce non-SVG line plots that do not have this issue - however these plots require Flash.</span><br />&nbsp;</p></li>
+<li>
+<p>The plot is not sorted according to size correctly in the interactive plots for horizontal bar charts. The static plots should be used instead. This includes:</p>
+<ul>
+<li>QTYPE for most popular TLD</li>
+<li>Busient client subnet</li>
+<li>CODE by client subnet&nbsp;</li>
+<li>Root abusers&nbsp;</li>
+<li>Query classification by subnet<br />&nbsp;</li></ul></li>
+<li>Server, node and group names may only contain alphanumeric characters and hyphens (-).<br />&nbsp;</li>
+<li>The Unique Sources plot is not available until after the RSSAC report has been generated for the date in question.</li></ul>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
