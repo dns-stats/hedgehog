@@ -157,8 +157,8 @@ Developed by Sinodun IT (www.sinodun.com)
   ================================================== -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script src="js/gengraph.js?version=PACKAGEVERSION" type="text/javascript"></script>
-    <script src="js/datetimes.js?version=PACKAGEVERSION" type="text/javascript"></script>
-    <script src="js/nodetabs.js?version=PACKAGEVERSION" type="text/javascript"></script>
+    <script src="js/gengraph.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
+    <script src="js/datetimes.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
+    <script src="js/nodetabs.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
 
 </html>

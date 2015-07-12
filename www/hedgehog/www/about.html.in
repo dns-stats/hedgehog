@@ -36,9 +36,9 @@ Developed by Sinodun IT (www.sinodun.com)
 
 	<!-- CSS
   ================================================== -->
-	<link rel="stylesheet" href="stylesheets/base.css?version=PACKAGEVERSION">
-	<link rel="stylesheet" href="stylesheets/skeleton.css?version=PACKAGEVERSION">
-	<link rel="stylesheet" href="stylesheets/layout.css?version=PACKAGEVERSION">
+	<link rel="stylesheet" href="stylesheets/base.css?version=@HH_PACKAGE_VERSION@">
+	<link rel="stylesheet" href="stylesheets/skeleton.css?version=@HH_PACKAGE_VERSION@">
+	<link rel="stylesheet" href="stylesheets/layout.css?version=@HH_PACKAGE_VERSION@">
 
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
