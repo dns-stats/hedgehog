@@ -21,7 +21,8 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000008_ddl_traffic_difference \
                          hedgehog/DDL_updates/000009_ddl_node_index \
                          hedgehog/DDL_updates/000010_ddl_tlds \
-                         hedgehog/DDL_updates/000011_ddl_geoip
+                         hedgehog/DDL_updates/000011_ddl_geoip \
+                         hedgehog/DDL_updates/000012_ddl_lower_key_index
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
                    $(srcdir)/hedgehog/sql/insert_lookup_data.sql
@@ -107,7 +108,11 @@ hedgehog/DDL_updates/000010_ddl_tlds: $(srcdir)/hedgehog/DDL_updates/000010_ddl_
 hedgehog/DDL_updates/000011_ddl_geoip: $(srcdir)/hedgehog/DDL_updates/000011_ddl_geoip.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000011_ddl_geoip.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000011_ddl_geoip
-  
+
+hedgehog/DDL_updates/000012_ddl_lower_key_index: $(srcdir)/hedgehog/DDL_updates/000012_ddl_lower_key_index.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000012_ddl_lower_key_index.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000012_ddl_lower_key_index
+    
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
              database_init.in \
