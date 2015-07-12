@@ -212,16 +212,19 @@ function toggle_plot() {
         $('#liny').removeClass('hidden');
         $('#logy').addClass('hidden');
         $('#stack').addClass('hidden');
+        $("#ploturi").val($("#liny").prop("src"));
     } else if ($("#rblogy").prop('checked')) {
         window.selectedOpt = "#rblogy";
         $('#liny').addClass('hidden');
         $('#logy').removeClass('hidden');
         $('#stack').addClass('hidden');
+        $("#ploturi").val($("#logy").prop("src"));
     } else if ($("#rbstack").prop('checked')) {
         window.selectedOpt = "#rbstack";
         $('#liny').addClass('hidden');
         $('#logy').addClass('hidden');
         $('#stack').removeClass('hidden');
+        $("#ploturi").val($("#stack").prop("src"));
     }
 }
 

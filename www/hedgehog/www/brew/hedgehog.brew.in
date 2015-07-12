@@ -331,13 +331,20 @@ generatePlot <- function(){
 	# OK - we have a plot file so now lets generate the html to hold that
 	now <- format(Sys.time(), '%Y-%m-%dT%H:%M')
 	if (plot_file != "plots/no_graph.png" && plot_file != "plots/no_results.png" && plot_file != "plots/no_connection.png") {
-		plot_file <- sub(hh_config$directories$plotcache, "../plotcache/", plot_file)
+		plot_file <- sub(hh_config$directories$plotcache, "../plotcache", plot_file)
         
 		if (gvis == '1') {
 			%><div id="plot">
 				<hr />
-				<iframe scrolling="no" width="100%" height="520px" frameborder="0" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
-				<hr />
+				<iframe scrolling="no" width="100%" height="520px" frameborder="0" id="plotframe" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
+			</div>
+			<div id="plink" classs="">
+				<label for="ploturi">Static Link:</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 850px;">
+				<script>
+					document.getElementById("ploturi").value=document.getElementById("plotframe").src
+				</script>
+			<hr />
 			</div><%
 		}
 		else if (pltnm %in% log_option) {
@@ -356,13 +363,27 @@ generatePlot <- function(){
 				<img src="<%=plot_file%>?nocache=<%=now%>" id= "liny" />
 				<img src="<%=log_file%>?nocache=<%=now%>" class="hidden" id="logy" />
 				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" />
+			</div>
+			<div id="plink" class="">
+				<label for="ploturi">Static Link:</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 850px;">
+				<script>
+					document.getElementById("ploturi").value=document.getElementById("liny").src
+				</script>
 				<hr />
 			</div><%
 		}
 		else {
 			%><div id="plot">
 				<hr />
-				<img src="<%=plot_file%>?nocache=<%=now%>" />
+				<img id="staticplot" src="<%=plot_file%>?nocache=<%=now%>" />
+			</div>
+			<div id="plink" class="">
+				<label for="ploturi">Static Link:</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 850px;">
+				<script>
+					document.getElementById("ploturi").value=document.getElementById("staticplot").src
+				</script>
 				<hr />
 			</div><%
 		}

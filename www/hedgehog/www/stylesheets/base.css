@@ -232,7 +232,7 @@
 		margin: 0;
 		width: 210px;
 		max-width: 100%;
-		display: block;
+		display: inline;
 		margin-bottom: 20px;
 		background: #fff; }
 	select {
@@ -254,7 +254,7 @@
 		min-height: 60px; }
 	label,
 	legend {
-		display: block;
+		display: inline;
 		font-weight: bold;
 		font-size: 13px;  }
 	select{
