@@ -135,6 +135,7 @@ echo "Running DDL scripts"
 # Skip the index creation as database_manage_partitions will do it
 # for us. Still need to run the script too ensure database versions are correct.
 @LIBEXEC@/DDL_updates/000009_ddl_node_index -s
+@LIBEXEC@/DDL_updates/000010_ddl_node_subgroup
 ###########################################################
 
 #############  PARTITION DATA TABLES  #####################

@@ -98,6 +98,7 @@ while read line || [[ -n "$line" ]]; do
 	SERVER_NAME=`echo ${arrline[0]} | sed -e 's/^ *//' -e 's/ *$//'`
 	NODE_NAME=`echo ${arrline[1]} | sed -e 's/^ *//' -e 's/ *$//'`
 	GROUP=`echo ${arrline[2]} | sed -e 's/^ *//' -e 's/ *$//'`
+	SUBGROUP=`echo ${arrline[3]} | sed -e 's/^ *//' -e 's/ *$//'`
 	
 	# First, validate the input	
 	if [ -z "$SERVER_NAME" ] ; then
@@ -126,7 +127,13 @@ while read line || [[ -n "$line" ]]; do
 		echo "Group name '${GROUP}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
 		continue
 	fi
-
+	
+	if [ -z $SUBGROUP ] ; then 
+		SUBGROUP=""
+	elif ! [[ "${SUBGROUP}" =~ ^[a-zA-Z0-9\-]+$ ]] ; then
+		echo "Sub group name '${SUBGROUP}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
+		continue
+	fi
 
 	# Now add the data
 	SERVER_ID=`psql -h $hhconfig_database_host $DB_NAME -tc "select id from server where display_name=$SQ$SERVER_NAME$SQ"`
@@ -147,16 +154,24 @@ while read line || [[ -n "$line" ]]; do
 	if [ -z "${NODE_ID}" ] ; then 
 		echo "INFO: New node found - inserting node with name name: '$NODE_NAME' on server: '$SERVER_NAME' with group: '$GROUP'"
 		if [ ${PREDICT} -eq 0 ] ; then
-			psql -h $hhconfig_database_host -d $DB_NAME -c "INSERT INTO dsc.node (server_id, name, region) VALUES ($SERVER_ID, '$NODE_NAME', '$GROUP');"
+			psql -h $hhconfig_database_host -d $DB_NAME -c "INSERT INTO dsc.node (server_id, name, region, subgroup) VALUES ($SERVER_ID, '$NODE_NAME', '$GROUP', '$SUBGROUP');"
 			mkdir -p $DATA_DIR/$SERVER_NAME/$NODE_NAME/incoming
 		fi		
 	else
-		DB_RESULT=`echo "SELECT region FROM dsc.node where server_id=$SERVER_ID and id=$NODE_ID;" | psql -h $hhconfig_database_host -td $DB_NAME  | sed -e 's/^ *//' -e 's/ *$//'`
-		if [ "${GROUP}" != "${DB_RESULT}" ] ; then
+		DB_GROUP=`echo "SELECT region FROM dsc.node where server_id=$SERVER_ID and id=$NODE_ID;" | psql -h $hhconfig_database_host -td $DB_NAME  | sed -e 's/^ *//' -e 's/ *$//'`
+		if [ "${GROUP}" != "${DB_GROUP}" ] ; then
 			# group for existing node has been updated
-        	echo "INFO: Updating existing node with name: '$NODE_NAME' on server: '$SERVER_NAME'. Changing group from '$DB_RESULT' to '$GROUP'"
+        	echo "INFO: Updating existing node with name: '$NODE_NAME' on server: '$SERVER_NAME'. Changing group from '$DB_GROUP' to '$GROUP'"
 			if [ ${PREDICT} -eq 0 ] ; then
 				psql -h $hhconfig_database_host -d $DB_NAME -c "UPDATE dsc.node SET region = '$GROUP' WHERE id=$NODE_ID;"	
+			fi
+		fi
+		DB_SUBGROUP=`echo "SELECT subgroup FROM dsc.node where server_id=$SERVER_ID and id=$NODE_ID;" | psql -h $hhconfig_database_host -td $DB_NAME  | sed -e 's/^ *//' -e 's/ *$//'`
+		if [ "${SUBGROUP}" != "${DB_SUBGROUP}" ] ; then
+			# group for existing node has been updated
+        	echo "INFO: Updating existing node with name: '$NODE_NAME' on server: '$SERVER_NAME'. Changing subgroup from '$DB_SUBGROUP' to '$SUBGROUP'"
+			if [ ${PREDICT} -eq 0 ] ; then
+				psql -h $hhconfig_database_host -d $DB_NAME -c "UPDATE dsc.node SET subgroup = '$SUBGROUP' WHERE id=$NODE_ID;"	
 			fi
 		fi
 	fi

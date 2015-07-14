@@ -629,7 +629,7 @@ initPlotOptions <- function() {
 	format3                 <<- c("client_subnet_accum", "ipv6_rsn_abusers_accum")
 	formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
     
-	formatother             <<- c("qtype_vs_tld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node")
+	formatother             <<- c("qtype_vs_tld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup")
 
 	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
     
@@ -640,11 +640,11 @@ initPlotOptions <- function() {
 	# now create other useful groups    
 	passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
 	avgoverwindow           <<- c(format3, 'qtype_vs_tld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype')
-	lineplots               <<- c(format1, format2, "by_node", "rcode_volume")
+	lineplots               <<- c(format1, format2, "by_node", "by_subgroup", "rcode_volume")
 	facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
 	facetedlineplots        <<- c("traffic_volume")
 	faceteddifflineplots    <<- c("traffic_volume_difference")
-	log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "rcode_volume")
+	log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "by_subgroup", "rcode_volume")
 }
 
 # create plot file if not cached

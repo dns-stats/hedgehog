@@ -55,11 +55,11 @@
     display: none !important;
 }
 
-input, textarea {
+/*input, textarea {
   /* stop iOS mobile safari from overriding my border radius settings */
-  -webkit-appearance: none;
+  /*-webkit-appearance: none;*/
   -webkit-border-radius: 0;
-}
+}*/
 
 ul.discs {
     list-style-type: disc;
@@ -293,7 +293,18 @@ input[type="button"][disabled]:hover {
     margin-bottom: 20px;
 }
 
+
 #nodecontent label {
+    color: #000;
+    display: inline;
+    font-family: "New Courier", Monospace;
+    cursor: pointer;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#node_cbs_id label {
     color: #ccc;
     display: inline-block;
     margin: 0 5px 5px 0;
@@ -354,13 +365,18 @@ input[type="button"][disabled]:hover {
 }
 
 #timeTabsBasic input[type="radio"],
-#nodecontent input[type="checkbox"] {
-    display: none;
+#node_cbs_id input[type="checkbox"] {
+   display: none;
 }
 
 #timeTabsBasic input[type="radio"]:checked + label.button {
     border: 1px solid #666;
     background: #ccc; /* Old browsers */
+}
+
+
+#node_cbs_id input[type="checkbox"]:checked + label {
+    color: #999;
 }
 
 #nodecontent input[type="checkbox"]:checked + label {
