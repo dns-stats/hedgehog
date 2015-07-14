@@ -95,6 +95,12 @@ function selectNone(cbGp) {
     select(cbGp,false);
 }
 
+function collapseNodes() {
+
+    // switch to the subgroup node view....
+    // alert("Hello");
+}
+
 function selectOnly(cbGp) {
     // set all checkboxes to false then 
 	// set all with

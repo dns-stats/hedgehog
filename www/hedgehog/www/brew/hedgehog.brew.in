@@ -186,7 +186,9 @@ initNodeTabsHtml <- function() {
 				nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectAllBtn\"  value=\"Select all nodes\"    
 								  title=\"Select all available nodes for plotting\" onclick=\"selectAll('cb_All_", srvr_nm, "')\"> ", sep="")
 				nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectNoneBtn\" value=\"De-select all nodes\" 
-								  title=\"De-select all available nodes \"          onclick=\"selectNone('cb_All_", srvr_nm, "')\"> <hr></div><div class=\"node_cbs\">", sep="")
+								  title=\"De-select all available nodes \"          onclick=\"selectNone('cb_All_", srvr_nm, "')\"> ", sep="")
+				nodehtml <- paste(nodehtml, "&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" id=\"groupNodes\"  value=\"Display subgroups\"   
+								  title=\"Display nodes only by subgroup\" onclick=\"collapseNodes()\"> <label for=\"groupNodes\">Use node subgroups</label> <hr></div><div class=\"node_cbs\" id=\"node_cbs_id\">", sep="")
 				for (n in 1:nrow(nodes)) {
 					nd_id <- nodes[n,1]
 					nd_nm <- nodes[n,2]
@@ -218,7 +220,9 @@ initNodeTabsHtml <- function() {
 			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectAllRegionBtn\"   value=\"Include all ", gp_nm, "\"    
 							  title=\"Include all the nodes in this region for plotting\"   onclick=\"selectAll('cb_", gp_nm, "_", srvr_nm,"')\"> ", sep="")
 			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectNoneRegionBtn\"  value=\"Exclude all ", gp_nm, "\" 
-							  title=\"De-select all the nodes in this region for plotting\" onclick=\"selectNone('cb_", gp_nm, "_", srvr_nm,"')\"><hr></div><div class=\"node_cbs\">", sep="")
+							  title=\"De-select all the nodes in this region for plotting\" onclick=\"selectNone('cb_", gp_nm, "_", srvr_nm,"')\">", sep="")
+			nodehtml <- paste(nodehtml, "&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" id=\"groupNodes\"  value=\"Display subgroups\"    
+							  title=\"Display nodes only by subgroup\" onclick=\"collapseNodes()\"><label for=\"groupNodes\">Use node subgroups</label><hr></div><div class=\"node_cbs\" id=\"node_cbs_id\">", sep="")
 
 			for (n in 1:nrow(nodes))   {
 				nd_id <- nodes[n,1]
@@ -288,6 +292,7 @@ generatePlot <- function(){
 		
 	svrid				<- GET$svrid
 	gvis				<- GET$gvis
+	subgroup 			<- GET$subgroup
 	ndarr				<- GET$ndarr
 	svrnm				<- GET$svrnm
 	start				<- GET$start
@@ -295,6 +300,10 @@ generatePlot <- function(){
 	
 	# Initialise plot parameters
 	initPlotOptions()
+	
+	if ( subgroup == '1' && pltnm == 'by_node') {
+		pltnm <- "by_subgroup"
+	}
 	
 	# Initialise name of plot file and make sure the cache directory exists
 	plot_dir = paste(hh_config$directories$plotcache, "/", svrnm, "/", pltnm, sep="") 

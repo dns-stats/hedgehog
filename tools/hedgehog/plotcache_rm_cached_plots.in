@@ -54,7 +54,7 @@ done
 
 echo "`date`: $0 COMMENCED"
 USER=$(whoami)
-[ $USER != $hhconfig_database_reader ] && echo "Must be $hhconfig_database_reader to run this script" && exit 1
+[ "$USER" != "$hhconfig_database_read_user" ] && echo "Must be $hhconfig_database_read_user to run this script" && exit 1
 
 if [ $REMOVE_ALL -eq 1 ] ; then
 	echo "Removing all cached plots from $hhconfig_directories_plotcache"

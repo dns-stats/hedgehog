@@ -8,3 +8,7 @@ To upgrade from 2.0.0b1 to 2.0.0b2 run the following scripts
 as the user hedgehog:
   000008_ddl_traffic_difference.sh
   000009_ddl_node_index.sh
+
+2.0.0 -> 2.1.0
+---------------
+000010_ddl_node_subgroup.sh

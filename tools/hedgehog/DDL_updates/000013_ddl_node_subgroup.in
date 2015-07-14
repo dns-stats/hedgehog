@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   000008_ddl_traffic_difference
+# File:   000013_ddl_node_subgroup
 #
 
 eval $(@LIBEXEC@/conf_read)
@@ -33,12 +33,15 @@ SUPPRESS_WARNINGS=0
 export PGPASSWORD=$hhconfig_database_owner_pass
 
 set -e
-NEW_DDL_SERIAL=8
+NEW_DDL_SERIAL=13
 REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
-NEW_API_VERSION=7
-REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 0 ))
+NEW_API_VERSION=10
+REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 1 ))
 
 DSC_SCHEMA="dsc"
+
+CONCURRENT=0
+SKIP=0
 
 usage () {
     echo
@@ -46,15 +49,14 @@ usage () {
     echo
     echo "Supported options:"
     echo "  -h Show this help."
+    exit 1
 }
 
 
 while getopts ":h" opt; do
     case $opt in
-        h  ) usage
-             exit 1 ;;
-        \? ) usage
-             exit 1 ;;
+        h  ) usage ;;
+        \? ) usage ;;
     esac
 done
 
@@ -68,15 +70,12 @@ DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version fr
 LAST_SERIAL=`psql -h $hhconfig_database_host $DB_NAME -tc  "select max(serial) from dsc.internal_version;"`
 [ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] && echo "Error: ddl scripts not run in correct order." && exit 1
 
-# Add DB information to support the Traffic Query/Response Difference plot
 
 psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
-INSERT INTO $DSC_SCHEMA.visible_plot (name, display_category, display_name, title ) VALUES ('traffic_volume_difference', '9.RSSAC', 'Traffic volume difference', 'The differences between queries and responses by transport and IP version');
-INSERT INTO $DSC_SCHEMA.dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id FROM $DSC_SCHEMA.visible_plot WHERE name = 'traffic_volume_difference'), (SELECT id FROM $DSC_SCHEMA.dataset WHERE name = 'traffic_volume_queries'));
-INSERT INTO $DSC_SCHEMA.dataset_visible_plot (visible_plot_id, dataset_id) VALUES ((SELECT id FROM $DSC_SCHEMA.visible_plot WHERE name = 'traffic_volume_difference'), (SELECT id FROM $DSC_SCHEMA.dataset WHERE name = 'traffic_volume_responses'));
+ALTER TABLE node  ADD column subgroup character varying(255);
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
-INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new query/response difference plot for rssac', now() );
+INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new sub group for nodes', now() );
 COMMIT;
 EOF
 
