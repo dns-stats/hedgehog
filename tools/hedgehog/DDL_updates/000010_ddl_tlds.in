@@ -65,7 +65,7 @@ DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version fr
 LAST_SERIAL=`psql -h $hhconfig_database_host $DB_NAME -tc  "select max(serial) from dsc.internal_version;"`
 [ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] && echo "Error: ddl scripts not run in correct order." && exit 1
 
-DATASET=$(psql $hhconfig_database_host $DB_NAME -qtc "SELECT id FROM dataset WHERE name = 'qtype_vs_tld';")
+DATASET=$(psql -h $hhconfig_database_host $DB_NAME -qtc "SELECT id FROM dataset WHERE name = 'qtype_vs_tld';")
 
 psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;

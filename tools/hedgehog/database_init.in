@@ -88,7 +88,6 @@ echo
 export PGPASSWORD=$hhconfig_database_owner_pass
 
 psql -h $hhconfig_database_host -d $hhconfig_database_name <<EOF
-  CREATE SCHEMA dsc AUTHORIZATION "$hhconfig_database_owner";
   REVOKE ALL ON DATABASE "$hhconfig_database_name" FROM public;
   ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT SELECT ON TABLES TO hh_read;
   GRANT CONNECT ON DATABASE "$hhconfig_database_name" TO hh_read;
@@ -134,7 +133,7 @@ echo "Running DDL scripts"
 @LIBEXEC@/DDL_updates/000009_ddl_node_index -s
 @LIBEXEC@/DDL_updates/000010_ddl_tlds
 @LIBEXEC@/DDL_updates/000011_ddl_geoip
-@LIBEXEC@/DDL_updates/000012_ddl_lower_key_index
+@LIBEXEC@/DDL_updates/000012_ddl_lower_key_index -s
 @LIBEXEC@/DDL_updates/000013_ddl_node_subgroup
 ###########################################################
 

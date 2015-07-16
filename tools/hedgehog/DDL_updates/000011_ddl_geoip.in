@@ -70,7 +70,7 @@ echo "No ip4r extension installed. Ensure that the ip4r package is installed." &
 echo "Then connect to the $DB_NAME database as a superuser and run the command \"CREATE EXTENSION ip4r SCHEMA dsc;\"" && \
 exit 1
 
-DATASET=$(psql -qtc "SELECT id FROM dataset WHERE name = 'client_subnet_accum';")
+DATASET=$(psql -h $hhconfig_database_host $DB_NAME -qtc "SELECT id FROM dataset WHERE name = 'client_subnet_accum';")
 
 psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;

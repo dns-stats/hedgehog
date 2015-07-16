@@ -67,6 +67,8 @@ while getopts ":csh" opt; do
     esac
 done
 
+echo "`date`: $0 COMMENCED"
+
 if [ $SKIP -eq 0 ] ; then
   echo "This script creates new indexes on all the data tables. It will take a long"
   echo "time to complete if you have a lot of data. In addition it requires a lock"
@@ -83,7 +85,6 @@ if [ $SKIP -eq 0 ] ; then
   [[ ! "$c" =~ ^(Y|y) ]] && exit 1
 fi
 
-echo "`date`: $0 COMMENCED"
 USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
