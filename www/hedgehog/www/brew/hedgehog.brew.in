@@ -187,13 +187,13 @@ initNodeTabsHtml <- function() {
 								  title=\"Select all available nodes for plotting\" onclick=\"selectAll('cb_All_", srvr_nm, "')\"> ", sep="")
 				nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectNoneBtn\" value=\"De-select all nodes\" 
 								  title=\"De-select all available nodes \"          onclick=\"selectNone('cb_All_", srvr_nm, "')\"> ", sep="")
-				nodehtml <- paste(nodehtml, "&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" id=\"groupNodes\"  value=\"Display subgroups\"   
-								  title=\"Display nodes only by subgroup\" onclick=\"collapseNodes()\"> <label for=\"groupNodes\">Use node subgroups</label> <hr></div><div class=\"node_cbs\" id=\"node_cbs_id\">", sep="")
+				nodehtml <- paste(nodehtml,"<hr></div><div class=\"node_cbs\" id=\"node_cbs_id\">", sep="")
 				for (n in 1:nrow(nodes)) {
 					nd_id <- nodes[n,1]
 					nd_nm <- nodes[n,2]
+					nd_sg <- nodes[n,3]
 					nodehtml <- paste(nodehtml, "<input type=\"checkbox\" class=\"nodeselection\" id=\"", nd_id, "_All_", srvr_nm, "\" name=\"cb_All_", srvr_nm,
-									  "\" value=\"", nd_id, "_All_", srvr_nm, "\"onclick=\"selectNode('", nd_id, "_All_", srvr_nm, "')\"", ck, ">",
+									  "\" value=\"", nd_id, "_All_", srvr_nm, "\"data-node-subgroup=\"", nd_sg, "\" onclick=\"selectNode('", nd_id, "_All_", srvr_nm, "')\"", ck, ">",
 									  "<label class=\"\" for=\"",	nd_id, "_All_", srvr_nm, "\" title=\"Toggle node selection\">", nd_nm, "</label>", sep="")
 				}
 				nodehtml <- paste(nodehtml, "</div></div>", sep="")
@@ -221,23 +221,25 @@ initNodeTabsHtml <- function() {
 							  title=\"Include all the nodes in this region for plotting\"   onclick=\"selectAll('cb_", gp_nm, "_", srvr_nm,"')\"> ", sep="")
 			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectNoneRegionBtn\"  value=\"Exclude all ", gp_nm, "\" 
 							  title=\"De-select all the nodes in this region for plotting\" onclick=\"selectNone('cb_", gp_nm, "_", srvr_nm,"')\">", sep="")
-			nodehtml <- paste(nodehtml, "&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" id=\"groupNodes\"  value=\"Display subgroups\"    
-							  title=\"Display nodes only by subgroup\" onclick=\"collapseNodes()\"><label for=\"groupNodes\">Use node subgroups</label><hr></div><div class=\"node_cbs\" id=\"node_cbs_id\">", sep="")
+			nodehtml <- paste(nodehtml,"<hr></div><div class=\"node_cbs\" id=\"node_cbs_id\">", sep="")
 
 			for (n in 1:nrow(nodes))   {
 				nd_id <- nodes[n,1]
 				nd_nm <- nodes[n,2]
+				nd_sg <- nodes[n,3]
 				nodehtml <- paste(nodehtml, "<input type=\"checkbox\" class=\"nodeselection\" id=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\" name=\"cb_", gp_nm, "_",
-								  srvr_nm, "\" value=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\"onclick=\"selectNode('", nd_id, "_", gp_nm, "_", srvr_nm, "')\"", ck,
+								  srvr_nm, "\" value=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\"data-node-subgroup=\"", nd_sg, "\" onclick=\"selectNode('", nd_id, "_", gp_nm, "_", srvr_nm, "')\"", ck,
 								  ">", "<label class=\"\" for=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\" title=\"Toggle node selection\">", nd_nm, "</label>", sep="")
 			}
 			nodehtml <- paste(nodehtml, "</div></div>", sep="")
 		}     
 		grouphtml <- paste(grouphtml, "</ul></div></div>", sep="")
 	}
+	subhtml <- "&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" id=\"groupNodes\"  value=\"Select all nodes in the same cluster\" title=\"Select all nodes in the same cluster\" onclick=\"collapseNodes()\"> <label for=\"groupNodes\">Cluster Node Selection</label>"
+	 
 	grouphtml <- paste(grouphtml, "</div>", sep="")
 	nodehtml <- paste(nodehtml, "</div>", sep="")
-	%><%=grouphtml%><br class="clear" /><%=nodehtml%><%
+	%><%=subhtml%><%=grouphtml%><br class="clear" /><%=nodehtml%><%
 
     return(TRUE)
 }

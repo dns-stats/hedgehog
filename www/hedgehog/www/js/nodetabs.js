@@ -99,6 +99,7 @@ function collapseNodes() {
 
     // switch to the subgroup node view....
     // alert("Hello");
+	// sync cb across all tabs
 }
 
 function selectOnly(cbGp) {
@@ -114,7 +115,13 @@ function selectNode(ckbxid) {
     // ensure any sister nodes are
     // updated to maintain consistency
     idList = new Array();
-    idList.push(ckbxid);
+	if($("input[id='groupNodes']").is(':checked')){
+		x = document.getElementById(ckbxid).getAttribute('data-node-subgroup');
+		y = $("[data-node-subgroup='" + x + "']").map(function () {
+			idList.push($(this).attr('id'));
+		});
+	}
+	idList.push(ckbxid);
     selectSister(idList, $("#" + ckbxid).is(':checked'));
 }
 
