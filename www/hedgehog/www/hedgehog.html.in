@@ -121,11 +121,14 @@ Developed by Sinodun IT (www.sinodun.com)
       <div class="sixteen columns" id="outerplot"><!-- 
         auto populated by gengraph.js
    --></div>
-      <div class="one-third column" id="srvr_select">
+      <div class="two-thirds column" id="srvr_select">
       <label for="servers">Servers</label>
-      <select name="servers" id="servers" onchange="serverTab()"><!-- 
+      <select name="servers" id="servers" onchange="serverTab()">
+<!-- 
         auto populated by gengraph.js
    --></select>
+      <input type="checkbox" id="groupNodes"  value="Select all nodes in the same cluster" title="Select all nodes in the same cluster">
+      <label for="groupNodes">Cluster Node Selection</label>
       </div>
       <div class="sixteen columns" id="nodetabs"><!-- 
         auto populated by gengraph.js
