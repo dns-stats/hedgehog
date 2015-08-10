@@ -349,8 +349,8 @@ generatePlot <- function(){
 				<iframe scrolling="no" width="100%" height="520px" frameborder="0" id="plotframe" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
 			</div>
 			<div id="plink" class="">
-				<label for="ploturi">Static Link:</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 850px;">
+				<label style="font-size:80%" for="ploturi">Static Link:</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 850px; font-size:80%">
 				<script>
 					document.getElementById("ploturi").value=document.getElementById("plotframe").src
 				</script>
@@ -374,8 +374,8 @@ generatePlot <- function(){
 				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" />
 			</div>
 			<div id="plink" class="">
-				<label for="ploturi">Static Link:</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 850px;">
+				<label style="font-size:80%" for="ploturi">Static Link:</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 850px; font-size:80%">
 				<script>
 					document.getElementById("ploturi").value=document.getElementById("liny").src
 				</script>
@@ -387,8 +387,8 @@ generatePlot <- function(){
 				<img id="staticplot" src="<%=plot_file%>?nocache=<%=now%>" />
 			</div>
 			<div id="plink" class="">
-				<label for="ploturi">Static Link:</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 850px;">
+				<label style="font-size:80%" for="ploturi">Static Link:</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 850px; font-size:80%">
 				<script>
 					document.getElementById("ploturi").value=document.getElementById("staticplot").src
 				</script>
