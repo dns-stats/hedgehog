@@ -23,7 +23,9 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000010_ddl_tlds \
                          hedgehog/DDL_updates/000011_ddl_geoip \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
-                         hedgehog/DDL_updates/000013_ddl_node_subgroup
+                         hedgehog/DDL_updates/000013_ddl_node_subgroup \
+						 hedgehog/DDL_updates/000014_ddl_loadtime \
+						 hedgehog/DDL_updates/000015_ddl_zonesize
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
                    $(srcdir)/hedgehog/sql/insert_lookup_data.sql
@@ -117,7 +119,15 @@ hedgehog/DDL_updates/000012_ddl_lower_key_index: $(srcdir)/hedgehog/DDL_updates/
 hedgehog/DDL_updates/000013_ddl_node_subgroup: $(srcdir)/hedgehog/DDL_updates/000013_ddl_node_subgroup.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000013_ddl_node_subgroup.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000013_ddl_node_subgroup
+	
+hedgehog/DDL_updates/000014_ddl_loadtime: $(srcdir)/hedgehog/DDL_updates/000014_ddl_loadtime.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_loadtime.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_loadtime
 
+hedgehog/DDL_updates/000015_ddl_zonesize: $(srcdir)/hedgehog/DDL_updates/000015_ddl_zonesize.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000015_ddl_zonesize.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000015_ddl_zonesize
+	
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
              database_init.in \
