@@ -27,7 +27,7 @@ class DnsReaderServer(SocketServer.UDPServer):
     keyname   = None
     keyring   = None
 
-    def __init__(self, server_address, RequestHandlerClass, nodes, conn, server_id, key=None, keyname=None, keyalgo=None):
+    def __init__(self, server_address, RequestHandlerClass, nodes, conn, server_id, load_time_plot_id, max_serial, key=None, keyname=None, keyalgo=None):
         SocketServer.UDPServer.__init__(
                 self, server_address, RequestHandlerClass)
         
@@ -40,6 +40,8 @@ class DnsReaderServer(SocketServer.UDPServer):
             self.keyalgorithm     = dns.name.from_text(keyalgo)
         self.conn                 = conn
         self.db_server_id         = server_id
+        self.load_time_plot_id    = load_time_plot_id
+        self.max_serial           = max_serial
         
 class DnsReaderHandler(SocketServer.BaseRequestHandler):
     '''
@@ -55,59 +57,25 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
     def __init__(self, request, client_address, server):
         SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
 
-    def _get_plot_id(self, plot_name):
-        logger = logging.getLogger('rssac_propagation.server')
-
-        cur = self.server.conn.cursor()
-    
-        sql = "SELECT id from plot where name=%s;"
-        data = (plot_name, )
-        fsql = cur.mogrify(sql, data)
-        logger.debug('SQL Query: {}'.format(fsql))
-        cur.execute(sql, data)
-        plot_id = cur.fetchone()
-        if plot_id == None:
-            cur.close()
-            raise ValueError('Plot is not defined in the database')
-        logger.debug('SQL Result: Plot {} has id {}'.format(plot_name, plot_id[0]))
-    
-        cur.close()
-        return plot_id[0]
-
     def _process_load_time(self):
         start = time.time()
-        plot_id = self._get_plot_id('load_time')
+        self.server.logger.debug('SQL Result: Server id {} has max serial {}'.format(self.server.db_server_id, self.server.max_serial))
+        zone_check = rssac.CheckZone(self.qname, self.server.nodes,
+                self.serial, start)
+        zone_check.check_propagation()
         cur = self.server.conn.cursor()
-        sql = "SELECT max(data.key2) FROM data, plot WHERE data.key1=%s AND plot.name=%s AND plot.id=data.plot_id AND server_id=%s"
-        data = (self.qname, 'load_time', self.server.db_server_id)
-        fsql = cur.mogrify(sql, data)
-        self.server.logger.debug('SQL: {}'.format(fsql))
-        cur.execute(sql, data)
-        max_serial_tuple = cur.fetchone()
-        if max_serial_tuple[0] == None:
-            max_serial=0
-        else:
-            max_serial=max_serial_tuple[0]
+        for node, end in zone_check.nodes_report.items():
+            if type(end) is str:
+                load_time = end
+            else:
+                load_time = end - start
+            sql = "INSERT INTO data (starttime, server_id, node_id, plot_id, key1, key2, value) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+            data = (datetime.datetime.fromtimestamp(start), self.server.db_server_id, node, self.server.load_time_plot_id, self.qname, self.serial, load_time)
+            fsql = cur.mogrify(sql, data)
+            self.server.logger.debug('SQL: {}'.format(fsql))
+            cur.execute(sql, data)
             
-        self.server.logger.debug('SQL Result: Server id {} has max serial {}'.format(self.server.db_server_id, max_serial))
-        if int(self.serial) <= int(max_serial):
-            self.server.logger.debug('{}:{}:load-time already processed or lower then max({})'.format(
-                self.qname, self.serial, max_serial))
-        else:
-            zone_check = rssac.CheckZone(self.qname, self.server.nodes,
-                    self.serial, start)
-            zone_check.check_propagation()
-            for node, end in zone_check.nodes_report.items():
-                if type(end) is str:
-                    load_time = end
-                else:
-                    load_time = end - start                    
-                sql = "INSERT INTO data (starttime, server_id, node_id, plot_id, key1, key2, value) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-                data = (datetime.datetime.fromtimestamp(start), self.server.db_server_id, node, plot_id, self.qname, self.serial, load_time)
-                fsql = cur.mogrify(sql, data)
-                self.server.logger.debug('SQL: {}'.format(fsql))
-                cur.execute(sql, data)
-        
+        self.server.max_serial = self.serial
         cur.close()
         
     def _get_zone_size(self):
@@ -172,9 +140,16 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
                 if len(self.message.answer) > 0:
                     answer = self.message.answer[0]
                     self.serial = answer.to_rdataset()[0].serial
-                    self.server.logger.debug('Received notify for {} from {}'.format(self.serial, self.client_address[0]))
-                    self.send_response()
-                    return True
+                    
+                    if int(self.serial) <= int(self.server.max_serial):
+                        self.server.logger.debug('{}:{}:load-time already processed or lower then max({})'.format(
+                            self.qname, self.serial, self.server.max_serial))
+                        self.send_response()
+                        return False
+                    else:    
+                        self.server.logger.debug('Received notify for {} from {}'.format(self.serial, self.client_address[0]))
+                        self.send_response()
+                        return True
                 else:
                     self.server.logger.error('Received notify with no serial from {}'.format(self.client_address[0]))
                     self.send_response()
@@ -190,7 +165,44 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         '''self._process_zone_size()
         db.session.commit()
         '''
-        
+
+def get_max_serial(conn, load_time_plot_id, db_server_id):
+    logger = logging.getLogger('rssac_propagation.server')
+    
+    cur = conn.cursor()
+    sql = "SELECT max(data.key2) FROM data WHERE plot_id=%s AND server_id=%s"
+    data = (load_time_plot_id, db_server_id)
+    fsql = cur.mogrify(sql, data)
+    logger.debug('SQL: {}'.format(fsql))
+    cur.execute(sql, data)
+    max_serial_tuple = cur.fetchone()
+    if max_serial_tuple[0] == None:
+        max_serial=0
+    else:
+        max_serial=max_serial_tuple[0]
+    
+    cur.close()
+    return max_serial
+
+def get_plot_id(conn, plot_name):
+    logger = logging.getLogger('rssac_propagation.server')
+
+    cur = conn.cursor()
+
+    sql = "SELECT id from plot where name=%s;"
+    data = (plot_name, )
+    fsql = cur.mogrify(sql, data)
+    logger.debug('SQL Query: {}'.format(fsql))
+    cur.execute(sql, data)
+    plot_id = cur.fetchone()
+    if plot_id == None:
+        cur.close()
+        raise ValueError('Plot is not defined in the database')
+    logger.debug('SQL Result: Plot {} has id {}'.format(plot_name, plot_id[0]))
+
+    cur.close()
+    return plot_id[0]
+                
 def get_nodes(server_id, conn):
     logger = logging.getLogger('rssac_propagation.server')
     nodes = {}
@@ -206,8 +218,10 @@ def get_nodes(server_id, conn):
         nodes[node[0]] = node[1]
     cur.close()
     if not nodes:
+        cur.close()
         raise ValueError('No nodes found for server id {}'.format(server_id))
     logger.debug('SQL Result: Server id {} has node(s) id {}'.format(server_id, nodes))
+    cur.close()
     return nodes
 
 def check_db(conn):
@@ -286,7 +300,8 @@ def main():
     conn = psycopg2.connect("dbname=hedgehog user=hedgehog")
     
     ''' Check databasse knows about load_time and zone_size '''
-    check_db(conn)    
+    ''' TODO: check db api version '''
+    check_db(conn)
     
     ''' Get server id from database '''
     server_id = get_server_id(args.server, conn)
@@ -294,8 +309,14 @@ def main():
     ''' Get the list of nodes to query '''
     nodes = get_nodes(server_id, conn)
     
+    ''' Get load_time plot_id '''
+    load_time_plot_id = get_plot_id(conn, 'load_time')
+    
+    ''' Get max serial number '''
+    max_serial = get_max_serial(conn, load_time_plot_id, server_id)
+    
     ''' Init and then run the server '''
-    server = DnsReaderServer((host, int(port)), DnsReaderHandler, nodes, conn, server_id,
+    server = DnsReaderServer((host, int(port)), DnsReaderHandler, nodes, conn, server_id, load_time_plot_id, max_serial,
             args.tsig_key, args.tsig_name, args.tsig_algo) 
     server.serve_forever()
     
