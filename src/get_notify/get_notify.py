@@ -175,7 +175,7 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         xfr       = dns.query.xfr(self.client_address[0], self.qname)
         # , keyname=self.server.keyname,
                 # keyring=self.server.keyring, keyalgorithm=self.server.keyalgorithm)
-                ''' TODO need to check there is something in xfr '''
+        ''' TODO need to check there is something in xfr '''
         for message in xfr:
             for ans in message.answer:
                 ans.to_wire(zone, origin=dns.name.root)
@@ -242,13 +242,10 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         if self.parse_dns():
             self._process_load_time()
             self._process_zone_size()
-        '''db.session.commit()
-        '''
-
-
     
 def main():
     ''' parse cmd line args '''
+    ''' TODO add id/gid options '''
     parser = argparse.ArgumentParser(description='nofify receiver')
     parser.add_argument('--tsig-name')
     parser.add_argument('--tsig-key')
