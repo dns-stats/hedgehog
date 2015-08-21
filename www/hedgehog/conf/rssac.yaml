@@ -25,7 +25,7 @@ metric:
   traffic-volume:
     statistics_type: kv_pair
     measurement_parameter: Number of queries
-    service: .root-servers.org
+    service: .root-servers.net
     statistics:
       - dns-udp-queries-received-ipv4
       - dns-udp-queries-received-ipv6
@@ -38,7 +38,7 @@ metric:
   traffic-sizes:
     statistics_type: buckets
     measurement_parameter: Query and response size distribution
-    service: .root-servers.org
+    service: .root-servers.net
     statistics:
       - name: udp-request-sizes
         bucket_min: 16
@@ -62,13 +62,13 @@ metric:
   rcode-volume:
     statistics_type: count
     measurement_parameter: RCODE distribution
-    service: .root-servers.org
+    service: .root-servers.net
     statistics:
       - name: rcodes
   unique-sources:
     statistics_type: kv_pair_with_alias
     measurement_parameter: Number of sources seen
-    service: .root-servers.org
+    service: .root-servers.net
     statistics:
       - name: num-sources-ipv4
         alias: IPv4
