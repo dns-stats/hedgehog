@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+
+# Copyright ICANN
+# Original developed by john.bond@icann.org
+# Modified for use with Hedgehog by sinodun.com
+
 import sys
 import time
 import rssac
@@ -172,17 +177,27 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         
     def _get_zone_size(self):
         zone      = StringIO.StringIO()
-        xfr       = dns.query.xfr(self.client_address[0], self.qname)
-        # , keyname=self.server.keyname,
-                # keyring=self.server.keyring, keyalgorithm=self.server.keyalgorithm)
-        ''' TODO need to check there is something in xfr '''
-        for message in xfr:
-            for ans in message.answer:
-                ans.to_wire(zone, origin=dns.name.root)
-        return sys.getsizeof(zone.getvalue())
+        zone_size = 0
+        xfr       = dns.query.xfr(self.client_address[0], self.qname, keyname=self.server.keyname,
+                    keyring=self.server.keyring, keyalgorithm=self.server.keyalgorithm)
+        try:
+            for message in xfr:
+                for ans in message.answer:
+                    ans.to_wire(zone, origin=dns.name.root)
+        except dns.exception.FormError:
+            self.server.logger.error('Error attempting AXFR from {}'.format(self.client_address[0]))
+        else:
+            zone_size = sys.getsizeof(zone.getvalue())
+        zone.close()
+        return zone_size
 
     def _process_zone_size(self):
+        start = time.time()
         zone_size = self._get_zone_size()
+        if zone_size == 0:
+            ''' Return because we didn't get an answer '''
+            return
+        cur = self.server.conn.cursor()
         for node in self.server.nodes.keys():
             sql = "INSERT INTO data (starttime, server_id, node_id, plot_id, key1, key2, value) VALUES (%s,%s,%s,%s,%s,%s,%s)"
             data = (datetime.datetime.fromtimestamp(start), self.server.db_server_id, node, self.server.zone_size_plot_id, self.qname, self.serial, zone_size)
@@ -190,7 +205,7 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
             self.server.logger.debug('SQL: {}'.format(fsql))
             cur.execute(sql, data)
             self.server.conn.commit()
-            cur.close()    
+        cur.close()    
                     
     def send_response(self):
         ''' Send notify response '''
@@ -245,7 +260,6 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
     
 def main():
     ''' parse cmd line args '''
-    ''' TODO add id/gid options '''
     parser = argparse.ArgumentParser(description='nofify receiver')
     parser.add_argument('--tsig-name')
     parser.add_argument('--tsig-key')
@@ -276,8 +290,6 @@ def main():
     server = DnsReaderServer((host, int(port)), DnsReaderHandler, args.server,
             args.tsig_key, args.tsig_name, args.tsig_algo) 
     server.serve_forever()
-    
-    conn.close()
     
 if __name__ == "__main__":
     main()

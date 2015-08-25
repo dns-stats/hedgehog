@@ -62,15 +62,21 @@ class CheckZone(object):
             self.nodes_report[node] = porpagation_time
 
     def check_propagation(self):
+        ''' Create threadpool before while loop and destroy it after the loop
+            or you get a thread leak! '''
+        main = threadpool.ThreadPool(self.node_cnt)
         while self.node_cnt != len(self.nodes_report):
             data = [ dict({node : self.nodes[node]}) for node in self.nodes 
                     if node not in self.nodes_report ]
             requests = threadpool.makeRequests(self._check_serial, 
                     data, self._thread_callback)
-            main = threadpool.ThreadPool(300)
             [main.putRequest(req) for req in requests]
             main.wait()
             logging.info('processed: {}/{}'.format(len(self.nodes_report), self.node_cnt))
+            if self.node_cnt != len(self.nodes_report):
+                ''' Report resolution is in seconds so sleep for a bit '''
+                time.sleep(0.25)
+        main.dismissWorkers(self.node_cnt,True)
         logging.info('{}: processed propagation:'.format(self.zone))
  
 def get_enabled_hosts(yaml_dir):
