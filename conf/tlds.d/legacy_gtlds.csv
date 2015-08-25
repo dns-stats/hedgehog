@@ -1,0 +1,27 @@
+# Format is: alabel, ulabel, english, type
+
+aero, null, null, Legacy-gTLD
+arpa, null, null, Legacy-gTLD
+asia, null, null, Legacy-gTLD
+biz, null, null, Legacy-gTLD
+cat, null, null, Legacy-gTLD
+com, null, null, Legacy-gTLD
+coop, null, null, Legacy-gTLD
+edu, null, null, Legacy-gTLD
+gov, null, null, Legacy-gTLD
+info, null, null, Legacy-gTLD
+int, null, null, Legacy-gTLD
+jobs, null, null, Legacy-gTLD
+mil, null, null, Legacy-gTLD
+mobi, null, null, Legacy-gTLD
+museum, null, null, Legacy-gTLD
+name, null, null, Legacy-gTLD
+net, null, null, Legacy-gTLD
+org, null, null, Legacy-gTLD
+post, null, null, Legacy-gTLD
+pro, null, null, Legacy-gTLD
+sncf, null, null, Legacy-gTLD
+tel, null, null, Legacy-gTLD
+travel, null, null, Legacy-gTLD
+xn--cg4bki, 삼성, Samsung, Legacy-gTLD
+xxx, null, null, Legacy-gTLD

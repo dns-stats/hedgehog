@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   000009_ddl_traffic_difference
+# File:   000010_ddl_tlds
 #
 
 eval $(@LIBEXEC@/conf_read)
@@ -28,31 +28,21 @@ eval $(@LIBEXEC@/conf_read)
 DB_NAME=$hhconfig_database_name
 DATA_DIR=$hhconfig_directories_data
 SQ="'"
-PREDICT=0;
-SUPPRESS_WARNINGS=0
 export PGPASSWORD=$hhconfig_database_owner_pass
 
 set -e
-NEW_DDL_SERIAL=9
+NEW_DDL_SERIAL=10
 REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
-NEW_API_VERSION=7
-REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 0 ))
+NEW_API_VERSION=8
+REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 1 ))
 
 DSC_SCHEMA="dsc"
-
-CONCURRENT=0
-SKIP=0
 
 usage () {
     echo
     echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
-    echo "  -c Build the indexes with the CONCURRENTLY flag set. This is slower"
-    echo "     but allows writes to continue being made to the tables."
-    echo "  -s Skip creating the new indexes. The new indexes should improve"
-    echo "     performance but are optional. You still need to run this script to"
-    echo "     update version numbers correctly in the database."
     echo "  -h Show this help."
     exit 1
 }
@@ -60,31 +50,12 @@ usage () {
 
 while getopts ":csh" opt; do
     case $opt in
-        c  ) CONCURRENT=1 ;;
-        s  ) SKIP=1 ;;
         h  ) usage ;;
         \? ) usage ;;
     esac
 done
 
 echo "`date`: $0 COMMENCED"
-
-if [ $SKIP -eq 0 ] ; then
-  echo "This script creates new indexes on all the data tables. It will take a long"
-  echo "time to complete if you have a lot of data. In addition it requires a lock"
-  echo "against writes to the tables being updated (reads are fine)."
-  echo "You should either:"
-  echo "1. Stop database writes while this script is running"
-  echo "2. Set the -c flag to build the indexes concurrently"
-  echo "3. Set the -s flag to skip index creation."
-  echo
-  echo "See the usage (-h) for more details."
-  echo
-  echo "Do you wish to continue? [yN]"
-  read c
-  [[ ! "$c" =~ ^(Y|y) ]] && exit 1
-fi
-
 USER=$(whoami)
 [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
@@ -94,20 +65,42 @@ DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version fr
 LAST_SERIAL=`psql -h $hhconfig_database_host $DB_NAME -tc  "select max(serial) from dsc.internal_version;"`
 [ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] && echo "Error: ddl scripts not run in correct order." && exit 1
 
-# Create node_id indexes on all data tables
-if [ $SKIP -eq 0 ] ; then
-  MYFILE=$(mktemp)
-  if [ $CONCURRENT -eq 0 ] ; then
-    psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index idx_' || table_name || '_node_id on ' || table_name || ' (node_id);' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
-  else
-    psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index CONCURRENTLY idx_' || table_name || '_node_id on ' || table_name || ' (node_id);' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
-  fi
-  psql -h $hhconfig_database_host $DB_NAME < $MYFILE
-  rm $MYFILE
-fi
+DATASET=$(psql -h $hhconfig_database_host $DB_NAME -qtc "SELECT id FROM dataset WHERE name = 'qtype_vs_tld';")
 
 psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
+CREATE TABLE tld_types (id serial PRIMARY KEY, type_name text);
+INSERT INTO tld_types (type_name) VALUES
+  ('New-gTLD'),
+  ('Legacy-gTLD'),
+  ('ccTLD');
+CREATE TABLE tlds (id serial PRIMARY KEY,
+                   alabel text,
+                   ulabel text,
+                   english text,
+                   type int REFERENCES tld_types (id));
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('qtype_vs_cctld','3.QTYPE','QTYPE for most popular ccTLDs','QTYPE for most popular ccTLDs') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title)
+    VALUES ('qtype_vs_newgtld','3.QTYPE','QTYPE for most popular New gTLDs','QTYPE for most popular New gTLDs') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('qtype_vs_legacygtld','3.QTYPE','QTYPE for most popular Legacy gTLDs','QTYPE for most popular Legacy gTLDs') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot select id, ${DATASET} FROM rows;
+
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
 INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new query/response difference plot for rssac', now() );
 COMMIT;

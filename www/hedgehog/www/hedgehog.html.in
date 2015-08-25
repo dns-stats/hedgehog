@@ -36,9 +36,9 @@ Developed by Sinodun IT (www.sinodun.com)
 
 	<!-- CSS
   ================================================== -->
-	<link rel="stylesheet" href="stylesheets/base.css?version=PACKAGEVERSION">
-	<link rel="stylesheet" href="stylesheets/skeleton.css?version=PACKAGEVERSION">
-	<link rel="stylesheet" href="stylesheets/layout.css?version=PACKAGEVERSION">
+	<link rel="stylesheet" href="stylesheets/base.css?version=@HH_PACKAGE_VERSION@">
+	<link rel="stylesheet" href="stylesheets/skeleton.css?version=@HH_PACKAGE_VERSION@">
+	<link rel="stylesheet" href="stylesheets/layout.css?version=@HH_PACKAGE_VERSION@">
 
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -121,11 +121,14 @@ Developed by Sinodun IT (www.sinodun.com)
       <div class="sixteen columns" id="outerplot"><!-- 
         auto populated by gengraph.js
    --></div>
-      <div class="one-third column" id="srvr_select">
+      <div class="two-thirds column" id="srvr_select">
       <label for="servers">Servers</label>
-      <select name="servers" id="servers" onchange="serverTab()"><!-- 
+      <select name="servers" id="servers" onchange="serverTab()">
+<!-- 
         auto populated by gengraph.js
    --></select>
+      <input type="checkbox" id="groupNodes"  value="Select all nodes in the same cluster" title="Select all nodes in the same cluster">
+      <label for="groupNodes">Cluster Node Selection</label>
       </div>
       <div class="sixteen columns" id="nodetabs"><!-- 
         auto populated by gengraph.js
@@ -144,7 +147,11 @@ Developed by Sinodun IT (www.sinodun.com)
     <div class="sixteen columns" id="copyright" >
       <hr style='margin-top:5px;' />
       &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
-    </div>
+    
+      <hr style='margin-top:5px;' />
+      This product includes GeoLite2 data created by MaxMind, available from
+      <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
+    </div>  
   </div><!-- container -->
 
 </body>
@@ -153,8 +160,8 @@ Developed by Sinodun IT (www.sinodun.com)
   ================================================== -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script src="js/gengraph.js?version=PACKAGEVERSION" type="text/javascript"></script>
-    <script src="js/datetimes.js?version=PACKAGEVERSION" type="text/javascript"></script>
-    <script src="js/nodetabs.js?version=PACKAGEVERSION" type="text/javascript"></script>
+    <script src="js/gengraph.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
+    <script src="js/datetimes.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
+    <script src="js/nodetabs.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
 
 </html>

@@ -1,0 +1,105 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   database_update_geoip
+#
+
+eval $(@LIBEXEC@/conf_read)
+
+REQUIRED_API_VERSION=@DB_VERSION@
+DB_NAME=$hhconfig_database_name
+TMP_DIR=/tmp
+export PGPASSWORD=$hhconfig_database_owner_pass
+
+usage () {
+	echo
+	echo "Update the GeopIP list in the database. This reads input from ${TMP_DIR}"
+	echo 
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "`date`: $0 COMMENCED"
+USER=$(whoami)
+[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+
+DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
+[ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+
+cd $TMP_DIR
+rm -f GeoLite2-City-CSV.zip.md5
+curl -O http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip.md5
+if [ -f GeoLite2-City-CSV.zip ] ; then
+  md5sum GeoLite2-City-CSV.zip | awk ' { print $1 } ' | diff -w GeoLite2-City-CSV.zip.md5 -
+  if [ $? -ne 0 ] ; then
+    rm GeoLite2-City-CSV.zip
+  fi
+fi
+if [ ! -f GeoLite2-City-CSV.zip ] ; then
+  curl -O http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip
+  md5sum GeoLite2-City-CSV.zip | awk ' { print $1 } ' | diff -w GeoLite2-City-CSV.zip.md5 -
+  if [ $? -ne 0 ] ; then
+    echo "Error downloading and md5-ing GeoLite2-City-CSV.zip"
+    exit 1
+  else
+  
+    unzip -oj GeoLite2-City-CSV.zip
+  
+    awk -F, " BEGIN { printf \"BEGIN;\n delete from geoip;\n insert into geoip (ip_range, geoname, latitude, longitude) values \n\" } 
+        { if (\$1 ~ /network/) { next }} NR > 2 { printf \",\n\" } 
+        { \$2 ~ /^$/ ? a=\$3 : a=\$2 }
+        { if (\$8 ~ /^$/ || \$9 ~ /^$/) {
+            printf \" ('%s', %i, null, null)\", \$1, a
+          } else {
+            printf \" ('%s',%i,%8.4f,%8.4f)\", \$1, a, \$8, \$9
+          }
+        }
+        END { print \";\nCOMMIT;\" } " $TMP_DIR/GeoLite2-City-Blocks-IPv4.csv $TMP_DIR/GeoLite2-City-Blocks-IPv6.csv | psql -h $hhconfig_database_host $DB_NAME
+    
+    awk -F, " BEGIN { printf \"BEGIN;\n delete from locations;\n insert into locations (geoname_id, country_iso_code, city) values \n\" } 
+        NR == 1 { next }
+        NR > 2 { printf \",\n\" }
+        { gsub(/\"/,\"\",\$11) }
+        { gsub(/'/,\"\",\$11) }
+        { if (\$11 ~ /^$/) {
+           printf \" (%i, '%s', null)\", \$1, \$5
+          } else {
+           printf \" (%i, '%s', '%s')\", \$1, \$5, \$11
+          }
+        }
+        END { print \";\nCOMMIT;\" } " /tmp/GeoLite2-City-Locations-en.csv | psql -h $hhconfig_database_host $DB_NAME
+
+    
+  fi
+fi
+echo "$(date): $0 COMPLETED"

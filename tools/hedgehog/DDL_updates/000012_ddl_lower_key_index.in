@@ -33,9 +33,9 @@ SUPPRESS_WARNINGS=0
 export PGPASSWORD=$hhconfig_database_owner_pass
 
 set -e
-NEW_DDL_SERIAL=9
+NEW_DDL_SERIAL=12
 REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
-NEW_API_VERSION=7
+NEW_API_VERSION=9
 REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 0 ))
 
 DSC_SCHEMA="dsc"
@@ -98,9 +98,9 @@ LAST_SERIAL=`psql -h $hhconfig_database_host $DB_NAME -tc  "select max(serial) f
 if [ $SKIP -eq 0 ] ; then
   MYFILE=$(mktemp)
   if [ $CONCURRENT -eq 0 ] ; then
-    psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index idx_' || table_name || '_node_id on ' || table_name || ' (node_id);' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
+    psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index idx_' || table_name || '_lower_key1 on ' || table_name || ' (lower(key1));' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
   else
-    psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index CONCURRENTLY idx_' || table_name || '_node_id on ' || table_name || ' (node_id);' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
+    psql -h $hhconfig_database_host $DB_NAME -tc "select 'create index CONCURRENTLY idx_' || table_name || '_lower_key1 on ' || table_name || ' (lower(key1));' FROM information_schema.tables where table_name like 'data\_%' and table_type='BASE TABLE' and table_schema='dsc';" > $MYFILE
   fi
   psql -h $hhconfig_database_host $DB_NAME < $MYFILE
   rm $MYFILE

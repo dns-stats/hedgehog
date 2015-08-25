@@ -131,8 +131,10 @@ function brew(divId) {
 function genDSCGraph() {
     // call hedgehog.brew to generate a plot
     var gvis = 0;
+    var subgroup = 0;
     if ($('#googleviz').prop('checked') === true) gvis = 1;
-    
+    if ($('#groupNodes').prop('checked') === true) subgroup = 1;
+
     var pltid = $("#plotType option:selected").val();
     var svrnm = $("#servers option:selected").text();
     var svrid = $("#servers option:selected").val();
@@ -168,6 +170,7 @@ function genDSCGraph() {
                 'start': window.start.toISOString().slice(0,16),
                 'stop': window.stop.toISOString().slice(0,16),
                 'gvis': gvis,
+                'subgroup': subgroup,
                 'pltid': pltid,
                 'svrnm' : svrnm,
                 'svrid': svrid,
@@ -212,16 +215,19 @@ function toggle_plot() {
         $('#liny').removeClass('hidden');
         $('#logy').addClass('hidden');
         $('#stack').addClass('hidden');
+        $("#ploturi").val($("#liny").prop("src"));
     } else if ($("#rblogy").prop('checked')) {
         window.selectedOpt = "#rblogy";
         $('#liny').addClass('hidden');
         $('#logy').removeClass('hidden');
         $('#stack').addClass('hidden');
+        $("#ploturi").val($("#logy").prop("src"));
     } else if ($("#rbstack").prop('checked')) {
         window.selectedOpt = "#rbstack";
         $('#liny').addClass('hidden');
         $('#logy').addClass('hidden');
         $('#stack').removeClass('hidden');
+        $("#ploturi").val($("#stack").prop("src"));
     }
 }
 

@@ -70,6 +70,9 @@ CREATE USER "$DB_READER";
 GRANT hh_read TO "$DB_READER";
 ALTER USER "$DB_READER" SET search_path TO dsc;
 ALTER USER "$DB_OWNER" SET search_path TO dsc;
+\connect hedgehog
+CREATE SCHEMA dsc AUTHORIZATION "$DB_OWNER";
+CREATE EXTENSION ip4r SCHEMA dsc;
 EOF
 
 echo
