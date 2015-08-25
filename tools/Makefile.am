@@ -24,8 +24,8 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000011_ddl_geoip \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
                          hedgehog/DDL_updates/000013_ddl_node_subgroup \
-						 hedgehog/DDL_updates/000014_ddl_loadtime \
-						 hedgehog/DDL_updates/000015_ddl_zonesize
+                         hedgehog/DDL_updates/000014_ddl_loadtime \
+                         hedgehog/DDL_updates/000015_ddl_zonesize
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
                    $(srcdir)/hedgehog/sql/insert_lookup_data.sql

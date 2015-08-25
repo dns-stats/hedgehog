@@ -20,7 +20,7 @@
 #
 
 # Debug mode set to 1, set to 0 to disable
-hh_debug <<- 1
+hh_debug <<- 0
 
 # TODO(refactor): preparing and executing DB queries should be wrapped better and in a dbQuery.R file
 # TODO: use either tabs or spaces for indentation - we have both at the moment

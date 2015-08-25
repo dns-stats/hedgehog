@@ -661,7 +661,7 @@ initPlotOptions <- function() {
 
 	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
   
-  geo                     <<- c("geomap", "geochart")
+	geo                     <<- c("geomap", "geochart")
   
 	formatother             <<- c(formatother, rssac, geo)
 
@@ -830,10 +830,10 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 		barPlot(df, plot_file, mytitle, "IP Version/Aggregation", "Number of Unique Sources", gvis, small=0)
 	}
 	else if (pltnm == 'geomap') {
-	  geomap(df, plot_file, mytitle, "aaaa", "bbbbb", 1)
+		geomap(df, plot_file, mytitle, "aaaa", "bbbbb", 1)
 	}
-  else if (pltnm == 'geochart') {
-	  geochart(df, plot_file, mytitle, "aaaa", "bbbbb", 1)
+	else if (pltnm == 'geochart') {
+		geochart(df, plot_file, mytitle, "aaaa", "bbbbb", 1)
 	}
 	return(plot_file)
 }
