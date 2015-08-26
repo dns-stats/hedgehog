@@ -79,7 +79,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       # For now we default to the timeline flash chart unless 'svg' is specified by the user
       if (gui_config$www$default_interactive_plot_type == "svg") {
           p <- gvisAnnotationChart(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x",
-                                   options=list(legendPosition='newRow', height=440, width=900, colors="['#0072B2','#990F0F','#99700F',
+                                   options=list(legendPosition='newRow', height=540, width=900, colors="['#0072B2','#990F0F','#99700F',
       '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#990F0F','#99700F','#1F990F',
       '#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99',
       '#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99','#E67E7E',
@@ -88,7 +88,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
          
       }else{
           p <- gvisAnnotatedTimeLine(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x", 
-                                     options=list(legendPosition='newRow', height=440, width=900, colors="['#0072B2','#990F0F','#99700F',
+                                     options=list(legendPosition='newRow', height=540, width=900, colors="['#0072B2','#990F0F','#99700F',
       '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#990F0F','#99700F','#1F990F',
       '#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99',
       '#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99','#E67E7E',
@@ -163,14 +163,14 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
       title <- sub("\n", " ", title)
       if(vertical == 1){
           p <- gvisColumnChart(df, xvar='x', yvar='y', 
-                            options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+                            options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}", height=600, width=940))
       }else{
         if(small==1){
           p <- gvisBarChart(df, xvar='x', yvar='y',
-                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), chartArea="{left:80,top:50,width:\"88%\",height:\"80%\"}", height=600, width=940))
         } else {
           p <- gvisBarChart(df, xvar='x', yvar='y',
-                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"')", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"')", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), chartArea="{left:80,top:50,width:\"88%\",height:\"80%\"}", height=600, width=940))
         }
       }
       cat(p$html$chart,file=f)
@@ -210,14 +210,14 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       if(vertical == 1){
           if (gbar_width == 0) {
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
-                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), legend=paste("{textStyle:{fontSize:'12'}}", sep=""), chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", height=600, width=940))
           } else {
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
-                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
+                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), legend=paste("{textStyle:{fontSize:'12'}}", sep=""), chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", height=600, width=940, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
           }
       }else{
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
-                            options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), height=500, width=920))
+                            options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'12'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), legend=paste("{textStyle:{fontSize:'12'}}", sep=""), chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", height=600, width=940))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -254,7 +254,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       if (vertical == 0) {
         p <- p +
              coord_flip() +
-             theme(panel.grid.major.x = element_line(colour = GRIDGREY), panel.grid.minor.x = element_line(colour = GRIDGREY, linetype = "dotted"), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.text.y=element_text(size=15))
+             theme(panel.grid.major.x = element_line(colour = GRIDGREY), panel.grid.minor.x = element_line(colour = GRIDGREY, linetype = "dotted"), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.text.y=element_text(size=14))
       } else {
           p <- p +
                geom_bar(width=1, stat="identity")
@@ -287,7 +287,7 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
       p <- gvisAreaChart(de, xvar='x', yvar=y_var, 
-                         options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), height=500, width=920))
+                         options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), legend=paste("{textStyle:{fontSize:'12'}}"), chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", height=600, width=940))
       cat(p$html$chart,file=f)
     }else{
       	df$x <- as.POSIXct(df$x)
@@ -431,7 +431,7 @@ geomap <- function(df, f, title, xlabel, ylabel, gvis) {
 	}
   if(gvis == 1){
     title <- sub("\n", " ", title)
-    p <- gvisMap(df, locationvar='location', tipvar='sum', options=list(colorAxis="{colors:['#FF0000', '#00FF00']}", displayMode='regions', height=500, width=920))
+    p <- gvisMap(df, locationvar='location', tipvar='sum', options=list(colorAxis="{colors:['#FF0000', '#00FF00']}", displayMode='regions', chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}", height=600, width=940))
     cat(p$html$chart,file=f)
   }
 }
@@ -446,7 +446,7 @@ geochart <- function(df, f, title, xlabel, ylabel, gvis) {
   if(gvis == 1){
     title <- sub("\n", " ", title)
 # colorAxis="{colors:['#FF0000', '#00FF00']}",    
-    p <- gvisGeoChart(df, locationvar='location', colorvar='sum', options=list(displayMode='regions', height=500, width=920))
+    p <- gvisGeoChart(df, locationvar='location', colorvar='sum', options=list(displayMode='regions', chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}", height=600, width=940))
     cat(p$html$chart,file=f)
   }
 }

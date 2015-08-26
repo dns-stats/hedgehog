@@ -54,6 +54,7 @@ Developed by Sinodun IT (www.sinodun.com)
 </head>
 <body>
   <div class="container">
+    <hr style='margin-bottom:5px; margin-top:1px;'/>
     <div class="three columns">
       <h2 class="remove-bottom">Hedgehog</h2>
       <h5>Version @HH_PACKAGE_VERSION@ <a href="about.html"><img id="helpimg" src="images/help.png" alt="About" height="24" width="24" title="Help" /></a></h5>
@@ -121,6 +122,7 @@ Developed by Sinodun IT (www.sinodun.com)
       <div class="sixteen columns" id="outerplot"><!-- 
         auto populated by gengraph.js
    --></div>
+      <hr style='margin-top:5px;margin-bottom:5px'/>
       <div class="two-thirds column" id="srvr_select">
       <label for="servers">Servers</label>
       <select name="servers" id="servers" onchange="serverTab()">
