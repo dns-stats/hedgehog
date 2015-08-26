@@ -41,6 +41,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_LIBTOOL
 LT_INIT
+AM_PATH_PYTHON
 
 AC_CONFIG_FILES(Makefile conf/Makefile tools/Makefile)
 

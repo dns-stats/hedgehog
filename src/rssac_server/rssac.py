@@ -34,6 +34,7 @@ class CheckZone(object):
             return response.answer[0].to_text().split()[6]
 
     def _check_serial(self, node_dict):
+        ''' TODO: Serial number arithmetic? '''
         node = node_dict.items()[0][0]
         addr = node_dict.items()[0][1]
         node_serial = self._get_serial(addr)

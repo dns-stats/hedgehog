@@ -39,8 +39,7 @@ class DnsReaderServer(SocketServer.UDPServer):
         SocketServer.UDPServer.__init__(
                 self, server_address, RequestHandlerClass)
         
-        ''' TODO tell make to define this path/file '''
-        config_doc = file('/opt/hedgehog/etc/hedgehog/hedgehog.yaml', 'r')
+        config_doc = file('@HEDGEHOGYAML@/hedgehog.yaml', 'r')
         config = yaml.load(config_doc)
         config_doc.close()
         db_host = config['database']['host']
@@ -137,6 +136,8 @@ class DnsReaderServer(SocketServer.UDPServer):
         self.logger.debug('SQL Result: Plot {} has id {}'.format(plot_name, plot_id_tuple[0]))
         cur.close()
         return plot_id_tuple[0]
+        
+    
         
 class DnsReaderHandler(SocketServer.BaseRequestHandler):
     '''
