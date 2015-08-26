@@ -1,0 +1,5 @@
+#!@PYTHON_EXE@
+import sys
+sys.path.append('@HHPYSITEDIR@')
+from rssac_server import main
+main()

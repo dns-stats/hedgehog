@@ -1,8 +1,11 @@
 if DM
 D = dsc-extractor
-S = rssac_server rssac_server/rssac.py rssac_server/threadpool.py
+P = rssac_server.py rssac_server/rssac.py rssac_server/threadpool.py
+S = rssacserver
 else
 D =
+P =
+S =
 endif
 
 sysconfdir = @sysconfdir@/hedgehog
@@ -40,11 +43,17 @@ dsc_extractor_LDADD = @BOOST_SYSTEM_LDFLAGS@ \
                           @BOOST_PROGRAM_OPTIONS_LIBS@ \
                           @LIBPQXX_LIBS@
 
-python_PYTHON = $(S)
-EXTRA_DIST = rssac_server.in
+python_PYTHON = $(P)
+sbin_SCRIPTS = $(S)
+EXTRA_DIST = rssac_server.in rssacserver.in
 
-do_subst = sed -e 's|@HEDGEHOGYAML@|$(sysconfdir)|'
+do_subst_hh = sed -e 's|@HEDGEHOGYAML@|$(sysconfdir)|'
+do_subst_python = sed -e 's|@PYTHON_EXE@|$(PYTHON)|'
+do_subst_python_site = sed -e 's|@HHPYSITEDIR@|$(pythondir)|'
 
-rssac_server: $(srcdir)/rssac_server/rssac_server.in Makefile
-	$(do_subst) < $(srcdir)/rssac_server/rssac_server.in > rssac_server
-	chmod 744 rssac_server
+rssac_server.py: $(srcdir)/rssac_server/rssac_server.in Makefile
+	$(do_subst_hh) < $(srcdir)/rssac_server/rssac_server.in > rssac_server.py
+	
+rssacserver: $(srcdir)/rssac_server/rssacserver.in Makefile
+	$(do_subst_python) < $(srcdir)/rssac_server/rssacserver.in > rssacserver.tmp
+	$(do_subst_python_site) < rssacserver.tmp > rssacserver
