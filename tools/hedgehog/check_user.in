@@ -1,0 +1,111 @@
+#!/bin/bash
+# 
+# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   check_user
+#
+set -e
+
+usage () {
+	echo
+	echo "Check if we are a valid user and check that we can connect to the DB"
+	echo "By default we are a read only user"
+	echo 
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+	echo "  -d run in debug mode."
+	echo "  -w check we are a write user"
+    echo "  -h Show this help."
+}
+
+# Read only access by default
+WRITER=0
+
+REQUIRED_API_VERSION=@DB_VERSION@
+eval $(@LIBEXEC@/conf_read)
+
+while getopts ":wd" opt; do
+    case $opt in
+		d  ) set -x ;;
+		w  ) WRITER=1 ;;
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+USER_NAME=$hhconfig_database_read_user
+export PGPASSWORD=$hhconfig_database_read_pass
+if [ $WRITER -eq 1 ] ; then
+	USER_NAME=$hhconfig_database_owner
+	export PGPASSWORD=$hhconfig_database_owner_pass
+fi
+
+# If the password is set then assume md5 authentication otherwise you must be
+# a user with the same name as the hedgehog database owner and are using peer
+# authentication
+if [ -z $PGPASSWORD ] ; then
+	USER=$(whoami)
+	if [ $USER != $USER_NAME ] ; then
+		echo "Must be $USER_NAME to run this script"
+		exit 1
+	fi
+fi
+
+PORT=$hhconfig_database_port
+if [ -z $PORT ] ; then
+	PORT=5432
+fi
+DB_NAME=$hhconfig_database_name
+if [ -z $DB_NAME ] ; then
+	echo "Database name not set"
+	exit 1
+fi
+DB_HOST=$hhconfig_database_host
+if [ -z $DB_HOST ]; then
+	echo "Database host not set"
+	exit 1
+fi
+if [ -z $USER_NAME ]; then
+	echo "Database user name not set"
+	exit 1
+fi
+
+CONN_STRING="-h $DB_HOST -U $USER_NAME -p $PORT -d $DB_NAME"
+# Test connection to the database
+TEST=$(psql $CONN_STRING -tc "SELECT has_table_privilege('version', 'SELECT')" | tr -d '[:space:]')
+if [ $WRITER -eq 1 ] ; then
+	TEST=$(psql $CONN_STRING -tc "SELECT has_table_privilege('version', 'INSERT')" | tr -d '[:space:]')
+fi
+
+if [ "x$TEST" == "xt" ] ; then	
+	DB_API_VERSION=$(psql $CONN_STRING -tc  "select version from dsc.version;")
+	if [ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] ; then
+		echo "Error: Database API version incorrect."
+		exit 1
+	fi
+else
+	echo "The user this script is running as does not have the expected database access."
+	exit 1
+fi
+exit 0
