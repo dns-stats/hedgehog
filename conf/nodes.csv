@@ -14,15 +14,17 @@
 # node-subgroup - This is used to collect nodes into subgroups for convenient
 #                 selection and plotting. It should be unique for a given group.
 #                 It is optional and if not specified is left blank.
+# node-ip       - IP address of the node (IPv4 or IPv6) It is optional and if
+#                 not specified is left blank.
 # Example input: (uncomment the following)
 
-#Server-A,Node-1,Region-1,Subgroup-1
-#Server-A,Node-2,Region-1,Subgroup-1
-#Server-A,Node-3,Region-1,Subgroup-2
-#Server-A,Node-4,Region-1,Subgroup-2
-#Server-A,Node-5,Region-2,Subgroup-3
-#Server-A,Node-6,Region-2,Subgroup-3
-#Server-A,Node-7,Region-3,
-#Server-B,Node-1,Region-1
-#Server-B,Node-2,Region-2
-#Server-C,Node-5,Region-4
+#Server-A,Node-1,Region-1,Subgroup-1,10.0.0.2
+#Server-A,Node-2,Region-1,Subgroup-1,
+#Server-A,Node-3,Region-1,Subgroup-2,
+#Server-A,Node-4,Region-1,Subgroup-2,
+#Server-A,Node-5,Region-2,Subgroup-3,
+#Server-A,Node-6,Region-2,Subgroup-3,
+#Server-A,Node-7,Region-3,,10.0.0.3
+#Server-B,Node-1,Region-1,,
+#Server-B,Node-2,Region-2,,
+#Server-C,Node-5,Region-4,,

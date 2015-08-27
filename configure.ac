@@ -22,8 +22,8 @@ AC_INIT(Hedgehog, 2.1.0a1,  dns-stats-users@dns-stats.org)
 AC_CONFIG_SRCDIR([tools/hedgehogctl.in])
 AC_CONFIG_HEADER([config.h])
 
-AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[10],[Database version])
-AC_SUBST([DB_SCHEMA_VERSION],[10])
+AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[11],[Database version])
+AC_SUBST([DB_SCHEMA_VERSION],[11])
 
 AC_CONFIG_MACRO_DIR([m4])
 

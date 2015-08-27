@@ -73,7 +73,19 @@ class DnsReaderServer(SocketServer.UDPServer):
         self.conn = psycopg2.connect(database=db_name, user=db_owner, password=db_password,
                                 host=db_host, port=db_port)
         cur = self.conn.cursor()
-        ''' TODO: check db api version '''
+        sql = "select version from dsc.version"
+        self.logger.debug('SQL Query: {}'.format(sql))
+        cur.execute(sql)
+        api_tuple = cur.fetchone()
+        if api_tuple == None:
+            cur.close()
+            self.logger.error('SQL Result: Databae API version not defined in the database')
+            raise ValueError('Databae API version not defined in the database')
+        if api_tuple[0] != @DB_VERSION@:
+            cur.close()
+            self.logger.error('SQL Result: Incorrect database API is {} should be {}'.format(api_tuple[0], @DB_VERSION@))
+            raise ValueError('Incorrect database API')
+        self.logger.debug('SQL Result: Database API is {}'.format(api_tuple[0]))
         
         ''' Get plot id '''
         self.load_time_plot_id = self._get_plot_id('load_time')
@@ -95,7 +107,7 @@ class DnsReaderServer(SocketServer.UDPServer):
         ''' Get the list of nodes to query '''
         self.nodes = {}
         ''' TODO: add ip address to db '''
-        sql="SELECT id, '192.168.1.148' as ip FROM node WHERE server_id=%s"
+        sql="SELECT id, ip FROM node WHERE server_id=%s"
         data = (self.db_server_id, )
         fsql = cur.mogrify(sql, data)
         self.logger.debug('SQL: {}'.format(fsql))

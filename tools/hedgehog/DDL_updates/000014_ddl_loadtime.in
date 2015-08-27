@@ -68,6 +68,7 @@ LAST_SERIAL=`psql -h $hhconfig_database_host $DB_NAME -tc  "select max(serial) f
 [ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] && echo "Error: ddl scripts not run in correct order." && exit 1
 
 DATASET=$(psql -h $hhconfig_database_host $DB_NAME -qtc "INSERT INTO dataset (name) VALUES ('load_time') RETURNING id;")
+DATASET1=$(psql -h $hhconfig_database_host $DB_NAME -qtc "INSERT INTO dataset (name) VALUES ('zone_size') RETURNING id;")
 
 psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
@@ -77,8 +78,19 @@ WITH rows AS (
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('zone_size','9.RSSAC','Zone size','Zone Size') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${DATASET1} FROM rows;
+
+alter table node add ip ipaddress;
+
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
-INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new query/response difference plot for rssac', now() );
+INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new load_time and zone_size for rssac', now() );
+
 COMMIT;
 EOF
 

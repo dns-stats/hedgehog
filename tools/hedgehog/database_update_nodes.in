@@ -99,7 +99,8 @@ while read line || [[ -n "$line" ]]; do
 	NODE_NAME=`echo ${arrline[1]} | sed -e 's/^ *//' -e 's/ *$//'`
 	GROUP=`echo ${arrline[2]} | sed -e 's/^ *//' -e 's/ *$//'`
 	SUBGROUP=`echo ${arrline[3]} | sed -e 's/^ *//' -e 's/ *$//'`
-	
+	IPADDRESS=`echo ${arrline[4]} | sed -e 's/^ *//' -e 's/ *$//'
+	`
 	# First, validate the input	
 	if [ -z "$SERVER_NAME" ] ; then
 		echo "Missing server name. This entry will be ignored."
@@ -132,6 +133,14 @@ while read line || [[ -n "$line" ]]; do
 		SUBGROUP=""
 	elif ! [[ "${SUBGROUP}" =~ ^[a-zA-Z0-9\-]+$ ]] ; then
 		echo "Sub group name '${SUBGROUP}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
+		continue
+	fi
+
+	if [ -z $IPADDRESS ] ; then 
+		IPADDRESS=""
+		# TODO IMPROVE THIS TEST
+	elif ! [[ "${IPADDRESS}" =~ ^[a-fA-F0-9:]+$ ]] ; then
+		echo "Sub group name '${IPADDRESS}' is invalid. This entry will be ignored."
 		continue
 	fi
 
