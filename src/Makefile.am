@@ -1,7 +1,7 @@
 if DM
 D = dsc-extractor
 P = rssac_server.py rssac_server/rssac.py rssac_server/threadpool.py
-S = rssacserver
+S = rssacd
 else
 D =
 P =
@@ -45,7 +45,7 @@ dsc_extractor_LDADD = @BOOST_SYSTEM_LDFLAGS@ \
 
 python_PYTHON = $(P)
 sbin_SCRIPTS = $(S)
-EXTRA_DIST = rssac_server.in rssacserver.in
+EXTRA_DIST = rssac_server.in rssacd.in
 
 do_subst_hh = sed -e 's|@HEDGEHOGYAML@|$(sysconfdir)|' -e "s|@DB_VERSION@|@DB_SCHEMA_VERSION@|"
 do_subst_python = sed -e 's|@PYTHON_EXE@|$(PYTHON)|' -e 's|@HHPYSITEDIR@|$(pythondir)|'
@@ -53,5 +53,5 @@ do_subst_python = sed -e 's|@PYTHON_EXE@|$(PYTHON)|' -e 's|@HHPYSITEDIR@|$(pytho
 rssac_server.py: $(srcdir)/rssac_server/rssac_server.in Makefile
 	$(do_subst_hh) < $(srcdir)/rssac_server/rssac_server.in > rssac_server.py
 	
-rssacserver: $(srcdir)/rssac_server/rssacserver.in Makefile
-	$(do_subst_python) < $(srcdir)/rssac_server/rssacserver.in > rssacserver
+rssacd: $(srcdir)/rssac_server/rssacd.in Makefile
+	$(do_subst_python) < $(srcdir)/rssac_server/rssacd.in > rssacd
