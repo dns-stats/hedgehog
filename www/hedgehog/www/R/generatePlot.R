@@ -79,7 +79,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       # For now we default to the timeline flash chart unless 'svg' is specified by the user
       if (gui_config$www$default_interactive_plot_type == "svg") {
           p <- gvisAnnotationChart(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x",
-                                   options=list(legendPosition='newRow', height=540, width=900, colors="['#0072B2','#990F0F','#99700F',
+                                   options=list(legendPosition='newRow', height=540, width=910, colors="['#0072B2','#990F0F','#99700F',
       '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#990F0F','#99700F','#1F990F',
       '#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99',
       '#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99','#E67E7E',
@@ -88,7 +88,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
          
       }else{
           p <- gvisAnnotatedTimeLine(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x", 
-                                     options=list(legendPosition='newRow', height=540, width=900, colors="['#0072B2','#990F0F','#99700F',
+                                     options=list(legendPosition='newRow', height=540, width=910, colors="['#0072B2','#990F0F','#99700F',
       '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#990F0F','#99700F','#1F990F',
       '#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99',
       '#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99','#E67E7E',
@@ -103,8 +103,8 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
                                         "</div>",
                                         "<div style=\"display: flex; display: -webkit-flex; justify-content:flex-start; width: 918px;\">",  
                                         "<div>", p$html$chart['divChart'], "</div>",
-                                        "<div style=\"width: 17px; height: 17px; font-size: small; transform: translateY(200px) rotate(90deg); transform-origin: right top; -webkit-transform: translateY(200px) rotate(90deg); -webkit-transform-origin: right top;\">",
-                                         ylabel, "</div>",
+                                        "<div style=\"width: 17px; height: 17px; font-size: small; transform: translateY(200px) rotate(90deg); transform-origin: right top; 
+                                              -webkit-transform: translateY(200px) rotate(90deg); -webkit-transform-origin: right top;\">", ylabel, "</div>",
                                         "</div>",
                                         "<div style=\"text-align: center; width: 918px; font-size: small;\">", xlabel, "</div>",
                                        sep="")
@@ -119,7 +119,8 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
                   scale_x_datetime(expand=c(0.01,0)) +
                   scale_y_continuous(expand=c(0.01,0), labels = comma) +
                   theme_bw() +
-                  theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                  theme(panel.grid.major = element_line(colour = GRIDGREY), 
+                        panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
                   guides(col = guide_legend(nrow = 20, byrow = TRUE, override.aes = list(size=3)))
       if (nKeys <= NCBPALETTE) {
         p <- p + scale_colour_manual(values=CBPALETTE)
@@ -136,7 +137,8 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
                    scale_x_datetime(expand=c(0.01,0)) + 
                    scale_y_continuous(expand=c(0,0), labels = comma) +
                    theme_bw() +
-                   theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                   theme(panel.grid.major = element_line(colour = GRIDGREY), 
+                         panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
                    guides(fill = guide_legend(nrow = 20, byrow = TRUE))
 
       if (nKeys <= NCBPALETTE) {
@@ -163,14 +165,23 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
       title <- sub("\n", " ", title)
       if(vertical == 1){
           p <- gvisColumnChart(df, xvar='x', yvar='y', 
-                            options=list(legend="none", title=title, vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}", height=600, width=940))
+                            options=list(legend="none", title=title, height=600, width=940,
+                                         vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), 
+                                         hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), 
+                                         chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
       }else{
         if(small==1){
           p <- gvisBarChart(df, xvar='x', yvar='y',
-                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), chartArea="{left:80,top:50,width:\"88%\",height:\"80%\"}", height=600, width=940))
+                            options=list(legend="none", title=title, height=600, width=940,
+                                         vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), 
+                                         hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), 
+                                         chartArea="{left:80,top:50,width:\"88%\",height:\"80%\"}"))
         } else {
           p <- gvisBarChart(df, xvar='x', yvar='y',
-                            options=list(legend="none", title=title, vAxis=paste("{title:'",xlabel,"')", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), chartArea="{left:80,top:50,width:\"88%\",height:\"80%\"}", height=600, width=940))
+                            options=list(legend="none", title=title, height=600, width=940,
+                                         vAxis=paste("{title:'",xlabel,"')", sep=""), 
+                                         hAxis=paste("{title:'",ylabel,"', textStyle:{fontSize:'14'}}", sep=""), 
+                                         chartArea="{left:80,top:50,width:\"88%\",height:\"80%\"}"))
         }
       }
       cat(p$html$chart,file=f)
@@ -184,12 +195,16 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
                   geom_bar(fill=GREY, colour=GREY, stat="identity") +
                   labs(title=title, x=xlabel, y=ylabel) +
                   theme_bw() + scale_y_continuous(expand=c(0,0), labels = comma) +
-                  theme(panel.grid.major.y = element_line(colour = GRIDGREY), panel.grid.minor.y = element_line(colour = GRIDGREY, linetype = "dotted"), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
+                  theme(panel.grid.major.y = element_line(colour = GRIDGREY), 
+                        panel.grid.minor.y = element_line(colour = GRIDGREY, linetype = "dotted"), 
+                        panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
 
       if (vertical == 0) {
         p <- p +
              coord_flip() +
-             theme(panel.grid.major.x = element_line(colour = GRIDGREY), panel.grid.minor.x = element_line(colour = GRIDGREY, linetype = "dotted"), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank())
+             theme(panel.grid.major.x = element_line(colour = GRIDGREY), 
+                   panel.grid.minor.x = element_line(colour = GRIDGREY, linetype = "dotted"), 
+                   panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank())
       }
 
       print(p)
@@ -210,14 +225,30 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       if(vertical == 1){
           if (gbar_width == 0) {
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
-                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), legend=paste("{textStyle:{fontSize:'12'}}", sep=""), chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", height=600, width=940))
+                                   options=list(isStacked=TRUE, title=title, height=600, width=940,
+                                                vAxis=paste("{title:'", ylabel,"'}", sep=""), 
+                                                hAxis=paste("{title:'", xlabel,"', textStyle:{fontSize:'14'}}", sep=""), 
+                                                legend=paste("{textStyle:{fontSize:'12'}}", sep=""),
+                                                chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
           } else {
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
-                                   options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), legend=paste("{textStyle:{fontSize:'12'}}", sep=""), chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", height=600, width=940, bar=paste("{groupWidth:",gbar_width,"}", sep="")))
+                                   options=list(isStacked=TRUE, title=title, height=600, width=940,
+                                                vAxis=paste("{title:'", ylabel,"'}", sep=""), 
+                                                hAxis=paste("{title:'", xlabel,"', textStyle:{fontSize:'14'}}", sep=""), 
+                                                legend=paste("{textStyle:{fontSize:'12'}}", sep=""), 
+                                                chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", 
+                                                bar=paste("{groupWidth:", gbar_width,"}", sep="")))
           }
       }else{
+          # Need to order the table before passing it to gviz
+          de$total <- rowSums(de, na.rm=TRUE);
+          de <-arrange(de, desc(total));
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
-                            options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'12'}}", sep=""), hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), legend=paste("{textStyle:{fontSize:'12'}}", sep=""), chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", height=600, width=940))
+                            options=list(isStacked=TRUE, title=title, height=600, width=940,
+                                         vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'12'}}", sep=""), 
+                                         hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), 
+                                         legend=paste("{textStyle:{fontSize:'12'}}", sep=""), 
+                                         chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -239,7 +270,8 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
                   labs(title=title, x=xlabel, y=ylabel) + 
                   scale_y_continuous(expand=c(0,0), labels = comma) +
                   theme_bw() +
-                  theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                  theme(panel.grid.major = element_line(colour = GRIDGREY), 
+                        panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
                   guides(fill = guide_legend(nrow = 20, byrow = TRUE))
 
       if (nKeys <= NCBPALETTE) {
@@ -254,7 +286,11 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       if (vertical == 0) {
         p <- p +
              coord_flip() +
-             theme(panel.grid.major.x = element_line(colour = GRIDGREY), panel.grid.minor.x = element_line(colour = GRIDGREY, linetype = "dotted"), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.text.y=element_text(size=14))
+             theme(panel.grid.major.x = element_line(colour = GRIDGREY), 
+                   panel.grid.minor.x = element_line(colour = GRIDGREY, linetype = "dotted"), 
+                   panel.grid.major.y = element_blank(), 
+                   panel.grid.minor.y = element_blank(),
+                   axis.text.y=element_text(size=14))
       } else {
           p <- p +
                geom_bar(width=1, stat="identity")
@@ -287,7 +323,11 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
       p <- gvisAreaChart(de, xvar='x', yvar=y_var, 
-                         options=list(isStacked=TRUE, title=title, vAxis=paste("{title:'",ylabel,"'}", sep=""), hAxis=paste("{title:'",xlabel,"'}", sep=""), legend=paste("{textStyle:{fontSize:'12'}}"), chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", height=600, width=940))
+                         options=list(isStacked=TRUE, title=title, height=600, width=940, 
+                                      vAxis=paste("{title:'",ylabel,"'}", sep=""), 
+                                      hAxis=paste("{title:'",xlabel,"'}", sep=""), 
+                                      legend=paste("{textStyle:{fontSize:'12'}}"), 
+                                      chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
       cat(p$html$chart,file=f)
     }else{
       	df$x <- as.POSIXct(df$x)
@@ -300,7 +340,8 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
                   scale_x_datetime(expand=c(0.01,0)) +
                   scale_y_continuous(expand=c(0,0), labels = comma) + 
                   theme_bw() +
-                  theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                  theme(panel.grid.major = element_line(colour = GRIDGREY), 
+                        panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
                   guides(fill = guide_legend(nrow = 20, byrow = TRUE))
 
       if (nKeys <= NCBPALETTE) {
@@ -329,7 +370,8 @@ facetedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, bar_width) {
                     facet_grid(key ~ ., scales="free") + 
                     labs(title=title, x=xlabel, y=ylabel) + 
                     theme_bw() +
-                    theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                    theme(panel.grid.major = element_line(colour = GRIDGREY), 
+                          panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
                     guides(fill = guide_legend(nrow = 20, byrow = TRUE))
 
         if (nKeys <= NCBPALETTE) {
@@ -370,7 +412,8 @@ facetedLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
                     scale_x_datetime(expand=c(0.01,0)) +
                     scale_y_continuous(expand=c(0.01,0), labels=comma) +
                     theme_bw() +
-                    theme(panel.grid.major = element_line(colour = GRIDGREY), panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                    theme(panel.grid.major = element_line(colour = GRIDGREY), 
+                          panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
                     guides(col = guide_legend(nrow = 20, byrow = TRUE, override.aes=list(size=3)))
 
         nKeys = length(unique(df$key))
@@ -412,7 +455,9 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
                     scale_x_datetime(expand=c(0.01,0)) +
                     scale_y_continuous(expand=c(0.01,0), labels=comma) +
                     theme_bw() +
-                    theme(panel.margin=grid::unit(3,"mm"), panel.grid.major=element_line(colour=GRIDGREY), panel.grid.minor=element_line(colour=GRIDGREY, linetype="dotted")) +
+                    theme(panel.margin=grid::unit(3,"mm"), 
+                          panel.grid.major=element_line(colour=GRIDGREY),
+                          panel.grid.minor=element_line(colour=GRIDGREY, linetype="dotted")) +
                     guides(col=guide_legend(nrow=20, byrow=TRUE, override.aes=list(size=3)))
         if (nKeys <= NCBPALETTE) {
             p <- p + scale_colour_manual(values=CBPALETTE)
@@ -431,7 +476,9 @@ geomap <- function(df, f, title, xlabel, ylabel, gvis) {
 	}
   if(gvis == 1){
     title <- sub("\n", " ", title)
-    p <- gvisMap(df, locationvar='location', tipvar='sum', options=list(colorAxis="{colors:['#FF0000', '#00FF00']}", displayMode='regions', chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}", height=600, width=940))
+    p <- gvisMap(df, locationvar='location', tipvar='sum', 
+                 options=list(colorAxis="{colors:['#FF0000', '#00FF00']}", displayMode='regions', height=600, width=940,
+                              chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
     cat(p$html$chart,file=f)
   }
 }
@@ -446,7 +493,9 @@ geochart <- function(df, f, title, xlabel, ylabel, gvis) {
   if(gvis == 1){
     title <- sub("\n", " ", title)
 # colorAxis="{colors:['#FF0000', '#00FF00']}",    
-    p <- gvisGeoChart(df, locationvar='location', colorvar='sum', options=list(displayMode='regions', chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}", height=600, width=940))
+    p <- gvisGeoChart(df, locationvar='location', colorvar='sum', 
+                      options=list(displayMode='regions', height=600, width=940,
+                                   chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
     cat(p$html$chart,file=f)
   }
 }
@@ -655,9 +704,12 @@ initPlotOptions <- function() {
 	format2                 <<- c(f2mergekeys, f2mergekeys_lookup, f2mergekeys_lookup_key1, f2sumkey2values)
     
 	format3                 <<- c("client_subnet_accum", "ipv6_rsn_abusers_accum")
+
 	formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
     
-	formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup")
+	formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", 
+	                              "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup")
+
 
 	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
   
@@ -693,147 +745,84 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 		mytitle <- paste(mytitle, " (smoothed)", sep="")
 	}
 
-	xlab <- "Date"
-	if (pltnm == 'traffic_sizes_small' || pltnm == 'traffic_sizes_big') {
-		xlab <- "Message Size (bytes)"
-	}
-
-	ylab <- "Queries/sec"
-	if (pltnm %in% rssac) {
-		ylab <- "Queries/min"
-	}
-
-	if (pltnm == 'traffic_sizes_small' || pltnm == 'traffic_sizes_big') {
-		ylab <- "Number of Queries in Each 16 Byte Group"
-	}
-
 	# Choose the prepared statement based on the group
 	prepStmntNm <- ""
-	if (pltnm %in% f1) {
-		prepStmntNm <- "f1"
-	}
-	else if (pltnm %in% f1lookupcodes ) {
-		prepStmntNm <- "f1lookupcodes"
-	}
-	else if (pltnm %in% f1lookupcodesnoquery) {
-		prepStmntNm <- "f1lookupcodesnoquery"
-	}
-	else if (pltnm %in% f1noclr) {
-		prepStmntNm <- "f1noclr"
-	}
-	else if (pltnm %in% f1count) {
-		prepStmntNm <- "f1count"
-		ylab <- "# Client Subnets"
-	}
-	else if (pltnm %in% f1nonormal) {
-		prepStmntNm <- "f1nonormal"
-	}
-	else if(pltnm %in% f2mergekeys){
-		prepStmntNm <- "f2mergekeys"
-	}
-	else if (pltnm %in% f2mergekeys_lookup) {
-		prepStmntNm <- "f2mergekeys_lookup"
-	}
-	else if (pltnm %in% f2mergekeys_lookup_key1) {
-		prepStmntNm <- "f2mergekeys_lookup_key1"
-	}
-	else if (pltnm %in% f2sumkey2values) {
-		prepStmntNm <- "f2sumkey2values"
-	}
-	else if (pltnm %in% format3 ) {
-		prepStmntNm <- "format3"
-	}
-	else if (pltnm %in% formattraffic ) {
-		prepStmntNm <- "traffic_volume"
-	}
-	else if (pltnm %in% formatother) {
-		prepStmntNm <- pltnm
-	}
+	if      (pltnm %in% f1)                         {prepStmntNm <- "f1"}
+	else if (pltnm %in% f1lookupcodes )             {prepStmntNm <- "f1lookupcodes"}
+	else if (pltnm %in% f1lookupcodesnoquery)       {prepStmntNm <- "f1lookupcodesnoquery"}
+	else if (pltnm %in% f1noclr)                    {prepStmntNm <- "f1noclr"}
+	else if (pltnm %in% f1count)                    {prepStmntNm <- "f1count"}
+	else if (pltnm %in% f1nonormal)                 {prepStmntNm <- "f1nonormal"}
+	else if (pltnm %in% f2mergekeys)                {prepStmntNm <- "f2mergekeys"}
+	else if (pltnm %in% f2mergekeys_lookup)         {prepStmntNm <- "f2mergekeys_lookup"}
+	else if (pltnm %in% f2mergekeys_lookup_key1)    {prepStmntNm <- "f2mergekeys_lookup_key1"}
+	else if (pltnm %in% f2sumkey2values)            {prepStmntNm <- "f2sumkey2values"}
+	else if (pltnm %in% format3 )                   {prepStmntNm <- "format3"}
+	else if (pltnm %in% formattraffic )             {prepStmntNm <- "traffic_volume"}
+	else if (pltnm %in% formatother)                {prepStmntNm <-  pltnm}
 
 	# Do other fix ups to the SQL before running the query
 	if (ndarr == '-1') {
 		prepStmntNm <- paste(prepStmntNm, "_all_nodes", sep="")
-	}
-	
+	}	
 	if (!(prepStmnt(prepStmntNm, dsccon))) {
 		return
 	}
-	
 	# Setting statement parameters with 1 or 2 datasets for the plot
 	sql <- getStmntParameters(dsccon, dbdrv, ddpltid, prepStmntNm, svrid, simple_start, simple_stop)
 	if (is.null(sql)) {
 		return
-	}
-	
+	}	
 	if (pltnm %in% passplotname){
 		sql <- sub(");", paste(", '", pltnm, "');", sep=""), sql)
 	}
-
 	if (ndarr != '-1'){
 		sql <- sub(");", paste(", '", ndarr, "');", sep=""), sql)
 	}
-
 	if(pltnm %in% avgoverwindow){
 		sql <- sub("\\(", paste("\\(" , time_window, ".0, ", sep=""), sql)
 	}
 
-	# Get the data.....
+	# Get the data  **RUN THE QUERY **
 	df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, sql)
 
+    # Set the axis labels
+	xlab <- "Date"
+	if       (pltnm %in% format3)                   {xlab <- "Subnet (IPv4/8 or IPv6/32)"}
+	else if  (pltnm == 'traffic_sizes_small' ||
+	          pltnm == 'traffic_sizes_big')         {xlab <- "Message Size (bytes)"}
+
+	ylab <- "Queries/sec"
+	if      (pltnm %in% rssac)                  {ylab <- "Queries/min"}
+	else if (pltnm %in% f1count)                {ylab <- "# Client Subnets"}
+	else if (pltnm %in% format3)                {ylab <- "Average Query Rate (q/sec)"}
+    else if (pltnm == 'traffic_sizes_small' ||
+             pltnm == 'traffic_sizes_big')      {ylab <- "Number of Queries in Each 16 Byte Group"}
+
 	# Now decide how to plot it
-	if (is.null(df)) {
-		plot_file <- "plots/no_connection.png"
-	}
-	else if (nrow(df) == 0) {
-		plot_file <- "plots/no_results.png"
-	}
-	else if (pltnm %in% f1count) {
-		stackedAreaPlot(df, plot_file, mytitle, xlab, ylab, gvis)
-	}
-	else if (pltnm %in% lineplots) {
-		linePlot(df, plot_file, mytitle, xlab, ylab, gvis)
-	}
-    else if (pltnm %in% facetedlineplots) {
-		facetedLinePlot(df, plot_file, mytitle, xlab, ylab, gvis)
-	}
-    else if (pltnm %in% faceteddifflineplots) {
-		facetedDiffLinePlot(df, plot_file, mytitle, xlab, ylab, gvis)
-	}
-	else if (pltnm %in% facetedbarplots) {
-		# currently hard coded to bar width of 14 to make 16 width buckets easy to see
-		facetedBarPlot(df, plot_file, mytitle, xlab, ylab, gvis, 14)
-	}
-	else if (pltnm %in% format3) {
-		barPlot(df, plot_file, mytitle, "Subnet (IPv4/8 or IPv6/32)", "Average Query Rate (q/sec)", gvis)
-	}
-	else if (pltnm == 'qtype_vs_tld' || pltnm == 'qtype_vs_legacygtld' || pltnm == 'qtype_vs_cctld' || pltnm == 'qtype_vs_newgtld') { 
-		stackedBarPlot(df, plot_file, mytitle, "TLD", "Average Query Rate (q/sec)", gvis, pltnm)
-	}
-	else if (pltnm == 'client_addr_vs_rcode_accum' || pltnm == 'client_subnet2_accum') {
-		stackedBarPlot(df, plot_file, mytitle, "Subnet (IPv4/8 or IPv6/32)", "Average Query Rate (q/sec)", gvis, pltnm)
-	}
-	else if (pltnm == 'qtype_vs_qnamelen') {
-		stackedBarPlot(df, plot_file, mytitle, "QNAME Length (bytes)", "Count", gvis, pltnm, scalex="continuous", vertical=1)
-	}
-	else if (pltnm == 'rcode_vs_replylen' || pltnm == 'rcode_vs_replylen_big') {
-		if (gvis==1) {
-			stackedAreaPlot(df, plot_file, mytitle, "Response Size Length (bytes)", "Count", gvis)
-		}
-		else {
-			stackedBarPlot(df, plot_file, mytitle, "Response Size Length (bytes)", "Count", gvis, pltnm, scalex="continuous", vertical=1)
-		}
-	}
-	else if (pltnm == 'dns_ip_version_vs_qtype') {
-		stackedBarPlot(df, plot_file, mytitle, "IP Version", "Average Query Rate (q/sec)", gvis, pltnm, vertical=1)
-	}
-	else if (pltnm == 'unique_sources') {
-		barPlot(df, plot_file, mytitle, "IP Version/Aggregation", "Number of Unique Sources", gvis, small=0)
-	}
-	else if (pltnm == 'geomap') {
-		geomap(df, plot_file, mytitle, "aaaa", "bbbbb", 1)
-	}
-	else if (pltnm == 'geochart') {
-		geochart(df, plot_file, mytitle, "aaaa", "bbbbb", 1)
-	}
+	if      (is.null(df))                               {plot_file <- "plots/no_connection.png"}
+	else if (nrow(df) == 0)                             {plot_file <- "plots/no_results.png"}
+	else if (pltnm %in% f1count)                        {stackedAreaPlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
+	else if (pltnm %in% lineplots)                      {linePlot            (df, plot_file, mytitle, xlab, ylab, gvis)}
+    else if (pltnm %in% facetedlineplots)               {facetedLinePlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
+    else if (pltnm %in% faceteddifflineplots)           {facetedDiffLinePlot (df, plot_file, mytitle, xlab, ylab, gvis)}
+	else if (pltnm %in% facetedbarplots)                {facetedBarPlot      (df, plot_file, mytitle, xlab, ylab, gvis, 14)} # width hardcoded to 14
+	else if (pltnm %in% format3)                        {barPlot             (df, plot_file, mytitle, xlab, ylab, gvis)}
+	else if (pltnm == 'qtype_vs_tld' || 
+	         pltnm == 'qtype_vs_legacygtld' || 
+	         pltnm == 'qtype_vs_cctld' || 
+	         pltnm == 'qtype_vs_newgtld')               {stackedBarPlot(df, plot_file, mytitle, "TLD",                        "Average Query Rate (q/sec)", gvis, pltnm)}
+	else if (pltnm == 'client_addr_vs_rcode_accum' || 
+	         pltnm == 'client_subnet2_accum')           {stackedBarPlot(df, plot_file, mytitle, "Subnet (IPv4/8 or IPv6/32)", "Average Query Rate (q/sec)", gvis, pltnm)}
+	else if (pltnm == 'qtype_vs_qnamelen')              {stackedBarPlot(df, plot_file, mytitle, "QNAME Length (bytes)",       "Count",                      gvis, pltnm, scalex="continuous", vertical=1)}
+
+	else if (pltnm == 'dns_ip_version_vs_qtype')        {stackedBarPlot(df, plot_file, mytitle, "IP Version",                 "Average Query Rate (q/sec)", gvis, pltnm, vertical=1)}
+	else if (pltnm == 'unique_sources')                 {barPlot       (df, plot_file, mytitle, "IP Version/Aggregation",     "Number of Unique Sources",   gvis, small=0)}
+	else if (pltnm == 'rcode_vs_replylen' || 
+	         pltnm == 'rcode_vs_replylen_big')          {if (gvis==1) {stackedAreaPlot(df, plot_file, mytitle, "Response Size Length (bytes)", "Count", gvis)}
+	                                                     else         {stackedBarPlot (df, plot_file, mytitle, "Response Size Length (bytes)", "Count", gvis, pltnm, scalex="continuous", vertical=1)}}
+	else if (pltnm == 'geomap')                         {geomap  (df, plot_file, mytitle, "aaaa", "bbbbb", 1)}
+	else if (pltnm == 'geochart')                       {geochart(df, plot_file, mytitle, "aaaa", "bbbbb", 1)}
+
 	return(plot_file)
 }
