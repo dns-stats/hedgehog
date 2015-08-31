@@ -82,24 +82,33 @@ CREATE TABLE tlds (id serial PRIMARY KEY,
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('qtype_vs_cctld','3.QTYPE','QTYPE for most popular ccTLDs','QTYPE for most popular ccTLDs') 
+    VALUES ('qtype_vs_cctld','3.1.QTYPE vs TLD','QTYPE for most popular ccTLDs','QTYPE value for most popular ccTLDs queried') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title)
-    VALUES ('qtype_vs_newgtld','3.QTYPE','QTYPE for most popular New gTLDs','QTYPE for most popular New gTLDs') 
+    VALUES ('qtype_vs_newgtld','3.1.QTYPE vs TLD','QTYPE for most popular New gTLDs','QTYPE value for most popular New gTLDs queried') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('qtype_vs_legacygtld','3.QTYPE','QTYPE for most popular Legacy gTLDs','QTYPE for most popular Legacy gTLDs') 
+    VALUES ('qtype_vs_legacygtld','3.1.QTYPE vs TLD','QTYPE for most popular Legacy gTLDs','QTYPE value for most popular Legacy gTLDs queried') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot select id, ${DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('qtype_vs_othertld','3.1.QTYPE vs TLD','QTYPE for most popular Undelegated TLDs','QTYPE value for most popular Undelegated TLDs queried') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
+
+UPDATE visible_plot set display_category = '3.1.QTYPE vs TLD' where id=${DATASET};
 
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
 INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new query/response difference plot for rssac', now() );

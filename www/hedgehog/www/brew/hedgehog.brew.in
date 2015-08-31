@@ -346,11 +346,11 @@ generatePlot <- function(){
 		if (gvis == '1') {
 			%><div id="plot">
 				<hr />
-				<iframe scrolling="no" width="100%" height="520px" frameborder="0" id="plotframe" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
+				<iframe scrolling="no" width="100%" height=600px" frameborder="0" id="plotframe" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
 			</div>
-			<div id="plink" class="">
-				<label style="font-size:80%" for="ploturi">Static Link:</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 850px; font-size:80%">
+			<div id="plink" class="" style="height:27px; width:960px;">
+				<label style="font-size:80%" for="ploturi">Static Link</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
 				<script>
 					document.getElementById("ploturi").value=document.getElementById("plotframe").src
 				</script>
@@ -359,8 +359,8 @@ generatePlot <- function(){
 		else if (pltnm %in% log_option) {
 			log_file <- sub(".png", "-log.png", plot_file)
 			stack_file <- sub(".png", "-stack.png", plot_file)
-			%><div id="opts">
-				<hr />
+			%><div id="opts" class="" style="height=10px">
+				<hr style="margin-bottom:10px;"/>
 				<input type="radio" name="pltoptions" id="rbliny" onclick="toggle_plot()" title="Line plot with linear y-axis" checked>
 				<label for="rbliny" title="Line plot with linear y-axis">Linear scale</label>
 				<input type="radio" name="pltoptions" id="rblogy" onclick="toggle_plot()" title="Line plot with log y-axis">
@@ -373,9 +373,9 @@ generatePlot <- function(){
 				<img src="<%=log_file%>?nocache=<%=now%>" class="hidden" id="logy" />
 				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" />
 			</div>
-			<div id="plink" class="">
-				<label style="font-size:80%" for="ploturi">Static Link:</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 850px; font-size:80%">
+			<div id="plink" class="" style="height:27px; width:960px;">
+				<label style="font-size:80%" for="ploturi">Static Link</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
 				<script>
 					document.getElementById("ploturi").value=document.getElementById("liny").src
 				</script>
@@ -386,9 +386,9 @@ generatePlot <- function(){
 				<hr />
 				<img id="staticplot" src="<%=plot_file%>?nocache=<%=now%>" />
 			</div>
-			<div id="plink" class="">
-				<label style="font-size:80%" for="ploturi">Static Link:</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 850px; font-size:80%">
+			<div id="plink" class="" style="height:27px; width:960px;">
+				<label style="font-size:80%" for="ploturi">Static Link</label>
+				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
 				<script>
 					document.getElementById("ploturi").value=document.getElementById("staticplot").src
 				</script>
@@ -399,7 +399,6 @@ generatePlot <- function(){
 		%><div id="plot">
 			<hr />
 			<img src="<%=plot_file%>" />
-			<hr />
 		</div><%
 	}
 }
