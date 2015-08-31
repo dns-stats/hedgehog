@@ -4,7 +4,7 @@ bin_SCRIPTS = refile_and_grok \
               hedgehogctl
 
 nobase_libexec_SCRIPTS = hedgehog/conf_read \
-                         hedgehog/check_user \
+                         hedgehog/check_user_db_api \
                          hedgehog/database_create \
                          hedgehog/database_init \
                          hedgehog/database_manage_partitions \
@@ -44,9 +44,9 @@ hedgehog/conf_read: $(srcdir)/hedgehog/conf_read.in Makefile
 	mkdir -p hedgehog
 	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog/conf_read.in > hedgehog/conf_read
 
-hedgehog/check_user: $(srcdir)/hedgehog/check_user.in Makefile
+hedgehog/check_user_db_api: $(srcdir)/hedgehog/check_user_db_api.in Makefile
 	mkdir -p hedgehog
-	$(subst_DB_VERSION) < $(srcdir)/hedgehog/check_user.in | $(subst_LIBEXECDATA) > hedgehog/check_user
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/check_user_db_api.in | $(subst_LIBEXECDATA) > hedgehog/check_user_db_api
 	
 hedgehog/database_init: $(srcdir)/hedgehog/database_init.in Makefile
 	mkdir -p hedgehog

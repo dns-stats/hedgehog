@@ -106,7 +106,6 @@ class DnsReaderServer(SocketServer.UDPServer):
         
         ''' Get the list of nodes to query '''
         self.nodes = {}
-        ''' TODO: add ip address to db '''
         sql="SELECT id, ip FROM node WHERE server_id=%s"
         data = (self.db_server_id, )
         fsql = cur.mogrify(sql, data)
