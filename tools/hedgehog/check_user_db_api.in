@@ -133,11 +133,13 @@ else
 fi
 
 if [ $CHECK_DATA_DIR -eq 1 ] ; then
+	set +e
 	touch $hhconfig_directories_data/test
 	if [ $? -ne 0 ] ; then
 		echo "The user $USER_NAME does not have write access to the data dirctory $hhconfig_directories_data"
 		exit 1
 	fi
+	set -e
 fi
 
 # print env variables for eval to process in calling script
