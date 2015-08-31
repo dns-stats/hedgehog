@@ -220,6 +220,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
 	
     if(gvis == 1){
       title <- sub("\n", " ", title)
+      write.table(de, file="/home/sara/temp/de1.out")
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
       if(vertical == 1){
@@ -242,15 +243,19 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       }else{
           # Need to order the table before passing it to gviz
           # write.table(de, file="/temp/de.out")
+          write.table(de, file="/home/sara/temp/de2.out")
           de$total <- rowSums(de, na.rm=TRUE);
           de <-arrange(de, desc(total));
           de$total <- NULL
+          write.table(de, file="/home/sara/temp/de3.out")
+          jscode <- "alert('Hello world');"
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
                             options=list(isStacked=TRUE, title=title, height=600, width=940,
                                          vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'12'}}", sep=""), 
                                          hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), 
                                          legend=paste("{textStyle:{fontSize:'12'}}", sep=""), 
-                                         chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
+                                         chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}",
+                                         gviz.listener.jscode=jscode))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -495,9 +500,11 @@ geochart <- function(df, f, title, xlabel, ylabel, gvis) {
   if(gvis == 1){
     title <- sub("\n", " ", title)
 # colorAxis="{colors:['#FF0000', '#00FF00']}",    
+          js.code <- "alert('Hello');"
     p <- gvisGeoChart(df, locationvar='location', colorvar='sum', 
                       options=list(displayMode='regions', height=600, width=940,
-                                   chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
+                                   chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"),
+                                   gvis.listener.jscode=jscode)
     cat(p$html$chart,file=f)
   }
 }
@@ -798,7 +805,7 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	if      (pltnm %in% rssac)                  {ylab <- "Queries/min"}
 	else if (pltnm %in% f1count)                {ylab <- "# Client Subnets"}
 	else if (pltnm %in% format3)                {ylab <- "Average Query Rate (q/sec)"}
-    else if (pltnm == 'traffic_sizes_small' ||
+	else if (pltnm == 'traffic_sizes_small' ||
              pltnm == 'traffic_sizes_big')      {ylab <- "Number of Queries in Each 16 Byte Group"}
 
 	# Now decide how to plot it
@@ -806,8 +813,8 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	else if (nrow(df) == 0)                             {plot_file <- "plots/no_results.png"}
 	else if (pltnm %in% f1count)                        {stackedAreaPlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
 	else if (pltnm %in% lineplots)                      {linePlot            (df, plot_file, mytitle, xlab, ylab, gvis)}
-    else if (pltnm %in% facetedlineplots)               {facetedLinePlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
-    else if (pltnm %in% faceteddifflineplots)           {facetedDiffLinePlot (df, plot_file, mytitle, xlab, ylab, gvis)}
+	else if (pltnm %in% facetedlineplots)               {facetedLinePlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
+	else if (pltnm %in% faceteddifflineplots)           {facetedDiffLinePlot (df, plot_file, mytitle, xlab, ylab, gvis)}
 	else if (pltnm %in% facetedbarplots)                {facetedBarPlot      (df, plot_file, mytitle, xlab, ylab, gvis, 14)} # width hardcoded to 14
 	else if (pltnm %in% format3)                        {barPlot             (df, plot_file, mytitle, xlab, ylab, gvis)}
 	else if (pltnm == 'qtype_vs_tld' || 
