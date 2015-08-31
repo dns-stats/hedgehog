@@ -22,7 +22,6 @@
 # 
 # File:   database_update_nodes
 #
-set +x
 
 eval $(@LIBEXEC@/conf_read)
 NODES_FILE="${hhconfig_directories_conf}/nodes.csv"
@@ -32,6 +31,7 @@ if [ ! -e $NODES_FILE ] ; then
 	exit 1
 fi
 
+# We need a write user with access to the data dir. 
 a=$(@LIBEXEC@/check_user_db_api -wfc)
 if [ $? -ne 0 ] ; then
 	echo $a
@@ -39,6 +39,29 @@ if [ $? -ne 0 ] ; then
 fi
 eval $a
 export PGPASSWORD=$PGPASSWORD
+
+usage () {
+        echo
+        echo "Add/update the servers and nodes in the database. This reads input from file"
+        echo "called nodes.csv in the $hhconfig_directories_conf directory."
+        echo " - An example nodes.csv file is installed if one does not exist."
+        echo " - See the comments in that file for details of the format."
+        echo " - No action is taken on servers/nodes that are in the database but are not in the input files."
+        echo 
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
 
 echo "`date`: $0 COMMENCED"
 

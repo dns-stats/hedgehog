@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-Hedgehog 2.1.0rc1 - 2015-08-31
+Hedgehog 2.1.0b1 
 ------------------------------
 
 * Added some support for displaying IDN in their unicode glyphs
