@@ -4,6 +4,7 @@ bin_SCRIPTS = refile_and_grok \
               hedgehogctl
 
 nobase_libexec_SCRIPTS = hedgehog/conf_read \
+                         hedgehog/check_user_db_api \
                          hedgehog/database_create \
                          hedgehog/database_init \
                          hedgehog/database_manage_partitions \
@@ -24,8 +25,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000011_ddl_geoip \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
                          hedgehog/DDL_updates/000013_ddl_node_subgroup \
-                         hedgehog/DDL_updates/000014_ddl_loadtime \
-                         hedgehog/DDL_updates/000015_ddl_zonesize
+                         hedgehog/DDL_updates/000014_ddl_loadtime
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
                    $(srcdir)/hedgehog/sql/insert_lookup_data.sql
@@ -44,6 +44,10 @@ hedgehog/conf_read: $(srcdir)/hedgehog/conf_read.in Makefile
 	mkdir -p hedgehog
 	$(subst_HH_CONF_FILE) < $(srcdir)/hedgehog/conf_read.in > hedgehog/conf_read
 
+hedgehog/check_user_db_api: $(srcdir)/hedgehog/check_user_db_api.in Makefile
+	mkdir -p hedgehog
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/check_user_db_api.in | $(subst_LIBEXECDATA) > hedgehog/check_user_db_api
+	
 hedgehog/database_init: $(srcdir)/hedgehog/database_init.in Makefile
 	mkdir -p hedgehog
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_init.in > hedgehog/database_init
@@ -124,10 +128,6 @@ hedgehog/DDL_updates/000014_ddl_loadtime: $(srcdir)/hedgehog/DDL_updates/000014_
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_loadtime.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_loadtime
 
-hedgehog/DDL_updates/000015_ddl_zonesize: $(srcdir)/hedgehog/DDL_updates/000015_ddl_zonesize.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000015_ddl_zonesize.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000015_ddl_zonesize
-	
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
              database_init.in \

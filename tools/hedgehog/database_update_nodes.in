@@ -23,41 +23,39 @@
 # File:   database_update_nodes
 #
 
-#TODO(asap): Add option to generate the nodes.csv file from the directory structure if it already exists (won't have group info)
-#TODO(asap): Add option to delete servers/nodes/groups
-#TODO: Add reporting if nodes found in the database that are not in the nodes.csv file
-
 eval $(@LIBEXEC@/conf_read)
-
-REQUIRED_API_VERSION=@DB_VERSION@
-DB_NAME=$hhconfig_database_name
+NODES_FILE="${hhconfig_directories_conf}/nodes.csv"
 DATA_DIR=$hhconfig_directories_data
-NODES_FILE=$hhconfig_directories_conf/"nodes.csv"
-PREDICT=0;
-SQ="'"
-NEW_SERVER=0
-SUPPRESS_WARNINGS=0
-export PGPASSWORD=$hhconfig_database_owner_pass
+if [ ! -e $NODES_FILE ] ; then
+	echo "Error attempting to find nodes.csv. Tried: $NODES_FILE"
+	exit 1
+fi
+
+# We need a write user with access to the data dir. 
+a=$(@LIBEXEC@/check_user_db_api -wfc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
 
 usage () {
-	echo
-	echo "Add/update the servers and nodes in the database. This reads input from file"
-	echo "called nodes.csv in the $hhconfig_directories_conf directory."
-	echo " - An example nodes.csv file is installed if one does not exist."
-	echo " - See the comments in that file for details of the format."
-	echo " - No action is taken on servers/nodes that are in the database but are not in the input files."
-	echo 
+        echo
+        echo "Add/update the servers and nodes in the database. This reads input from file"
+        echo "called nodes.csv in the $hhconfig_directories_conf directory."
+        echo " - An example nodes.csv file is installed if one does not exist."
+        echo " - See the comments in that file for details of the format."
+        echo " - No action is taken on servers/nodes that are in the database but are not in the input files."
+        echo 
     echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
-	echo "  -p Run in prediction mode. Output findings but don't act on the DB"
     echo "  -h Show this help."
 }
 
-while getopts ":psh" opt; do
+while getopts ":h" opt; do
     case $opt in
-		p  ) PREDICT=1;;
-		s  ) SUPPRESS_WARNINGS=1;;
         h  ) usage
              exit 1 ;;
         \? ) usage
@@ -66,118 +64,121 @@ while getopts ":psh" opt; do
 done
 
 echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+# Read CSV file with the following fields in order:
+fields=(server_name node_name node_region node_subgroup node_ip)
 
+NAME_REGEX="^[a-zA-Z0-9-]+$"
+NAME_ERROR="It may contain alphanumeric characters and hyphens (-) only."
+IP_REGEXP="^[a-fA-F0-9:\\.]*$"
+IP_ERROR="It must be a valid IPv4 or IPv6 address."
 
-if [ ! -f $NODES_FILE ] ; then
-	echo "No nodes.csv file found. Expecting a file $NODES_FILE... done..."
-	exit 1
-fi
-echo "Processing file: " $NODES_FILE
-if [ ${PREDICT} -eq 1 ] ; then
-	echo "***** PREDICTION MODE *****"
-fi
+declare -A aNODES
+declare -A aFIELD_OPTIONAL
+declare -A aFIELD_REGEX
+declare -A aFIELD_ERROR
 
-# Process the nodes file
+aFIELD_OPTIONAL["server_name"]="no"
+aFIELD_OPTIONAL["node_name"]="no"
+aFIELD_OPTIONAL["node_region"]="yes"
+aFIELD_OPTIONAL["node_subgroup"]="yes"
+aFIELD_OPTIONAL["node_ip"]="yes"
+
+aFIELD_REGEX["server_name"]=$NAME_REGEX
+aFIELD_REGEX["node_name"]=$NAME_REGEX
+aFIELD_REGEX["node_region"]=$NAME_REGEX
+aFIELD_REGEX["node_subgroup"]=$NAME_REGEX
+aFIELD_REGEX["node_ip"]=$IP_REGEXP
+
+aFIELD_ERROR["server_name"]=$NAME_ERROR
+aFIELD_ERROR["node_name"]=$NAME_ERROR
+aFIELD_ERROR["node_region"]=$NAME_ERROR
+aFIELD_ERROR["node_subgroup"]=$NAME_ERROR
+aFIELD_ERROR["node_ip"]=$IP_ERROR
+
+i=0
+# Read nodes.csv
 while read line || [[ -n "$line" ]]; do
-
-	trimmed_line=`echo $line | sed -e 's/^ *//' -e 's/ *$//'`
+	
+	i=$(($i+1))
+	
+	trimmed_line=$(echo $line | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
 	if [[ -z ${trimmed_line} ]] || [[ "${trimmed_line}" =~ ^# ]] ; then
 		continue
-	fi	
+	fi	 
+
+	IFS=, read -r aNODES["server_name"] aNODES["node_name"] \
+	                aNODES["node_region"] aNODES["node_subgroup"] \
+					aNODES["node_ip"] junk <<< "$trimmed_line"
 	
-	OIFS=$IFS
-	IFS=','
-	read -ra arrline <<< "$trimmed_line"
-	IFS=$OIFS
-	SERVER_NAME=`echo ${arrline[0]} | sed -e 's/^ *//' -e 's/ *$//'`
-	NODE_NAME=`echo ${arrline[1]} | sed -e 's/^ *//' -e 's/ *$//'`
-	GROUP=`echo ${arrline[2]} | sed -e 's/^ *//' -e 's/ *$//'`
-	SUBGROUP=`echo ${arrline[3]} | sed -e 's/^ *//' -e 's/ *$//'`
-	
-	# First, validate the input	
-	if [ -z "$SERVER_NAME" ] ; then
-		echo "Missing server name. This entry will be ignored."
-		continue
-	fi	
-	
-	if ! [[ "${SERVER_NAME}" =~ ^[a-zA-Z0-9\-]+$ ]] ; then
-		echo "Server name '${SERVER_NAME}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
-		continue
-	fi	
-	
-	if [ -z "$NODE_NAME" ] ; then
-		echo "Missing node name field for node on server $SERVER_NAME - node ignored"
-		continue
-	fi
-	
-	if ! [[ "${NODE_NAME}" =~ ^[a-zA-Z0-9\-]+$ ]] ; then
-		echo "Node name '${NODE_NAME}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
-		continue
+	if [[ -n $junk ]] ; then
+		echo "Error: Too many fields in $NODES_FILE line $i"
+		exit 1
 	fi
 
-	[ -z $GROUP ] && GROUP="Other"
-
-	if ! [[ "${GROUP}" =~ ^[a-zA-Z0-9\-]+$ ]] ; then
-		echo "Group name '${GROUP}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
-		continue
-	fi
-	
-	if [ -z $SUBGROUP ] ; then 
-		SUBGROUP=""
-	elif ! [[ "${SUBGROUP}" =~ ^[a-zA-Z0-9\-]+$ ]] ; then
-		echo "Sub group name '${SUBGROUP}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
-		continue
-	fi
-
-	# Now add the data
-	SERVER_ID=`psql -h $hhconfig_database_host $DB_NAME -tc "select id from server where display_name=$SQ$SERVER_NAME$SQ"`
-
-	if [ -z "$SERVER_ID" ] ; then
-		echo "INFO: New server found - inserting: '$SERVER_NAME' "
-		if [ ${PREDICT} -eq 0 ] ; then
-			SERVER_DB_NAME=`echo $SERVER_NAME | awk '{print tolower($0)}' | sed -e 's/-/_/g' `
-			psql -h $hhconfig_database_host -d $DB_NAME -c "INSERT INTO dsc.server (name, display_name) VALUES ('$SERVER_DB_NAME', '$SERVER_NAME');"
-			SERVER_ID=`psql -h $hhconfig_database_host $DB_NAME -tc "select id from server where display_name=$SQ$SERVER_NAME$SQ"`
-			mkdir -p ${DATA_DIR}/${SERVER_NAME}
-			let NEW_SERVER=1
-		fi
-	fi
-
-	NODE_ID=`psql -h $hhconfig_database_host $DB_NAME -tc "select id from dsc.node where server_id=$SERVER_ID and name=$SQ$NODE_NAME$SQ"`
-	
-	if [ -z "${NODE_ID}" ] ; then 
-		echo "INFO: New node found - inserting node with name name: '$NODE_NAME' on server: '$SERVER_NAME' with group: '$GROUP'"
-		if [ ${PREDICT} -eq 0 ] ; then
-			psql -h $hhconfig_database_host -d $DB_NAME -c "INSERT INTO dsc.node (server_id, name, region, subgroup) VALUES ($SERVER_ID, '$NODE_NAME', '$GROUP', '$SUBGROUP');"
-			mkdir -p $DATA_DIR/$SERVER_NAME/$NODE_NAME/incoming
-		fi		
-	else
-		DB_GROUP=`echo "SELECT region FROM dsc.node where server_id=$SERVER_ID and id=$NODE_ID;" | psql -h $hhconfig_database_host -td $DB_NAME  | sed -e 's/^ *//' -e 's/ *$//'`
-		if [ "${GROUP}" != "${DB_GROUP}" ] ; then
-			# group for existing node has been updated
-        	echo "INFO: Updating existing node with name: '$NODE_NAME' on server: '$SERVER_NAME'. Changing group from '$DB_GROUP' to '$GROUP'"
-			if [ ${PREDICT} -eq 0 ] ; then
-				psql -h $hhconfig_database_host -d $DB_NAME -c "UPDATE dsc.node SET region = '$GROUP' WHERE id=$NODE_ID;"	
+	error="no"
+	# Turn off filename expansion in case someone has put something stupid 
+	# in the nodes file
+	set -f
+	for key in ${fields[*]} ; do
+		# Abuse set to strip whitespace
+		set -- ${aNODES["$key"]}
+		aNODES["$key"]=$*
+		if [[ ${aNODES["$key"]} =~ ^[[:space:]]*$ ]] ; then
+			# Empty IP address MUST be null not an empty string
+			if [ "$key" == "node_ip" ] ; then
+				aNODES["$key"]="null"
+			fi
+			if [ "${aFIELD_OPTIONAL["$key"]}" == "no" ] ; then
+				echo "Line $i, Field $key is not optional."
+				error="yes"
+				break
+			else
+				continue
 			fi
 		fi
-		DB_SUBGROUP=`echo "SELECT subgroup FROM dsc.node where server_id=$SERVER_ID and id=$NODE_ID;" | psql -h $hhconfig_database_host -td $DB_NAME  | sed -e 's/^ *//' -e 's/ *$//'`
-		if [ "${SUBGROUP}" != "${DB_SUBGROUP}" ] ; then
-			# group for existing node has been updated
-        	echo "INFO: Updating existing node with name: '$NODE_NAME' on server: '$SERVER_NAME'. Changing subgroup from '$DB_SUBGROUP' to '$SUBGROUP'"
-			if [ ${PREDICT} -eq 0 ] ; then
-				psql -h $hhconfig_database_host -d $DB_NAME -c "UPDATE dsc.node SET subgroup = '$SUBGROUP' WHERE id=$NODE_ID;"	
-			fi
+		if [[ ! ${aNODES["$key"]} =~ ${aFIELD_REGEX["$key"]} ]] ; then
+			echo "Line $i, Field $key value: \"${aNODES["$key"]}\" is not valid. ${aFIELD_ERROR["$key"]} This line will be ignored."
+			error="yes"
+			break
 		fi
+	done
+	if [ "$error" == "yes" ] ; then
+		continue
 	fi
+	set +f
+	
+	echo "Processing: ${aNODES["server_name"]} ${aNODES["node_name"]} ${aNODES["node_region"]} ${aNODES["node_subgroup"]}"
+	NEW_SERVER=0
+	SERVER_ID=$(psql $CONN_STRING -tc "select id from server where display_name='${aNODES["server_name"]}'")
+	if [ -z $SERVER_ID ]; then
+		# lower case
+		SERVER_DB_NAME=${SERVER_NAME,,}
+		# subsitute _ for -
+		SERVER_DB_NAME=${SERVER_DB_NAME//-/_}
+		SERVER_ID=$(psql $CONN_STRING -tc "INSERT INTO dsc.server (name, display_name) VALUES ('$SERVER_DB_NAME', '${aNODES["server_name"]}') RETURNING id;")
+		echo "Added server ${aNODES["server_name"]} with ID=$SERVER_ID"
+		NEW_SERVER=1
+	fi
+	
+	NODE_ID=$(psql $CONN_STRING -tc "select id from dsc.node where server_id=$SERVER_ID and name='${aNODES["node_name"]}'")
+	if [ ${aNODES["node_ip"]} != "null" ] ; then
+		aNODES["node_ip"]="'${aNODES["node_ip"]}'"
+	fi
+	if [ -z $NODE_ID ] ; then
+		NODE_ID=$(psql $CONN_STRING -c "INSERT INTO dsc.node (server_id, name, region, subgroup, ip) VALUES ($SERVER_ID, '${aNODES["node_name"]}', '${aNODES["node_region"]}', '${aNODES["node_subgroup"]}', ${aNODES["node_ip"]}) RETURNING id;")
+		echo "Added node ${aNODES["node_name"]} with ID=$NODE_ID"
+	else	
+		psql $CONN_STRING -c "UPDATE dsc.node SET server_id=$SERVER_ID, name='${aNODES["node_name"]}', region='${aNODES["node_region"]}', subgroup='${aNODES["node_subgroup"]}', ip=${aNODES["node_ip"]} where id=$NODE_ID;"
+		echo "Updated node ${aNODES["node_name"]} for server ${aNODES["server_name"]}"
+	fi
+	mkdir -p $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}/incoming
+	
+	junk=""
 done < ${NODES_FILE}
 
-if [ ${NEW_SERVER} -eq 1 ] && [ $SUPPRESS_WARNINGS -eq 0 ] ; then
+if [ ${NEW_SERVER} -eq 1 ] ; then
 	echo
 	echo "********************************************************************************"
 	echo "New servers have been added to Hedgehog! To enable the import of data for this"

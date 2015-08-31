@@ -14,13 +14,21 @@
 # limitations under the License.
 #
 
-Hedgehog 2.1.0rc1 - 2015-06-22
+Hedgehog 2.1.0b1 
 ------------------------------
 
 * Added some support for displaying IDN in their unicode glyphs
 * Added separate graphs for different types of TLD (Qtype for most popular TLD)
 * Added GeoLite2 data created by MaxMind, available from
   http://www.maxmind.com
+* Added serevr to collect rssac load time and zone size data
+* Added ip address to nodes table
+* rewrote database_update_nodes to make it easier to maintain
+* wrote check_user_db_api to do all user checks, check db access and data dir.
+  access. Used in new database_update_nodes will gradually be used by all tools.
+* Improved font sizes in some graphs
+* Fixed DSC-251 to ensure lowwer case comparison
+* Added static link box 
 
 
 Hedgehog 2.0.0rc2 - 2015-07-09
