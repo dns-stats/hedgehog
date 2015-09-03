@@ -78,8 +78,10 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       names(df)[names(df)=="y"] <- "yyyyyyyyyyyy"
       # For now we default to the timeline flash chart unless 'svg' is specified by the user
       if (gui_config$www$default_interactive_plot_type == "svg") {
-          p <- gvisAnnotationChart(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x",
-                                   options=list(legendPosition='newRow', height=540, width=910, colors="['#0072B2','#990F0F','#99700F',
+          p <- gvisAnnotationChart(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x", #titlevar="serial",
+                                   options=list(
+                                                #displayAnnotations=TRUE, annotationsWidth=10, 
+                                                legendPosition='newRow', height=540, width=910, colors="['#0072B2','#990F0F','#99700F',
       '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#990F0F','#99700F','#1F990F',
       '#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99',
       '#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99','#E67E7E',
@@ -683,6 +685,21 @@ generateYaml <- function(dsccon) {
 			yaml_out[[s$name]] <- countlist
 		}
 	}
+	else if (metric_data$statistics_type == "average") {
+		df$x <- NULL
+		#de <- as.data.frame(cast(df, ~ serial, value='y', fun.aggregate=max))
+		de <- as.data.frame(cast(df, ~ serial, value='y', function(x) quantile(x,c(0.95))))
+		
+		for (s in metric_data$statistics) {	
+			countlist <- list()
+			for (i in colnames(de)) {
+				if (i != "value") {
+					countlist[[i]] <- as.integer(de[[i]])
+				}
+			}
+			yaml_out[[s$name]] <- countlist
+		}
+	}
 	
 	# Write the result to the yaml file
 	# A large precision is needed to deal with large (up to 64 bit) numbers
@@ -717,7 +734,7 @@ initPlotOptions <- function() {
 	formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
     
 	formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "qtype_vs_othertld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", 
-	                              "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup")
+	                              "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup", "load_time")
 
 
 	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
@@ -731,7 +748,7 @@ initPlotOptions <- function() {
 	# now create other useful groups    
 	passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
 	avgoverwindow           <<- c(format3, 'qtype_vs_tld', 'qtype_vs_legacygtld', 'qtype_vs_cctld', 'qtype_vs_newgtld', 'qtype_vs_othertld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype')
-	lineplots               <<- c(format1, format2, "by_node", "by_subgroup", "rcode_volume")
+	lineplots               <<- c(format1, format2, "by_node", "by_subgroup", "rcode_volume", "load_time")
 	facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
 	facetedlineplots        <<- c("traffic_volume")
 	faceteddifflineplots    <<- c("traffic_volume_difference")

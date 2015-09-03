@@ -78,4 +78,10 @@ metric:
         
       - name: num-sources-ipv6-aggregate
         alias: IPv6/64
+  load-time:
+    statistics_type: average
+    measurement_parameter: Latency of the distribution system
+    service: .root-servers.net
+    statistics:
+      - name: time
 ...
