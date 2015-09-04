@@ -85,7 +85,7 @@ SQ="'"
 CURL_ARGS="--max-time 300 --retry 1 --get"
 # TODO: do not hardcode this path
 URL="localhost/hedgehog/brew/hedgehog.brew"
-TOP_OUTPUTDIR="$hhconfig_directories_rssac/$(date --date=${START} +%Y`/`date --date=${START} +%m)"
+TOP_OUTPUTDIR="$hhconfig_directories_rssac/$(date --date=${START} +%Y)/$(date --date=${START} +%m)"
 TYPES="generateYaml generatePlot"
 GVIS=0
 # Specify some strings for special handling

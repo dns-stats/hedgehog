@@ -476,7 +476,7 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 scatterPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
 	if (hh_debug) {
-		system('logger -p user.notice In barPlot')
+		system('logger -p user.notice In scatterPlot')
 	}
 
     if(gvis == 1){
@@ -488,7 +488,7 @@ scatterPlot <- function(df, f, title, xlabel, ylabel, gvis) {
       p <- gvisScatterChart(df, 
                         options=list(legend="none", title=title, height=600, width=940,
                                      vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), 
-                                     hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), 
+                                     hAxis=paste("{format:'', title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), 
                                      chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
     }
       cat(p$html$chart,file=f)
@@ -846,14 +846,18 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	if       (pltnm %in% format3)                   {xlab <- "Subnet (IPv4/8 or IPv6/32)"}
 	else if  (pltnm == 'traffic_sizes_small' ||
 	          pltnm == 'traffic_sizes_big')         {xlab <- "Message Size (bytes)"}
-
+	else if (pltnm == 'zone_size')              {xlab <- "Serial Number"}
+	else if (pltnm == 'load_time')              {xlab <- "Serial Number"}
+		
 	ylab <- "Queries/sec"
 	if      (pltnm %in% rssac)                  {ylab <- "Queries/min"}
 	else if (pltnm %in% f1count)                {ylab <- "# Client Subnets"}
 	else if (pltnm %in% format3)                {ylab <- "Average Query Rate (q/sec)"}
 	else if (pltnm == 'traffic_sizes_small' ||
              pltnm == 'traffic_sizes_big')      {ylab <- "Number of Queries in Each 16 Byte Group"}
-
+	else if (pltnm == 'zone_size')              {ylab <- "Bytes"}
+	else if (pltnm == 'load_time')              {ylab <- "Seconds"}
+		
 	# Now decide how to plot it
 	if      (is.null(df))                               {plot_file <- "plots/no_connection.png"}
 	else if (nrow(df) == 0)                             {plot_file <- "plots/no_results.png"}

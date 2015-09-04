@@ -148,12 +148,13 @@ fi
 
 if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
 	set +e
-	touch $hhconfig_directories_rssac/test
+	mydir=${hhconfig_directories_rssac/%rssac/}
+	touch $mydir/test
 	if [ $? -ne 0 ] ; then
-		echo "The user $USER_NAME does not have write access to the data dirctory $hhconfig_directories_rssac"
+		echo "The user $USER_NAME does not have write access to the dirctory $mydir"
 		exit 1
 	fi
-	rm $hhconfig_directories_rssac/test
+	rm $mydir/test
 	set -e
 fi
 
