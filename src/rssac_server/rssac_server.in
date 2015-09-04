@@ -173,9 +173,11 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         cur = self.server.conn.cursor()
         for node, end in zone_check.nodes_report.items():
             if type(end) is str:
-                load_time = end
-            else:
-                load_time = end - start
+                ''' Timeout '''
+                load_time = None
+                continue
+            
+            load_time = end - start
             sql = "INSERT INTO data (starttime, server_id, node_id, plot_id, key1, key2, value) VALUES (%s,%s,%s,%s,%s,%s,%s)"
             data = (datetime.datetime.fromtimestamp(start), self.server.db_server_id, node, self.server.load_time_plot_id, self.qname, self.serial, load_time)
             fsql = cur.mogrify(sql, data)
@@ -296,7 +298,7 @@ def main():
         log_level = logging.DEBUG
     logging.basicConfig(level=log_level, filename=args.log, format=log_format)
     logger = logging.getLogger('rssac_propagation.server')
-    logger.info('get_notify starting up...')
+    logger.info('rssacd starting up...')
     
     ''' Init and then run the server '''
     server = DnsReaderServer((host, int(port)), DnsReaderHandler, args.server,

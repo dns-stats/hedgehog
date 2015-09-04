@@ -26,7 +26,8 @@ class CheckZone(object):
         logging.debug('fetching: {}@{}'.format(self.zone, nameserver))
         request = dns.message.make_query(self.zone, dns.rdatatype.SOA)
         try:
-            response = dns.query.udp(request, nameserver, timeout=1)
+            ''' The timeout might need tuning '''
+            response = dns.query.udp(request, nameserver, timeout=.25)
         except dns.exception.Timeout:
             logging.error('Timeout from {}@{}'.format(self.zone, nameserver))
             return False

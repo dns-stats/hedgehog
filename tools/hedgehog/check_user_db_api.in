@@ -24,13 +24,13 @@
 #
 
 # This script should be called like this:
-#	a=$(@LIBEXEC@/check_user_db_api -wc)
-#	if [ $? -ne 0 ] ; then
-#		echo $a
-#		exit 1
-#	fi
-#	eval $a
-#	echo "$CONN_STRING -- $PGPASSWORD"
+# a=$(@LIBEXEC@/check_user_db_api -wfc)
+# if [ $? -ne 0 ] ; then
+# 	echo $a
+# 	exit 1
+# fi
+# eval $a
+# export PGPASSWORD=$PGPASSWORD
 
 
 set -e
@@ -49,6 +49,7 @@ usage () {
 	echo "  -c check databse API version"
 	echo "  -d run in debug mode."
 	echo "  -f check user has write permission to $hhconfig_directories_data"
+	echo "  -g check user has write permission to $hhconfig_directories_rssac"
 	echo "  -w check we are a write user"
     echo "  -h Show this help."
 }
@@ -57,16 +58,18 @@ usage () {
 WRITER=0
 CHECK_API=0
 CHECK_DATA_DIR=0
+CHECK_RSSAC_DIR=0
 
 REQUIRED_API_VERSION=@DB_VERSION@
 
-while getopts ":C:cdfw" opt; do
+while getopts ":C:cdfgw" opt; do
     case $opt in
 		C  ) REQUIRED_API_VERSION=$OPTARG
 		     CHECK_API=1 ;;
 		c  ) CHECK_API=1 ;;
 		d  ) set -x ;;
 		f  ) CHECK_DATA_DIR=1 ;;
+		g  ) CHECK_RSSAC_DIR=1 ;;
 		w  ) WRITER=1 ;;
         h  ) usage
              exit 1 ;;
@@ -139,6 +142,18 @@ if [ $CHECK_DATA_DIR -eq 1 ] ; then
 		echo "The user $USER_NAME does not have write access to the data dirctory $hhconfig_directories_data"
 		exit 1
 	fi
+	rm $hhconfig_directories_data/test
+	set -e
+fi
+
+if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
+	set +e
+	touch $hhconfig_directories_rssac/test
+	if [ $? -ne 0 ] ; then
+		echo "The user $USER_NAME does not have write access to the data dirctory $hhconfig_directories_rssac"
+		exit 1
+	fi
+	rm $hhconfig_directories_rssac/test
 	set -e
 fi
 
