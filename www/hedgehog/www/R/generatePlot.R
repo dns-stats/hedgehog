@@ -222,7 +222,6 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
 	
     if(gvis == 1){
       title <- sub("\n", " ", title)
-      write.table(de, file="/home/sara/temp/de1.out")
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
       if(vertical == 1){
@@ -245,11 +244,9 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       }else{
           # Need to order the table before passing it to gviz
           # write.table(de, file="/temp/de.out")
-          write.table(de, file="/home/sara/temp/de2.out")
           de$total <- rowSums(de, na.rm=TRUE);
           de <-arrange(de, desc(total));
           de$total <- NULL
-          write.table(de, file="/home/sara/temp/de3.out")
           jscode <- "alert('Hello world');"
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
                             options=list(isStacked=TRUE, title=title, height=600, width=940,
@@ -476,6 +473,28 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }
 }
 
+scatterPlot <- function(df, f, title, xlabel, ylabel, gvis) {
+
+	if (hh_debug) {
+		system('logger -p user.notice In barPlot')
+	}
+
+    if(gvis == 1){
+      title <- sub("\n", " ", title)
+      df$key <- NULL
+	  df$x <- NULL
+      df$serial <- as.integer(df$serial)
+      df <- df[,c("serial", "y")]
+      p <- gvisScatterChart(df, 
+                        options=list(legend="none", title=title, height=600, width=940,
+                                     vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), 
+                                     hAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), 
+                                     chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
+    }
+      cat(p$html$chart,file=f)
+}
+
+
 geomap <- function(df, f, title, xlabel, ylabel, gvis) {
 
 	if (hh_debug) {
@@ -700,6 +719,16 @@ generateYaml <- function(dsccon) {
 			yaml_out[[s$name]] <- countlist
 		}
 	}
+	else if (metric_data$statistics_type == "value") {
+		df$x <- NULL
+		for (s in metric_data$statistics) {	
+			countlist <- list()
+			for(i in 1:nrow(df))  {
+					countlist[df$serial[[i]]] <- df$y[[i]]
+			}
+			yaml_out[[s$name]] <- countlist
+		}
+	}
 	
 	# Write the result to the yaml file
 	# A large precision is needed to deal with large (up to 64 bit) numbers
@@ -734,7 +763,7 @@ initPlotOptions <- function() {
 	formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
     
 	formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "qtype_vs_othertld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", 
-	                              "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup", "load_time")
+	                              "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup", "load_time", "zone_size")
 
 
 	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
@@ -748,7 +777,7 @@ initPlotOptions <- function() {
 	# now create other useful groups    
 	passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
 	avgoverwindow           <<- c(format3, 'qtype_vs_tld', 'qtype_vs_legacygtld', 'qtype_vs_cctld', 'qtype_vs_newgtld', 'qtype_vs_othertld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype')
-	lineplots               <<- c(format1, format2, "by_node", "by_subgroup", "rcode_volume", "load_time")
+	lineplots               <<- c(format1, format2, "by_node", "by_subgroup", "rcode_volume")
 	facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
 	facetedlineplots        <<- c("traffic_volume")
 	faceteddifflineplots    <<- c("traffic_volume_difference")
@@ -850,6 +879,8 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	                                                     else         {stackedBarPlot (df, plot_file, mytitle, "Response Size Length (bytes)", "Count", gvis, pltnm, scalex="continuous", vertical=1)}}
 	else if (pltnm == 'geomap')                         {geomap  (df, plot_file, mytitle, "aaaa", "bbbbb", 1)}
 	else if (pltnm == 'geochart')                       {geochart(df, plot_file, mytitle, "aaaa", "bbbbb", 1)}
+	else if (pltnm == 'load_time')                      {scatterPlot(df, plot_file, mytitle, xlab, ylab, gvis)}
+	else if (pltnm == 'zone_size')                      {barPlot(df, plot_file, mytitle, xlab, ylab, gvis, vertical=1)}
 
 	return(plot_file)
 }

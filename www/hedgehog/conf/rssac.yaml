@@ -80,8 +80,14 @@ metric:
         alias: IPv6/64
   load-time:
     statistics_type: average
-    measurement_parameter: Latency of the distribution system
+    measurement_parameter: Latency in publishing available data
     service: .root-servers.net
     statistics:
       - name: time
+  zone-size:
+    statistics_type: value
+    measurement_parameter: The size of the overall root zone
+    service: .root-servers.net
+    statistics:
+      - name: size
 ...
