@@ -482,16 +482,34 @@ scatterPlot <- function(df, f, title, xlabel, ylabel, gvis) {
     if(gvis == 1){
       title <- sub("\n", " ", title)
       df$key <- NULL
-	  df$x <- NULL
+      df$x <- NULL
       df$serial <- as.integer(df$serial)
       df <- df[,c("serial", "y")]
+      serial_min <- min(df$serial, na.rm = TRUE) - 1
+      serial_max <- max(df$serial, na.rm = TRUE) + 1
       p <- gvisScatterChart(df, 
                         options=list(legend="none", title=title, height=600, width=940,
                                      vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), 
-                                     hAxis=paste("{format:'', title:'",xlabel,"',textStyle:{fontSize:'14'}}", sep=""), 
+                                     hAxis=paste("{format:'', title:'",xlabel,"',textStyle:{fontSize:'14'}, viewWindow:{min:'",serial_min,"', max:'",serial_max,"'}}", sep=""), 
+                                     #hAxis=paste("{format:'', title:'",xlabel,"',textStyle:{fontSize:'14'}, ticks:[2014061900, 2014061901, 2014061902, 2014061903]}", sep=""),
                                      chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
-    }
       cat(p$html$chart,file=f)
+    }
+    else {
+	    png(f, width = W, height = H)
+        df$key <- NULL
+        df$x <- NULL
+	    p <- ggplot(data=df, aes(x=serial, y=y)) +
+	                geom_point(size = 4, stat="identity") +
+	                labs(title=title, x=xlabel, y=ylabel) +
+	                theme_bw() + scale_y_continuous(expand=c(0.05,0), labels = comma) +
+	                theme(panel.grid.major.y = element_line(colour = GRIDGREY), 
+	                      panel.grid.minor.y = element_line(colour = GRIDGREY, linetype = "dotted"), 
+	                      panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
+
+	    print(p)
+	    dev.off()
+    }
 }
 
 
@@ -720,11 +738,11 @@ generateYaml <- function(dsccon) {
 		}
 	}
 	else if (metric_data$statistics_type == "value") {
-		df$x <- NULL
+		df$d.starttime <- NULL
 		for (s in metric_data$statistics) {	
 			countlist <- list()
 			for(i in 1:nrow(df))  {
-					countlist[df$serial[[i]]] <- df$y[[i]]
+					countlist[df$x[[i]]] <- df$y[[i]]
 			}
 			yaml_out[[s$name]] <- countlist
 		}
@@ -855,8 +873,8 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	else if (pltnm %in% format3)                {ylab <- "Average Query Rate (q/sec)"}
 	else if (pltnm == 'traffic_sizes_small' ||
              pltnm == 'traffic_sizes_big')      {ylab <- "Number of Queries in Each 16 Byte Group"}
-	else if (pltnm == 'zone_size')              {ylab <- "Bytes"}
-	else if (pltnm == 'load_time')              {ylab <- "Seconds"}
+	else if (pltnm == 'zone_size')              {ylab <- "Zone Size (Bytes)"}
+	else if (pltnm == 'load_time')              {ylab <- "Zone Propagation Time (Seconds)"}
 		
 	# Now decide how to plot it
 	if      (is.null(df))                               {plot_file <- "plots/no_connection.png"}
