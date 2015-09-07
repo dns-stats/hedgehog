@@ -481,14 +481,17 @@ scatterPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
     if(gvis == 1){
       title <- sub("\n", " ", title)
+      dt <- df
+      #de <- as.data.frame(cast(df, serial + x + y ~ key, value='key'))
       df$key <- NULL
       df$x <- NULL
       df$serial <- as.integer(df$serial)
       df <- df[,c("serial", "y")]
+      df$y.html.tooltip <- paste(dt$key,": ", dt$y, " (", dt$x, ")",  sep="")
       serial_min <- min(df$serial, na.rm = TRUE) - 1
       serial_max <- max(df$serial, na.rm = TRUE) + 1
       p <- gvisScatterChart(df, 
-                        options=list(legend="none", title=title, height=600, width=940,
+                        options=list(legend="none", title=title, height=600, width=940, tooltip="{isHtml:'true'}, {textStyle: {fontSize: '18'}}",
                                      vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), 
                                      hAxis=paste("{format:'', title:'",xlabel,"',textStyle:{fontSize:'14'}, viewWindow:{min:'",serial_min,"', max:'",serial_max,"'}}", sep=""), 
                                      #hAxis=paste("{format:'', title:'",xlabel,"',textStyle:{fontSize:'14'}, ticks:[2014061900, 2014061901, 2014061902, 2014061903]}", sep=""),

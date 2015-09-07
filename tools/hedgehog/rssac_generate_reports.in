@@ -126,7 +126,7 @@ for SVRNM in $SERVERNMS ; do
 			
             if [ "${TYPE}" == "generatePlot" ] ; then
 				# Retrieve the plot from the plot cache
-                PLTFILE=$(echo ${RESULT} | sed 's/^.*img src="\([^"?]*\).*/\1/' | sed "s:../plotcache:$hhconfig_directories_plotcache:" | sed 's/-log//' | sed 's/-stack//')
+                PLTFILE=$(echo ${RESULT} | sed 's/^.* src="\([^"?]*\).*/\1/' | sed "s:../plotcache:$hhconfig_directories_plotcache:" | sed 's/-log//' | sed 's/-stack//')
 
                 if [ "${PLTFILE}" != "plots/no_graph.png" ] && [ "${PLTFILE}" != "plots/no_results.png" ] && [ "${PLTFILE}" != "plots/no_connection.png" ] ; then                   
 					# Report names are the same as plot names but use dash instead of underscore
