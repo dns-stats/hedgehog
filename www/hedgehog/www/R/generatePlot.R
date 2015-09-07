@@ -78,8 +78,10 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
       names(df)[names(df)=="y"] <- "yyyyyyyyyyyy"
       # For now we default to the timeline flash chart unless 'svg' is specified by the user
       if (gui_config$www$default_interactive_plot_type == "svg") {
-          p <- gvisAnnotationChart(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x",
-                                   options=list(legendPosition='newRow', height=540, width=910, colors="['#0072B2','#990F0F','#99700F',
+          p <- gvisAnnotationChart(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x", #titlevar="serial",
+                                   options=list(
+                                                #displayAnnotations=TRUE, annotationsWidth=10, 
+                                                legendPosition='newRow', height=540, width=910, colors="['#0072B2','#990F0F','#99700F',
       '#1F990F','#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#0072B2','#990F0F','#99700F','#1F990F',
       '#710F99','#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99',
       '#E67E7E','#E6C77E','#8AE67E','#C77EE6','#CC5252','#CCA852','#60CC52','#A852CC','#0072B2','#B22D2D','#B28B2D','#3CB22D','#8B2DB2','#990F0F','#99700F','#1F990F','#710F99','#E67E7E',
@@ -220,7 +222,6 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
 	
     if(gvis == 1){
       title <- sub("\n", " ", title)
-      write.table(de, file="/home/sara/temp/de1.out")
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
       if(vertical == 1){
@@ -243,11 +244,9 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
       }else{
           # Need to order the table before passing it to gviz
           # write.table(de, file="/temp/de.out")
-          write.table(de, file="/home/sara/temp/de2.out")
           de$total <- rowSums(de, na.rm=TRUE);
           de <-arrange(de, desc(total));
           de$total <- NULL
-          write.table(de, file="/home/sara/temp/de3.out")
           jscode <- "alert('Hello world');"
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
                             options=list(isStacked=TRUE, title=title, height=600, width=940,
@@ -474,6 +473,49 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }
 }
 
+scatterPlot <- function(df, f, title, xlabel, ylabel, gvis) {
+
+	if (hh_debug) {
+		system('logger -p user.notice In scatterPlot')
+	}
+
+    if(gvis == 1){
+      title <- sub("\n", " ", title)
+      dt <- df
+      #de <- as.data.frame(cast(df, serial + x + y ~ key, value='key'))
+      df$key <- NULL
+      df$x <- NULL
+      df$serial <- as.integer(df$serial)
+      df <- df[,c("serial", "y")]
+      df$y.html.tooltip <- paste(dt$key,": ", dt$y, " (", dt$x, ")",  sep="")
+      serial_min <- min(df$serial, na.rm = TRUE) - 1
+      serial_max <- max(df$serial, na.rm = TRUE) + 1
+      p <- gvisScatterChart(df, 
+                        options=list(legend="none", title=title, height=600, width=940, tooltip="{isHtml:'true'}, {textStyle: {fontSize: '18'}}",
+                                     vAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'10'}}", sep=""), 
+                                     hAxis=paste("{format:'', title:'",xlabel,"',textStyle:{fontSize:'14'}, viewWindow:{min:'",serial_min,"', max:'",serial_max,"'}}", sep=""), 
+                                     #hAxis=paste("{format:'', title:'",xlabel,"',textStyle:{fontSize:'14'}, ticks:[2014061900, 2014061901, 2014061902, 2014061903]}", sep=""),
+                                     chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
+      cat(p$html$chart,file=f)
+    }
+    else {
+	    png(f, width = W, height = H)
+        df$key <- NULL
+        df$x <- NULL
+	    p <- ggplot(data=df, aes(x=serial, y=y)) +
+	                geom_point(size = 4, stat="identity") +
+	                labs(title=title, x=xlabel, y=ylabel) +
+	                theme_bw() + scale_y_continuous(expand=c(0.05,0), labels = comma) +
+	                theme(panel.grid.major.y = element_line(colour = GRIDGREY), 
+	                      panel.grid.minor.y = element_line(colour = GRIDGREY, linetype = "dotted"), 
+	                      panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
+
+	    print(p)
+	    dev.off()
+    }
+}
+
+
 geomap <- function(df, f, title, xlabel, ylabel, gvis) {
 
 	if (hh_debug) {
@@ -683,6 +725,31 @@ generateYaml <- function(dsccon) {
 			yaml_out[[s$name]] <- countlist
 		}
 	}
+	else if (metric_data$statistics_type == "average") {
+		df$x <- NULL
+		#de <- as.data.frame(cast(df, ~ serial, value='y', fun.aggregate=max))
+		de <- as.data.frame(cast(df, ~ serial, value='y', function(x) quantile(x,c(0.95))))
+		
+		for (s in metric_data$statistics) {	
+			countlist <- list()
+			for (i in colnames(de)) {
+				if (i != "value") {
+					countlist[[i]] <- as.integer(de[[i]])
+				}
+			}
+			yaml_out[[s$name]] <- countlist
+		}
+	}
+	else if (metric_data$statistics_type == "value") {
+		df$d.starttime <- NULL
+		for (s in metric_data$statistics) {	
+			countlist <- list()
+			for(i in 1:nrow(df))  {
+					countlist[df$x[[i]]] <- df$y[[i]]
+			}
+			yaml_out[[s$name]] <- countlist
+		}
+	}
 	
 	# Write the result to the yaml file
 	# A large precision is needed to deal with large (up to 64 bit) numbers
@@ -717,7 +784,7 @@ initPlotOptions <- function() {
 	formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
     
 	formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "qtype_vs_othertld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", 
-	                              "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup")
+	                              "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_subgroup", "load_time", "zone_size")
 
 
 	rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
@@ -800,14 +867,18 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	if       (pltnm %in% format3)                   {xlab <- "Subnet (IPv4/8 or IPv6/32)"}
 	else if  (pltnm == 'traffic_sizes_small' ||
 	          pltnm == 'traffic_sizes_big')         {xlab <- "Message Size (bytes)"}
-
+	else if (pltnm == 'zone_size')              {xlab <- "Serial Number"}
+	else if (pltnm == 'load_time')              {xlab <- "Serial Number"}
+		
 	ylab <- "Queries/sec"
 	if      (pltnm %in% rssac)                  {ylab <- "Queries/min"}
 	else if (pltnm %in% f1count)                {ylab <- "# Client Subnets"}
 	else if (pltnm %in% format3)                {ylab <- "Average Query Rate (q/sec)"}
 	else if (pltnm == 'traffic_sizes_small' ||
              pltnm == 'traffic_sizes_big')      {ylab <- "Number of Queries in Each 16 Byte Group"}
-
+	else if (pltnm == 'zone_size')              {ylab <- "Zone Size (Bytes)"}
+	else if (pltnm == 'load_time')              {ylab <- "Zone Propagation Time (Seconds)"}
+		
 	# Now decide how to plot it
 	if      (is.null(df))                               {plot_file <- "plots/no_connection.png"}
 	else if (nrow(df) == 0)                             {plot_file <- "plots/no_results.png"}
@@ -833,6 +904,8 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
 	                                                     else         {stackedBarPlot (df, plot_file, mytitle, "Response Size Length (bytes)", "Count", gvis, pltnm, scalex="continuous", vertical=1)}}
 	else if (pltnm == 'geomap')                         {geomap  (df, plot_file, mytitle, "aaaa", "bbbbb", 1)}
 	else if (pltnm == 'geochart')                       {geochart(df, plot_file, mytitle, "aaaa", "bbbbb", 1)}
+	else if (pltnm == 'load_time')                      {scatterPlot(df, plot_file, mytitle, xlab, ylab, gvis)}
+	else if (pltnm == 'zone_size')                      {barPlot(df, plot_file, mytitle, xlab, ylab, gvis, vertical=1)}
 
 	return(plot_file)
 }

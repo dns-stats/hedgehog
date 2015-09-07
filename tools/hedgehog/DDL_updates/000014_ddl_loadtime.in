@@ -74,14 +74,14 @@ psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('load_time','9.RSSAC','Zone propagation time','Zone propagation time') 
+    VALUES ('load_time','9.RSSAC','Zone propagation time','Latency in the distribution system by serial number') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('zone_size','9.RSSAC','Zone size','Zone Size') 
+    VALUES ('zone_size','9.RSSAC','Zone size','Size of the zone by serial number') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET1} FROM rows;
