@@ -136,6 +136,9 @@ Developed by Sinodun IT (www.sinodun.com)
         auto populated by gengraph.js
         TODO: Node tab appears shifted to the right by a few pixels.
    --></div>
+      <div class="sixteen columns" id="nodetabs2"><!-- 
+         auto populated by gengraph.js
+   --></div>
     </form>
     <div class="eight columns" id="local_links" >
       <hr style='margin-bottom:5px;' />

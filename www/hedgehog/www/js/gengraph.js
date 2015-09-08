@@ -43,6 +43,7 @@ $(document).ready(function() {
     window.selectedOpt = null;
 
     // populate plot and server dropdowns and nodetabs then generate default plot    
+    // , brew("initnodeslist"),
     $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeTabsHtml"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nt, dp){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
@@ -79,7 +80,9 @@ $(document).ready(function() {
 	    }
 
         // initialise node tabs
-        $("#nodetabs").html(nt[0]);
+        //$("#nodetabs").html(nt[0]);
+        initnodehtml();
+
         setServersGroups();
         initnodetabs();
         serverTab();
