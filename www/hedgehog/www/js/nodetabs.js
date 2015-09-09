@@ -16,8 +16,9 @@
 /// Developed by Sinodun IT (www.sinodun.com)
 ///
 
-function initnodehtml(output_text) {
+function initnodehtml() {
 
+    // FIX ME: obtain nodes structure from R via brew call
     var nodes = [
       { server:     "Server-A",
         groups:     [{group_name: "Region-1", node_list: [{node_name: "Node-1", node_id: "1"}, {node_name: "Node-2", node_id: "2"}]},
@@ -29,58 +30,54 @@ function initnodehtml(output_text) {
       }
     ];
 
-    // Append requires a full element and will close any open elements....
+    // Append requires a full element and will close any open elements so need care when using it.
     $('#nodetabs2').append("<div class='sixteen columns' id='groupcontent'></div>");
     $('#nodetabs2').append("<br class='clear'>");
     $('#nodetabs2').append("<div class='sixteen columns' id='nodecontent'>");
 
-     // For each server, construct the groups. 
-     for (var i = 0; i < nodes.length; i++) {
-      $('#groupcontent').append("<div id='" + nodes[i].server +"' class='hidden'>");
-            $('#' + nodes[i].server).append("<div class='Tabs' id='" + nodes[i].server +"_tabs'>");
-                $('#' + nodes[i].server + '_tabs').append("<ul id='" + nodes[i].server +"_tabs_ul'>");
-                for (var j = -1; j < nodes[i].groups.length; j++) {
-                    if (j ==-1) var group = "All"; 
-                    else        var group =  nodes[i].groups[j].group_name;
-                    var group_server = group + "_" + nodes[i].server;
-                    // create the top tab
-                    $('#' + nodes[i].server + '_tabs_ul').append("<li id='li_" + group_server + "' onclick='gpTab(\"" + group_server + "\")'>  <a>" + group + "<img id='cb_" + group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></a></li>");
-                    // now the node content
-                    $('#nodecontent').append("<div class='group_showing' id='" + group_server + "'>");
-                        $('#' + group_server).append("<div class='allnone' id='" + group_server + "_allnone'>");
-                            $('#' + group_server + '_allnone').append("<a style='font-weight:bold;'>Actions:</a>");
-                            $('#' + group_server + '_allnone').append("<input type='button' id='selectAllBtn2'  value='Select all nodes'    title='Select all available nodes for plotting' onclick='selectAll(\"cb_" + group_server + "\")'>"); 
-                            $('#' + group_server + '_allnone').append("<input type='button' id='selectNoneBtn2' value='De-select all nodes' title='De-select all available nodes'           onclick='selectNone(\"cb_" + group_server + "\")'><hr>");
-                        $('#' + group_server).append(" <div class='node_cbs' id='" + group_server + "_node_cbs_id'>");
-                    // FIXME: collapse loop to a single pass for all and groups
-                    if (j != -1) {
-                        for (var k = 0; k < nodes[i].groups[j].node_list.length; k++) {
-                            var node_name = nodes[i].groups[j].node_list[k].node_name;
-                            var node_id   = nodes[i].groups[j].node_list[k].node_id;
-                            var node_group_server = node_id + "_" + group_server;
-                            // FIXME: Format of node checkboxes is wrong
-                            $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_group_server + "' name='cb_" + group_server + "' value='" + node_group_server + "' data-node-subgroup='Subgroup-1' onclick='selectNode(\"" + node_group_server + "\")'>");
-                            $('#' + group_server + '_node_cbs_id').append("<label class='' for='" + node_group_server + "' title='Toggle node selection'>" + node_name + "</label>");                                    
-                        }
-                    } else {
-                        for (var x = 0; x < nodes[i].groups.length; x++) {
-                            for (var k = 0; k < nodes[i].groups[x].node_list.length; k++) {
-                                var node_name = nodes[i].groups[x].node_list[k].node_name;
-                                var node_id   = nodes[i].groups[x].node_list[k].node_id;
-                                var node_group_server = node_id + "_" + group_server;
-                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_group_server + "' name='cb_" + group_server + "' value='" + node_group_server + "' data-node-subgroup='Subgroup-1' onclick='selectNode(\"" + node_group_server + "\")'>");
-                                $('#' + group_server + '_node_cbs_id').append("<label class='' for='" + node_group_server + "' title='Toggle node selection'>" + node_name + "</label>");                                    
-                            }
-                        }
-                    }
+    // For each server, construct the groups.
+    for (var i = 0; i < nodes.length; i++) {
+        $('#groupcontent'                ).append(  "<div class='hidden' id='" + nodes[i].server + "'>");
+        $('#' + nodes[i].server          ).append(  "<div class='Tabs'   id='" + nodes[i].server + "_tabs'>");
+        $('#' + nodes[i].server + '_tabs').append(  "<ul                 id='" + nodes[i].server +"_tabs_ul'>");
+        // For each group, add a tab and fill in the nodes
+        for (var j = -1; j < nodes[i].groups.length; j++) {
+            // Special case for the 'All' tabs are needed here
+            if (j == -1) var group = "All"; 
+            else         var group =  nodes[i].groups[j].group_name;
+            var group_server       = group + "_" + nodes[i].server;
+            // Create the top tab with a list entry
+            $('#' + nodes[i].server + '_tabs_ul').append("<li id='li_" + group_server + "' onclick='gpTab(\"" + group_server + "\")'>  <a>" + group + "<img id='cb_" + group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></a></li>");
+            // Now the node content divs
+            $('#nodecontent'                 ).append("<div class='group_showing'   id='" + group_server + "'>");
+            $('#' + group_server             ).append("<div class='allnone'         id='" + group_server + "_allnone'>");
+            $('#' + group_server             ).append("<div class='node_cbs'        id='" + group_server + "_node_cbs_id'>");
+            // Selection buttons
+            $('#' + group_server + '_allnone').append("<a style='font-weight:bold;'>Actions:</a>");
+            $('#' + group_server + '_allnone').append("<input type='button'         id='selectAllBtn2'  value='Select all nodes'    title='Select all available nodes for plotting' onclick='selectAll(\"cb_" + group_server + "\")'>"); 
+            $('#' + group_server + '_allnone').append("<input type='button'         id='selectNoneBtn2' value='De-select all nodes' title='De-select all available nodes'           onclick='selectNone(\"cb_" + group_server + "\")'><hr>");            
+            // Add all the nodes to the 'All' tab or just the group nodes for all other cases
+            if (j == -1) {var start_group = 0; var stop_group = nodes[i].groups.length; }
+            else         {var start_group = j; var stop_group  = j + 1}
+            // Loop over the nodes
+            for (var x = start_group; x < stop_group; x++) {
+                for (var k = 0; k < nodes[i].groups[x].node_list.length; k++) {
+                    var node_name            = nodes[i].groups[x].node_list[k].node_name;
+                    var node_id              = nodes[i].groups[x].node_list[k].node_id;
+                    var node_id_group_server = node_id + "_" + group_server;
+                    // FIXME: For some reason the checkboxes are not inheriting the correct class so their appearance is incorrect.
+                    $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' value='" + node_id_group_server + "' data-node-subgroup='Subgroup-1' onclick='selectNode(\"" + node_id_group_server + "\")'>");
+                    $('#' + group_server + '_node_cbs_id').append("<label class='' for='" + node_id_group_server + "' title='Toggle node selection'>" + node_name + "</label>");                                    
                 }
-     }
+            }
+        }
+    }
 }
 
 function setServersGroups() {
     // sets window.servers to the set of server names,
     // and window.groups to the set of group names.
-    // nodeselection checkbox name format: 'node_group_server'
+    // nodeselection checkbox name format: 'node_id_group_server'
     window.servers = {};
     window.groups = {};
     $("input[type='checkbox'].nodeselection").each(function(){
