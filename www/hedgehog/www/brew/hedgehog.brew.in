@@ -110,6 +110,43 @@ initServerDDHtml <- function() {
 }
 
 # Initialise the All and region node tabs html
+initNodeData <- function() {
+    if (hh_debug) {
+        system('logger -p user.notice In initNodeTabsHtml')
+    }
+
+    if (!(prepStmnt("getsrvrid_display_name", dsccon)) || !(prepStmnt("getgroups", dsccon)) || !(prepStmnt("getnodes", dsccon)) || !(prepStmnt("getnodesbyregion", dsccon))) {
+        %>DB error preparing node query<%
+        return(FALSE)
+    }
+
+    servers <- dbGetDataFrame(dbdrv, dsccon, dbconstr, "EXECUTE getsrvrid_display_name;")
+    if (!is.null(servers) && nrow(servers) >= 1) {
+        for (s in 1:nrow(servers)) {
+            srvr_id <- servers[s,1]
+            srvr_nm <- servers[s,2]
+            groups <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getgroups(", srvr_id, ");", sep=""))
+            if (!is.null(groups) && nrow(groups) >= 1) {
+              for (g in 1:nrow(groups)) {
+                  gp_nm <- groups[g,1]
+                  nodes <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
+                  for (n in 1:nrow(nodes)) {
+                  nd_id <- nodes[n,1]
+                  nd_nm <- nodes[n,2]
+                  node_
+              }
+            }
+        }
+        node_json = jsonlite::toJSON(node_data)
+        output = print(node_json)
+        %><%node_json%><%
+        return(TRUE)
+    }
+    %>No data returned<%
+    return(FALSE)
+}
+
+# Initialise the All and region node tabs html
 initNodeTabsHtml <- function() {
 	
 	if (hh_debug) {
@@ -466,6 +503,7 @@ if (class(dsccon) != "try-error") {
 		initPlotDDHtml    = {initPlotDDHtml()},
 		initServerDDHtml  = {initServerDDHtml()},
 		initNodeTabsHtml  = {initNodeTabsHtml()},
+		initNodeData      = {initNodeData()},
 		getDefaultPlotId  = {getDefaultPlotId()},
 		generatePlot      = {generatePlot()},
 		generateYaml      = {generateYaml(dsccon)}

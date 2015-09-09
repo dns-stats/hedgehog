@@ -37,6 +37,7 @@ suppressPackageStartupMessages(library(scales))
 suppressPackageStartupMessages(library(yaml))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(grid))
+suppressPackageStartupMessages(library(rjson))
 
 dbdrv  <- dbDriver("PostgreSQL")
 hh_config <- yaml.load_file("@HH_CONF_FILE@")

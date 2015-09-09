@@ -16,7 +16,7 @@
 /// Developed by Sinodun IT (www.sinodun.com)
 ///
 
-function initNodeHtml() {
+function initNodeHtml(nodes2) {
 
     // FIX ME: obtain nodes structure from R via brew call
     // FIX ME: This doesn't yet work or sub-group, country or city
@@ -30,6 +30,10 @@ function initNodeHtml() {
                      {group_name: "America", node_list: [{node_name: "Node-7", node_id: "7"}, {node_name: "Node-8", node_id: "8"}]}]
       }
     ];
+
+    // TODO: Check for errors e.g. empty data
+    
+    alert(nodes2);
 
     // Append requires a full element and will close any open elements so need care when using it.
     $('#nodetabs2').append("<div class='sixteen columns' id='groupcontent'></div>");
@@ -67,8 +71,7 @@ function initNodeHtml() {
                     var node_id              = nodes[i].groups[x].node_list[k].node_id;
                     var node_id_group_server = node_id + "_" + group_server;
                     // FIXME: For some reason the checkboxes are not inheriting the correct class so their appearance is incorrect.
-                    // FIXME: subgroup is still hardcoded. Note value attr is not specified here (it is in the original code), but I can't see where it is used.
-                    // TODO: I think we could dispense with name and just use id
+                    // FIXME: subgroup is still hardcoded. I think we could dispense with name and just use id
                     $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' data-node-subgroup='Subgroup-1' onclick='selectNode(\"" + node_id_group_server + "\")'>");
                     $('#' + group_server + '_node_cbs_id').append("<label class='' for='" + node_id_group_server + "' title='Toggle node selection'>" + node_name + "</label>");
                 }
