@@ -16,9 +16,10 @@
 /// Developed by Sinodun IT (www.sinodun.com)
 ///
 
-function initnodehtml() {
+function initNodeHtml() {
 
     // FIX ME: obtain nodes structure from R via brew call
+    // FIX ME: This doesn't yet work or sub-group, country or city
     var nodes = [
       { server:     "Server-A",
         groups:     [{group_name: "Region-1", node_list: [{node_name: "Node-1", node_id: "1"}, {node_name: "Node-2", node_id: "2"}]},
@@ -66,8 +67,10 @@ function initnodehtml() {
                     var node_id              = nodes[i].groups[x].node_list[k].node_id;
                     var node_id_group_server = node_id + "_" + group_server;
                     // FIXME: For some reason the checkboxes are not inheriting the correct class so their appearance is incorrect.
-                    $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' value='" + node_id_group_server + "' data-node-subgroup='Subgroup-1' onclick='selectNode(\"" + node_id_group_server + "\")'>");
-                    $('#' + group_server + '_node_cbs_id').append("<label class='' for='" + node_id_group_server + "' title='Toggle node selection'>" + node_name + "</label>");                                    
+                    // FIXME: subgroup is still hardcoded. Note value attr is not specified here (it is in the original code), but I can't see where it is used.
+                    // TODO: I think we could dispense with name and just use id
+                    $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' data-node-subgroup='Subgroup-1' onclick='selectNode(\"" + node_id_group_server + "\")'>");
+                    $('#' + group_server + '_node_cbs_id').append("<label class='' for='" + node_id_group_server + "' title='Toggle node selection'>" + node_name + "</label>");
                 }
             }
         }
