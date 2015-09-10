@@ -214,9 +214,9 @@ generatePlot <- function(){
 	# Initialise plot parameters
 	initPlotOptions()
 	
-	if ( subgroup == '1' && pltnm == 'by_node') {
-		pltnm <- "by_subgroup"
-	}
+    # if ( subgroup == '1' && pltnm == 'by_node') {
+    #   pltnm <- "by_subgroup"
+    # }
 	
 	# Initialise name of plot file and make sure the cache directory exists
 	plot_dir = paste(hh_config$directories$plotcache, "/", svrnm, "/", pltnm, sep="") 

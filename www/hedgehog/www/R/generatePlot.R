@@ -181,7 +181,7 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
         } else {
           p <- gvisBarChart(df, xvar='x', yvar='y',
                             options=list(legend="none", title=title, height=600, width=940,
-                                         vAxis=paste("{title:'",xlabel,"')", sep=""), 
+                                         vAxis=paste("{title:'",xlabel,"'}", sep=""), 
                                          hAxis=paste("{title:'",ylabel,"', textStyle:{fontSize:'14'}}", sep=""), 
                                          chartArea="{left:80,top:50,width:\"88%\",height:\"80%\"}"))
         }
@@ -447,7 +447,7 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     png(f, width=W, height=H)
     df["rkey"] = rkey1
 
-    dfx <- dplyr::arrange(df, x, rkey, desc(key))
+    dfx <- arrange(df, x, rkey, desc(key))
     df1 <- aggregate(dfx$y, by=list(x2=dfx$x, rkey=dfx$rkey), FUN=diff)
     df1 <- plyr::rename(df1,c("x"="y", "x2"="x", "rkey"="key"))
     if (gvis == 1) {
