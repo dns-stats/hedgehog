@@ -304,7 +304,7 @@ input[type="button"][disabled]:hover {
     border-radius: 5px;
 }
 
-#node_cbs_id label {
+.node_cbs label {
     color: #ccc;
     display: inline-block;
     margin: 0 5px 5px 0;
@@ -365,7 +365,7 @@ input[type="button"][disabled]:hover {
 }
 
 #timeTabsBasic input[type="radio"],
-#node_cbs_id input[type="checkbox"] {
+.node_cbs input[type="checkbox"] {
    display: none;
 }
 
@@ -375,7 +375,7 @@ input[type="button"][disabled]:hover {
 }
 
 
-#node_cbs_id input[type="checkbox"]:checked + label {
+.node_cbs input[type="checkbox"]:checked + label {
     color: #999;
 }
 
