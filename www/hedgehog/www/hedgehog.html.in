@@ -133,11 +133,7 @@ Developed by Sinodun IT (www.sinodun.com)
       <label for="groupNodes">Cluster Node Selection</label>
       </div>
       <div class="sixteen columns" id="nodetabs"><!-- 
-        auto populated by gengraph.js
-        TODO: Node tab appears shifted to the right by a few pixels.
-   --></div>
-      <div class="sixteen columns" id="nodetabs2"><!-- 
-         auto populated by gengraph.js
+         auto populated by nodetabs.js
    --></div>
     </form>
     <div class="eight columns" id="local_links" >

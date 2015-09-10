@@ -16,29 +16,26 @@
 /// Developed by Sinodun IT (www.sinodun.com)
 ///
 
-function initNodeHtml(nodes2) {
+function initNodeHtml(nodes_raw) {
 
-    // FIX ME: obtain nodes structure from R via brew call
     // FIX ME: This doesn't yet work or sub-group, country or city
-    var nodes = [
-      { server:     "Server-A",
-        groups:     [{group_name: "Region-1", node_list: [{node_name: "Node-1", node_id: "1"}, {node_name: "Node-2", node_id: "2"}]},
-                     {group_name: "Region-2", node_list: [{node_name: "Node-3", node_id: "3"}, {node_name: "Node-4", node_id: "4"}]}]
-      },
-      { server:     "L-root",
-        groups:     [{group_name: "Europe",  node_list: [{node_name: "Node-5", node_id: "5"}, {node_name: "Node-6", node_id: "6"}]},
-                     {group_name: "America", node_list: [{node_name: "Node-7", node_id: "7"}, {node_name: "Node-8", node_id: "8"}]}]
-      }
-    ];
-
-    // TODO: Check for errors e.g. empty data
     
-    alert(nodes2);
+    // Example data format
+    // var nodes = [
+    //   { server:     "Server-A",
+    //     groups:     [{group_name: "Region-1", node_list: [{node_name: "Node-1", node_id: "1"}, {node_name: "Node-2", node_id: "2"}]},
+    //                  {group_name: "Region-2", node_list: [{node_name: "Node-3", node_id: "3"}, {node_name: "Node-4", node_id: "4"}]}]},
+    //   { server:     "L-root",
+    //     groups:     [{group_name: "Europe",  node_list: [{node_name: "Node-5", node_id: "5"}, {node_name: "Node-6", node_id: "6"}]},
+    //                  {group_name: "America", node_list: [{node_name: "Node-7", node_id: "7"}, {node_name: "Node-8", node_id: "8"}]}]}];
+
+    nodes= jQuery.parseJSON(nodes_raw);
+    // TODO: Check for errors e.g. empty data
 
     // Append requires a full element and will close any open elements so need care when using it.
-    $('#nodetabs2').append("<div class='sixteen columns' id='groupcontent'></div>");
-    $('#nodetabs2').append("<br class='clear'>");
-    $('#nodetabs2').append("<div class='sixteen columns' id='nodecontent'>");
+    $('#nodetabs').append("<div class='sixteen columns' id='groupcontent'></div>");
+    $('#nodetabs').append("<br class='clear'>");
+    $('#nodetabs').append("<div class='sixteen columns' id='nodecontent'>");
 
     // For each server, construct the groups.
     for (var i = 0; i < nodes.length; i++) {
