@@ -79,9 +79,9 @@ $(document).ready(function() {
             return;
 	    }
 
-        // initialise node tabs
+        // initialise node tabs and grouping
         initNodeHtml(nd[0]);
-        // init the node grouping, this should be a config options
+        // FIXME[node grouping]: this should be a config options
         $('#ng_subgroup').prop('checked', true);
 
         setServersGroups();
@@ -89,8 +89,8 @@ $(document).ready(function() {
         serverTab();
 
         // generate default plot
-       genDSCGraph();
-       setInitHelpMsg(true);
+        genDSCGraph();
+        setInitHelpMsg(true);
 
     });
     
@@ -174,6 +174,7 @@ function genDSCGraph() {
                 'start': window.start.toISOString().slice(0,16),
                 'stop': window.stop.toISOString().slice(0,16),
                 'gvis': gvis,
+                // FIXME[node grouping]: this parm is no longer needed
                 'subgroup': subgroup,
                 'pltid': pltid,
                 'svrnm' : svrnm,

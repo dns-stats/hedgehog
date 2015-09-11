@@ -18,19 +18,20 @@
 
 function initNodeHtml(nodes_raw) {
 
-    // FIX ME: This doesn't yet work or sub-group, country or city
+    // FIXME[node grouping]: This doesn't yet work or country or city
+    // FIXME[node grouping]: Check if the all of the 'each' loops are really needed. There was a bug in the id name that stopped direct lookup working that is now fixed.
     
     // Example data format
     // var nodes = [
     //   { server:     "Server-A",
-    //     groups:     [{group_name: "Region-1", node_list: [{node_name: "Node-1", node_id: "1"}, {node_name: "Node-2", node_id: "2"}]},
-    //                  {group_name: "Region-2", node_list: [{node_name: "Node-3", node_id: "3"}, {node_name: "Node-4", node_id: "4"}]}]},
+    //     groups:     [{group_name: "Region-1", node_list: [{node_name: "Node-1", node_id: "1"}, {node_name: "Node-2", node_id: "2", node_sg: "Subgroup-1"}]},
+    //                  {group_name: "Region-2", node_list: [{node_name: "Node-3", node_id: "3"}, {node_name: "Node-4", node_id: "4", node_sg: "Subgroup-2"}]}]},
     //   { server:     "L-root",
-    //     groups:     [{group_name: "Europe",  node_list: [{node_name: "Node-5", node_id: "5"}, {node_name: "Node-6", node_id: "6"}]},
-    //                  {group_name: "America", node_list: [{node_name: "Node-7", node_id: "7"}, {node_name: "Node-8", node_id: "8"}]}]}];
+    //     groups:     [{group_name: "Europe",  node_list: [{node_name: "Node-5", node_id: "5"}, {node_name: "Node-6", node_id: "6", node_sg: "Subgroup-3"}}]},
+    //                  {group_name: "America", node_list: [{node_name: "Node-7", node_id: "7"}, {node_name: "Node-8", node_id: "8", node_sg: "Subgroup-3"}}]}]}];
 
     nodes= jQuery.parseJSON(nodes_raw);
-    // TODO: Check for errors e.g. empty data
+    // FIXME[node grouping]: Check for errors e.g. empty data
 
     // Append requires a full element and will close any open elements so need care when using it.
     $('#nodetabs').append("<div class='sixteen columns' id='groupcontent'></div>");
@@ -50,7 +51,6 @@ function initNodeHtml(nodes_raw) {
             // Special case for the 'All' tabs are needed here
             if (j == -1) var group = "All"; 
             else         var group =  nodes[i].groups[j].group_name;
-            // TODO: improve names
             var group_server       = group + "_" + nodes[i].server;
             var group_server_basic = group_server;
             // Create the top tab with a list entry
@@ -80,7 +80,7 @@ function initNodeHtml(nodes_raw) {
                         var node_name            = nodes[i].groups[x].node_list[k].node_name;
                         var node_id              = nodes[i].groups[x].node_list[k].node_id;
                         var node_sg              = nodes[i].groups[x].node_list[k].node_sg;
-                        // TODO[node grouping]: this will need special handling on select......
+                        // FIXME[node grouping]: 'Other' may need special handling on select......
                         if (!node_sg) node_sg    = 'Other';
                         var node_id_group_server = node_id + "_" + group_server_basic;
                         // use tilde not underscores so current code doesn't trigger off this
@@ -157,6 +157,7 @@ function selectSister(idList, ckd) {
     });
     
     // update to also set the cbs in the grouping tabs
+    // FIXME[node grouping]: move this to a separate function
      $("input[type='checkbox'].subgroubselection").each(function(){
          node_list = this.value.split("~");
          var all = true;
@@ -243,7 +244,6 @@ function selectNode(ckbxid) {
 }
 
 function selectSubGroup(subgroup) {
-    //console.log("Passing this: "+ subgroup.value + " " + $(subgroup).is(':checked'));
     idList = subgroup.value.split("~");
     selectSister(idList, $(subgroup).is(':checked'));
     var my_subgroup = subgroup.id.split("~")[0];
