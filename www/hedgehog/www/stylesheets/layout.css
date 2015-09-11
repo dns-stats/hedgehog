@@ -229,7 +229,7 @@ input[type="button"][disabled]:hover {
 }
 
 .Tabs #groupcontent,
-.Tabs #nodecontent {
+.Tabs .group_showing {
     padding: 0 15px;
     clear:both;
     line-height:19px;
@@ -289,12 +289,12 @@ input[type="button"][disabled]:hover {
     border-radius: 0 3px 3px 0;
 }
 
-#nodecontent {
+.group_showing {
     margin-bottom: 20px;
 }
 
 
-#nodecontent label {
+.group_showing label {
     color: #000;
     display: inline;
     font-family: "New Courier", Monospace;
@@ -317,7 +317,7 @@ input[type="button"][disabled]:hover {
     border-radius: 5px;
 }
 
-#nodecontent label:hover {
+.group_showing label:hover {
     background: #ddd;
 }
 
@@ -379,16 +379,20 @@ input[type="button"][disabled]:hover {
     color: #999;
 }
 
-#nodecontent input[type="checkbox"]:checked + label {
+.group_showing input[type="checkbox"]:checked + label {
     color: #000;
 }
 
-#nodecontent input[type="button"] {
+.subgroup_partial input[type="checkbox"]:checked + label {
+    color: #0072B2;
+}
+
+.group_showing input[type="button"] {
     margin: 0 0 2px 16px;
     padding: 2px 8px;
 }
 
-#nodecontent hr {  
+.group_showing hr {  
 margin: 5px 0px 10px; 
 }
 

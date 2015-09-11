@@ -136,7 +136,7 @@ initNodeData <- function() {
                     for (n in 1:nrow(nodes_df)) {
                         nd_id <- nodes_df[n,1]
                         nd_nm <- nodes_df[n,2]
-                        node  = list(node_name=nd_nm, node_id=nd_id)
+                        node  = list(node_name=nd_nm, node_id=nd_id, node_sg=nodes_df[n,3])
                         nodes = c(nodes, list(node))
                     }
                     group=list(group_name=gp_nm, node_list=nodes)

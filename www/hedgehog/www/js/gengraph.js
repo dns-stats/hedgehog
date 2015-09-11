@@ -81,6 +81,8 @@ $(document).ready(function() {
 
         // initialise node tabs
         initNodeHtml(nd[0]);
+        // init the node grouping, this should be a config options
+        $('#ng_subgroup').prop('checked', true);
 
         setServersGroups();
         initnodetabs();
@@ -101,7 +103,7 @@ $(document).ready(function() {
     $("#plotType").change(function() {
        enableGenerate(true);
     });
-    
+
     // register callback function for when the generate plot button is clicked
     $("#generate").click(function() {
         genDSCGraph();
@@ -135,7 +137,7 @@ function genDSCGraph() {
     var gvis = 0;
     var subgroup = 0;
     if ($('#googleviz').prop('checked') === true) gvis = 1;
-    if ($('#groupNodes').prop('checked') === true) subgroup = 1;
+    //if ($('#groupNodes').prop('checked') === true) subgroup = 1;
 
     var pltid = $("#plotType option:selected").val();
     var svrnm = $("#servers option:selected").text();
