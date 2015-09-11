@@ -82,8 +82,7 @@ function initNodeHtml(nodes_raw) {
                         var node_sg              = nodes[i].groups[x].node_list[k].node_sg;
                         // TODO[node grouping]: this will need special handling on select......
                         if (!node_sg) node_sg    = 'Other';
-                        var node_id_group_server = node_id + "_" + group_server;
-
+                        var node_id_group_server = node_id + "_" + group_server_basic;
                         // use tilde not underscores so current code doesn't trigger off this
                         var node_sg_group_server = node_sg + "~" + group + "~" + nodes[i].server;
                         if (node_grouping_options == 0) {
@@ -157,8 +156,31 @@ function selectSister(idList, ckd) {
         }
     });
     
-    //TODO[node_grouping]: update this to also set the cbs in the grouping tabs
-    
+    // update to also set the cbs in the grouping tabs
+     $("input[type='checkbox'].subgroubselection").each(function(){
+         node_list = this.value.split("~");
+         var all = true;
+         var none = true;
+         $.each(node_list, function(i, value){
+             var node_cb = $("#" + value);
+             if($(node_cb).is(':checked')){
+                 none = false;
+             }else{
+                 all = false;
+             }
+         });
+         if (all == true) {
+             $(this).prop('checked', true);
+             $("label[for='" + this.id + "']").css("color", '#000');
+         } else if (none == true) {
+             $(this).prop('checked', false);
+             $("label[for='" + this.id + "']").css("color", '#999');
+         } else {
+             $(this).prop('checked', true);
+             $("label[for='" + this.id + "']").css("color", '#0072B2');
+         }
+     });
+         
     // set group tab images to reflect
     // whether all, some or no checkboxes
     // are selected
