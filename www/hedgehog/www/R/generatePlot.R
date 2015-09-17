@@ -103,7 +103,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
                                                       'Helvetica Neue', Helvetica, Arial, sans-serif;\">", 
                                                        title,
                                         "</div>",
-                                        "<div style=\"display: flex; display: -webkit-flex; justify-content:flex-start; width: 918px;\">",  
+                                        "<div style=\"display: flex; display: -webkit-flex; justify-content:flex-start; width: 930px;\">",  
                                         "<div>", p$html$chart['divChart'], "</div>",
                                         "<div style=\"width: 17px; height: 17px; font-size: small; transform: translateY(200px) rotate(90deg); transform-origin: right top; 
                                               -webkit-transform: translateY(200px) rotate(90deg); -webkit-transform-origin: right top;\">", ylabel, "</div>",
@@ -228,14 +228,14 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
           if (gbar_width == 0) {
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
                                    options=list(isStacked=TRUE, title=title, height=600, width=940,
-                                                vAxis=paste("{title:'", ylabel,"'}", sep=""), 
+                                                vAxis=paste("{title:'", ylabel,"', format: 'short'}", sep=""), 
                                                 hAxis=paste("{title:'", xlabel,"', textStyle:{fontSize:'14'}}", sep=""), 
                                                 legend=paste("{textStyle:{fontSize:'12'}}", sep=""),
                                                 chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
           } else {
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
                                    options=list(isStacked=TRUE, title=title, height=600, width=940,
-                                                vAxis=paste("{title:'", ylabel,"'}", sep=""), 
+                                                vAxis=paste("{title:'", ylabel,"', format: 'short'}", sep=""), 
                                                 hAxis=paste("{title:'", xlabel,"', textStyle:{fontSize:'14'}}", sep=""), 
                                                 legend=paste("{textStyle:{fontSize:'12'}}", sep=""), 
                                                 chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}", 
@@ -247,14 +247,12 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
           de$total <- rowSums(de, na.rm=TRUE);
           de <-arrange(de, desc(total));
           de$total <- NULL
-          jscode <- "alert('Hello world');"
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
                             options=list(isStacked=TRUE, title=title, height=600, width=940,
                                          vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'12'}}", sep=""), 
                                          hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), 
                                          legend=paste("{textStyle:{fontSize:'12'}}", sep=""), 
-                                         chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}",
-                                         gviz.listener.jscode=jscode))
+                                         chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
       }
       cat(p$html$chart,file=f)
     }else{
@@ -541,12 +539,10 @@ geochart <- function(df, f, title, xlabel, ylabel, gvis) {
 	}
   if(gvis == 1){
     title <- sub("\n", " ", title)
-# colorAxis="{colors:['#FF0000', '#00FF00']}",    
-          js.code <- "alert('Hello');"
+# colorAxis="{colors:['#FF0000', '#00FF00']}",
     p <- gvisGeoChart(df, locationvar='location', colorvar='sum', 
-                      options=list(displayMode='regions', height=600, width=940,
-                                   chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"),
-                                   gvis.listener.jscode=jscode)
+                      options=list(displayMode='markers', height=600, width=940,
+                                   chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
     cat(p$html$chart,file=f)
   }
 }
