@@ -283,7 +283,7 @@ def main():
     parser.add_argument('--log', default='server.log')
     parser.add_argument('-l', '--listen', metavar="0.0.0.0:53", 
             default="0.0.0.0:53", help='listen on address:port ')
-    parser.add_argument('-s','--server', help='Server name', required=True)
+    parser.add_argument('-s','--server', help='Server name (as in the database, lower case with - replaced by _)', required=True)
     args = parser.parse_args()
     host, port = args.listen.split(":")
     
