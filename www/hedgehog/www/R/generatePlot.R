@@ -76,7 +76,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     if(gvis == 1){
       # Stupid bug in gvis where the name of the numvar column causes issues with the correct name being diplayed in the legend
       names(df)[names(df)=="y"] <- "yyyyyyyyyyyy"
-      # For now we default to the timeline flash chart unless 'svg' is specified by the user
+
       if (gui_config$www$default_interactive_plot_type == "svg") {
           p <- gvisAnnotationChart(df, numvar="yyyyyyyyyyyy", idvar = "key", datevar = "x", #titlevar="serial",
                                    options=list(
