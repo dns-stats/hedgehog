@@ -76,6 +76,12 @@ BEGIN;
 ALTER TABLE node  ADD column subgroup character varying(255);
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
 INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new sub group for nodes', now() );
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('by_subgroup','1.Node Statistics','By Sub-group','Queries grouped by sub-group') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='qtype') FROM rows;
 COMMIT;
 EOF
 

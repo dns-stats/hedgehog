@@ -29,6 +29,7 @@ Hedgehog 2.1.0b1
 * Improved font sizes in some graphs
 * Fixed DSC-251 to ensure lowwer case comparison
 * Added static link box 
+* Fixed appearance of gvis column chart vAxis
 
 
 Hedgehog 2.0.0rc2 - 2015-07-09

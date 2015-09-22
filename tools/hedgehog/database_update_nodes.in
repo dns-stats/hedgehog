@@ -158,8 +158,7 @@ while read line || [[ -n "$line" ]]; do
 		SERVER_DB_NAME=${SERVER_DB_NAME,,}
 		# subsitute _ for -
 		SERVER_DB_NAME=${SERVER_DB_NAME//-/_}
-		psql $CONN_STRING -tc "INSERT INTO dsc.server (name, display_name) VALUES ('$SERVER_DB_NAME', '${aNODES["server_name"]}') RETURNING id;"
-		SERVER_ID=`psql $CONN_STRING -tc "select id from server where name='$SERVER_DB_NAME'"`
+		SERVER_ID=$(psql $CONN_STRING -tqc "INSERT INTO dsc.server (name, display_name) VALUES ('$SERVER_DB_NAME', '${aNODES["server_name"]}') RETURNING id;")
 		echo "Added server ${aNODES["server_name"]}"
 		NEW_SERVER=1
 	fi
@@ -169,7 +168,7 @@ while read line || [[ -n "$line" ]]; do
 		aNODES["node_ip"]="'${aNODES["node_ip"]}'"
 	fi
 	if [ -z $NODE_ID ] ; then
-		NODE_ID=$(psql $CONN_STRING -c "INSERT INTO dsc.node (server_id, name, region, subgroup, ip) VALUES ($SERVER_ID, '${aNODES["node_name"]}', '${aNODES["node_region"]}', '${aNODES["node_subgroup"]}', ${aNODES["node_ip"]});")
+		NODE_ID=$(psql $CONN_STRING -tqc "INSERT INTO dsc.node (server_id, name, region, subgroup, ip) VALUES ($SERVER_ID, '${aNODES["node_name"]}', '${aNODES["node_region"]}', '${aNODES["node_subgroup"]}', ${aNODES["node_ip"]});")
 		echo "Added node ${aNODES["node_name"]}"
 	else
 		# It would be nice here to only update when something has changed so the user can easily see what changed

@@ -43,7 +43,8 @@ $(document).ready(function() {
     window.selectedOpt = null;
 
     // populate plot and server dropdowns and nodetabs then generate default plot    
-    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeTabsHtml"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nt, dp){
+    // , brew("initnodeslist"),
+    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeData"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss,  nd, dp){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -78,15 +79,18 @@ $(document).ready(function() {
             return;
 	    }
 
-        // initialise node tabs
-        $("#nodetabs").html(nt[0]);
+        // initialise node tabs and grouping
+        initNodeHtml(nd[0]);
+        // FIXME[node grouping]: this should be a config options
+        $('#ng_subgroup').prop('checked', true);
+
         setServersGroups();
         initnodetabs();
         serverTab();
 
         // generate default plot
-       genDSCGraph();
-       setInitHelpMsg(true);
+        genDSCGraph();
+        setInitHelpMsg(true);
 
     });
     
@@ -99,7 +103,7 @@ $(document).ready(function() {
     $("#plotType").change(function() {
        enableGenerate(true);
     });
-    
+
     // register callback function for when the generate plot button is clicked
     $("#generate").click(function() {
         genDSCGraph();
@@ -133,7 +137,7 @@ function genDSCGraph() {
     var gvis = 0;
     var subgroup = 0;
     if ($('#googleviz').prop('checked') === true) gvis = 1;
-    if ($('#groupNodes').prop('checked') === true) subgroup = 1;
+    //if ($('#groupNodes').prop('checked') === true) subgroup = 1;
 
     var pltid = $("#plotType option:selected").val();
     var svrnm = $("#servers option:selected").text();
@@ -144,7 +148,7 @@ function genDSCGraph() {
     $("input[type='checkbox'].nodeselection").each(function(){
         if( $(this).attr('id').split('_')[2] === svrnm) {
             if( $(this).is(':checked') ) {
-                var node_id = $(this).val().split("_")[0];
+                var node_id = $(this).attr('id').split("_")[0];
                 ndset[node_id] = true;
             }else{
                 allselected = false;
@@ -170,6 +174,7 @@ function genDSCGraph() {
                 'start': window.start.toISOString().slice(0,16),
                 'stop': window.stop.toISOString().slice(0,16),
                 'gvis': gvis,
+                // FIXME[node grouping]: this parm is no longer needed
                 'subgroup': subgroup,
                 'pltid': pltid,
                 'svrnm' : svrnm,

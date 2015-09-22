@@ -135,14 +135,15 @@ echo "Running DDL scripts"
 @LIBEXEC@/DDL_updates/000011_ddl_geoip
 @LIBEXEC@/DDL_updates/000012_ddl_lower_key_index -s
 @LIBEXEC@/DDL_updates/000013_ddl_node_subgroup
+@LIBEXEC@/DDL_updates/000014_ddl_loadtime
 ###########################################################
 
 ###################  POPULATE TABLES  #####################
 ###########################################################
 echo "Populate servers and nodes"
-@LIBEXEC@/database_update_nodes -s
 @LIBEXEC@/database_update_tlds
 @LIBEXEC@/database_update_geoip
+@LIBEXEC@/database_update_nodes
 ###########################################################
 
 #############  PARTITION DATA TABLES  #####################

@@ -129,12 +129,9 @@ Developed by Sinodun IT (www.sinodun.com)
 <!-- 
         auto populated by gengraph.js
    --></select>
-      <input type="checkbox" id="groupNodes"  value="Select all nodes in the same cluster" title="Select all nodes in the same cluster">
-      <label for="groupNodes">Cluster Node Selection</label>
       </div>
       <div class="sixteen columns" id="nodetabs"><!-- 
-        auto populated by gengraph.js
-        TODO: Node tab appears shifted to the right by a few pixels.
+         auto populated by nodetabs.js
    --></div>
     </form>
     <div class="eight columns" id="local_links" >

@@ -27,7 +27,7 @@ prepStmnt <- function(statementNm, dsccon){
         rs <- NULL
         switch(statementNm,
                getdbversion                         = { rs <- try(dbSendQuery(dsccon, "PREPARE getdbversion AS                      SELECT version FROM dsc.version;"))},
-               getpltddcategories                   = { rs <- try(dbSendQuery(dsccon, "PREPARE getpltddcategories AS                SELECT DISTINCT ddcategory FROM dsc.plot WHERE ddcategory != '' ORDER BY ddcategory;"))},
+               getpltddcategories                   = { rs <- try(dbSendQuery(dsccon, "PREPARE getpltddcategories AS                SELECT DISTINCT ddcategory, cast(substring(ddcategory from 1 for position('.' in ddcategory)-1 ) as int) as in_order FROM dsc.plot WHERE ddcategory != '' order by in_order;"))},
                getpltid_ddname                      = { rs <- try(dbSendQuery(dsccon, "PREPARE getpltid_ddname (TEXT) AS            SELECT id, ddname FROM dsc.plot WHERE ddcategory=$1 ORDER BY ddname ;"))},
                getpltdetails                        = { rs <- try(dbSendQuery(dsccon, "PREPARE getpltdetails (INTEGER) AS           SELECT name, title, description, plot_id FROM dsc.plot WHERE id=$1;"))},
                getsrvrid_display_name               = { rs <- try(dbSendQuery(dsccon, "PREPARE getsrvrid_display_name AS            SELECT id, display_name FROM dsc.server ORDER BY display_name;"))},
