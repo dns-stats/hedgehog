@@ -47,17 +47,17 @@ usage () {
 	echo " - See the comments in that file for details of the format."
 	echo " - No action is taken on servers/nodes that are in the database but are not in the input files."
 	echo 
-    echo "Usage: $(basename $0) options"
-    echo
-    echo "Supported options:"
+	echo "Usage: $(basename $0) options"
+	echo
+	echo "Supported options:"
 	echo "  -p Run in prediction mode. Output findings but don't act on the DB"
-    echo "  -h Show this help."
+	echo "  -h Show this help."
 }
 
 while getopts ":psh" opt; do
     case $opt in
-		p  ) PREDICT=1;;
-		s  ) SUPPRESS_WARNINGS=1;;
+	p  ) PREDICT=1;;
+	s  ) SUPPRESS_WARNINGS=1;;
         h  ) usage
              exit 1 ;;
         \? ) usage
