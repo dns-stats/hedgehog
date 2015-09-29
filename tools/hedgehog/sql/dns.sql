@@ -22,7 +22,7 @@
  * See http://www.team-cymru.org/IP-ASN-mapping.html
  */
 
-create or replace function ip2asn (addr dsc.ipaddress)
+create or replace function dsc.ip2asn (addr dsc.ipaddress)
 	returns text
 as $$
 	from IPy import IP
@@ -32,14 +32,9 @@ as $$
 	if addr is None:
 		plpy.error('Function ip2asn: Address passed in was null')
 		return None
-	
+		
 	''' Create a IPy IP object '''
 	ip = IP(addr)
-
-	if ip.prefixlen() != 32:
-		if ip.prefixlen() != 128:
-			plpy.error('Function ip2asn: Address passed in is a range')
-			return None
 	
 	''' reverse the address '''
 	if ip.version() == 4:
@@ -74,8 +69,61 @@ as $$
 			for answer in answers:
 				if answer['type'] == getdns.RRTYPE_TXT:
 					rdata = answer['rdata']
-					return rdata['txt_strings']
-	
-	plpy.info('Function ip2asn: No TXT record returned')
+					return rdata['txt_strings'][0].split('|')[0].strip()
+					
+	plpy.info('Function ip2asn: No ASN found')
 	return None
-$$ LANGUAGE plpythonu;			
+$$ LANGUAGE plpythonu;
+
+create or replace function dsc.ip2bgpprefix (addr dsc.ipaddress)
+	returns dsc.iprange
+as $$
+	from IPy import IP
+	import getdns
+
+	''' Sanity Check '''
+	if addr is None:
+		plpy.error('Function ip2bgpprefix: Address passed in was null')
+		return None
+		
+	''' Create a IPy IP object '''
+	ip = IP(addr)
+
+	''' reverse the address '''
+	if ip.version() == 4:
+		s = ip.strFullsize()
+		s = s.split('.')
+		s.reverse()
+		s = '.'.join(s)
+		qname = "%s.origin.asn.cymru.com." % s
+	elif ip.version() == 6:
+		s = '%032x' % ip.int()
+		s = list(s)
+		s.reverse()
+		s = '.'.join(s)
+		qname = "%s.origin6.asn.cymru.com." % s	
+	else:
+		plpy.error('Function ip2bgpprefix: Unknown IP address type.')
+		return None
+				
+	ctx = getdns.Context()
+	ctx.resolution_type = getdns.RESOLUTION_STUB
+	ctx.resolver_type = getdns.RESOLUTION_STUB
+	
+	try:
+		results = ctx.general(name=qname, request_type=getdns.RRTYPE_TXT, extensions={})
+	except getdns.error as e:
+		plpy.error('Function ip2bgpprefix: GetDNS Error: %s' % str(e))
+		return None
+	status = results.status
+	if status == getdns.RESPSTATUS_GOOD:
+		for reply in results.replies_tree:
+			answers = reply['answer']
+			for answer in answers:
+				if answer['type'] == getdns.RRTYPE_TXT:
+					rdata = answer['rdata']
+					return rdata['txt_strings'][0].split('|')[1].strip()
+					
+	plpy.info('Function ip2bgpprefix: No BGP Prefix found')
+	return None
+$$ LANGUAGE plpythonu;

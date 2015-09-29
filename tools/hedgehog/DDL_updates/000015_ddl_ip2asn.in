@@ -1,0 +1,95 @@
+#!/bin/bash
+#
+# Copyright 2015 Internet Corporation for Assigned Names and Numbers.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   000015_ddl_ip2asn
+#
+
+eval $(@LIBEXEC@/conf_read)
+
+DB_NAME=$hhconfig_database_name
+DATA_DIR=$hhconfig_directories_data
+SQ="'"
+
+NEW_DDL_SERIAL=15
+REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
+NEW_API_VERSION=12
+REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 1 ))
+
+DSC_SCHEMA="dsc"
+
+usage () {
+    echo
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+	echo "  -P <password for the super user>"
+	echo "  -U <username for the super user> Required"
+    exit 1
+}
+
+while getopts ":hP:U:" opt; do
+    case $opt in
+        h  ) usage ;;
+		P  ) SPECIFIED_PASS=$OPTARG ;;
+		U  ) SPECIFIED_USER=$OPTARG ;;
+        \? ) usage ;;
+    esac
+done
+
+if [ -z "SPECIFIED_USER" ] ; then
+	usage
+fi
+
+# We need a superuser. 
+a=$(@LIBEXEC@/check_user_db_api -U $SPECIFIED_USER -P $SPECIFIED_PASS -C $REQUIRED_API_VERSION)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+echo "`date`: $0 COMMENCED"
+
+LAST_SERIAL=`psql -h $hhconfig_database_host $DB_NAME -tc  "select max(serial) from dsc.internal_version;"`
+[ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] && echo "Error: ddl scripts not run in correct order." && exit 1
+
+psql -h $hhconfig_database_host $DB_NAME -qtc '\dL' | grep plpythonu
+if [ $? -eq 1 ] ; then
+	echo "No plpythonu language installed. Ensure that the plpythonu package is installed."
+	echo "Then connect to the $DB_NAME database as a superuser and run the command \"CREATE EXTENSION plpythonu SCHEMA pg_catalog;\""
+	exit 1
+fi
+
+psql $CONN_STRING < @SQL_PATH/dns.sql
+if [ $? -eq 0 ] ; then
+psql -h $hhconfig_database_host $DB_NAME <<EOF
+BEGIN;
+
+UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
+INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new ip2asn functions', now() );
+COMMIT;
+EOF
+fi
+
+echo "`date`: $0 COMPLETED"

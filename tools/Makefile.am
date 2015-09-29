@@ -26,6 +26,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
                          hedgehog/DDL_updates/000013_ddl_node_subgroup \
                          hedgehog/DDL_updates/000014_ddl_loadtime \
+                         hedgehog/DDL_updates/000015_ddl_ip2asn \
                          hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
                          hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
@@ -36,6 +37,7 @@ subst_LIBEXECDATA = sed -e "s|@LIBEXEC@|@libexecdir@/hedgehog|" -e "s|@DATA@|@da
 subst_DB_VERSION = sed -e "s|@DB_VERSION@|@DB_SCHEMA_VERSION@|"
 subst_BIN = sed -e "s|@BIN@|@bindir@|"
 do_subst_python = sed -e 's|@PYTHON_EXE@|$(PYTHON)|' -e 's|@HHPYSITEDIR@|$(pythondir)|'
+subst_sql = sed -e 's|@SQL_PATH@|$(datadir)/hedgehog/sql|'
 
 hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX: $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX.in Makefile
 	$(do_subst_python) < $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX.in > hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX
@@ -136,6 +138,10 @@ hedgehog/DDL_updates/000013_ddl_node_subgroup: $(srcdir)/hedgehog/DDL_updates/00
 hedgehog/DDL_updates/000014_ddl_loadtime: $(srcdir)/hedgehog/DDL_updates/000014_ddl_loadtime.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_loadtime.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_loadtime
+
+hedgehog/DDL_updates/000015_ddl_ip2asn: $(srcdir)/hedgehog/DDL_updates/000015_ddl_ip2asn.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000015_ddl_ip2asn | $(subst_DB_VERSION) | $(subst_sql) > hedgehog/DDL_updates/000015_ddl_ip2asn
 
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
