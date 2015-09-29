@@ -88,7 +88,7 @@ CREATE INDEX ix_ip_range ON geoip USING gist (ip_range);
 
 CREATE TABLE locations (
   geoname_id integer PRIMARY KEY,
-  country_iso_code text,
+  name text,
   city text );
 
 WITH rows AS (

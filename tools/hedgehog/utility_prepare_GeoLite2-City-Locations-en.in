@@ -1,0 +1,12 @@
+#!@PYTHON_EXE@
+import csv
+with open('/tmp/GeoLite2-City-Locations-en.csv', 'rb') as f:
+	reader = csv.reader(f)
+	with open('/tmp/locations_ready_to_import.csv', 'ab') as o:
+		writer = csv.writer(o)
+		for row in reader:
+			if row[0] == "geoname_id":
+				continue
+			writer.writerow([row[0],row[5],row[10]])
+	o.close()
+f.close()

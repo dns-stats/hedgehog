@@ -25,7 +25,9 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000011_ddl_geoip \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
                          hedgehog/DDL_updates/000013_ddl_node_subgroup \
-                         hedgehog/DDL_updates/000014_ddl_loadtime
+                         hedgehog/DDL_updates/000014_ddl_loadtime \
+						 hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
+						 hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
                    $(srcdir)/hedgehog/sql/insert_lookup_data.sql
@@ -33,7 +35,14 @@ nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
 subst_LIBEXECDATA = sed -e "s|@LIBEXEC@|@libexecdir@/hedgehog|" -e "s|@DATA@|@datadir@|"
 subst_DB_VERSION = sed -e "s|@DB_VERSION@|@DB_SCHEMA_VERSION@|"
 subst_BIN = sed -e "s|@BIN@|@bindir@|"
+do_subst_python = sed -e 's|@PYTHON_EXE@|$(PYTHON)|' -e 's|@HHPYSITEDIR@|$(pythondir)|'
 
+hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX: $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX.in Makefile
+	$(do_subst_python) < $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX.in > hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX
+
+hedgehog/utility_prepare_GeoLite2-City-Locations-en: $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Locations-en.in Makefile
+	$(do_subst_python) < $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Locations-en.in > hedgehog/utility_prepare_GeoLite2-City-Locations-en
+	
 refile_and_grok: refile_and_grok.in Makefile
 	$(subst_LIBEXECDATA) < $(srcdir)/refile_and_grok.in | $(subst_DB_VERSION) | $(subst_BIN) > refile_and_grok
 
@@ -145,3 +154,4 @@ EXTRA_DIST = refile_and_grok.in \
 install-data-hook:
 	mkdir -p ${DESTDIR}$(localstatedir)/hedgehog/data
 	chmod -R 775 ${DESTDIR}$(localstatedir)/hedgehog/data
+

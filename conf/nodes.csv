@@ -5,26 +5,34 @@
 # 
 # server-name  - This must be unique and it must match the name used in the
 #                data directory path for uploaded files.
-# node-name    - This must be unique for a given server and it must match the name
-#                used in the data directory path for uploaded files.
-# node-group   - This is used in the node grouping tabs in the Hedgehog front end.
-#                It should be unique for a given server. It is optional and if not
+# node-name    - This must be unique for a given server and it must 
+#                match the name used in the data directory path for 
+#                uploaded files.
+# node-group   - This is used in the node grouping tabs in the Hedgehog
+#                front end. It should be unique for a given server. 
+#                It is optional and if not
 #                specified the node is added to a group called 'Other'.
+# country      - This is the country that the node is located in
+#                It is optional and if not specified is left blank
+#
+# city         - This is the city that the node is located in
+#                It is optional and if not specified is left blank
 # 
 # node-subgroup - This is used to collect nodes into subgroups for convenient
 #                 selection and plotting. It should be unique for a given group.
 #                 It is optional and if not specified is left blank.
-# node-ip       - IP address of the node (IPv4 or IPv6) It is optional and if
-#                 not specified is left blank.
+#
+# node-ip       - The management IP address of the node (IPv4 or IPv6)
+#                 It is optional and if not specified is left blank.
 # Example input: (uncomment the following)
-
-#Server-A,Node-1,Region-1,Subgroup-1,10.0.0.2
-#Server-A,Node-2,Region-1,Subgroup-1,
-#Server-A,Node-3,Region-1,Subgroup-2,
-#Server-A,Node-4,Region-1,Subgroup-2,
-#Server-A,Node-5,Region-2,Subgroup-3,
-#Server-A,Node-6,Region-2,Subgroup-3,
-#Server-A,Node-7,Region-3,,10.0.0.3
-#Server-B,Node-1,Region-1,,
-#Server-B,Node-2,Region-2,,
-#Server-C,Node-5,Region-4,,
+#Server-A,Node-1,Region-1,US,Boston,Subgroup-1,10.0.0.2
+#Server-A,Node-2,Region-1,Canada,,Subgroup-1,
+#Server-A,Node-3,Region-1,,,Subgroup-2,
+#Server-A,Node-4,Region-1,,,Subgroup-2,
+#Server-A,Node-5,Region-2,,,Subgroup-3,
+#Server-A,Node-6,Region-2,,,Subgroup-3,
+#Server-A,Node-7,Region-3,,,,10.0.0.3
+#Server-B,Node-1,Region-1,,,,
+#Server-B,Node-2,Region-2,,,,
+#Server-C,Node-5,Region-4,,,,
+######################################################################

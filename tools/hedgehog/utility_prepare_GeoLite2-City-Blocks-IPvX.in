@@ -1,0 +1,28 @@
+#!@PYTHON_EXE@
+import csv
+with open('/tmp/GeoLite2-City-Blocks-IPv4.csv', 'rb') as f:
+	reader = csv.reader(f)
+	with open('/tmp/blocks_ready_to_import.csv', 'wb') as o:
+		writer = csv.writer(o)
+		for row in reader:
+			if row[0] == "network":
+				continue
+			if row[1] == "":
+				writer.writerow([row[0],row[2],row[7],row[8]])
+			else:
+				writer.writerow([row[0],row[1],row[7],row[8]])
+	o.close()
+f.close()
+with open('/tmp/GeoLite2-City-Blocks-IPv6.csv', 'rb') as f:
+	reader = csv.reader(f)
+	with open('/tmp/blocks_ready_to_import.csv', 'ab') as o:
+		writer = csv.writer(o)
+		for row in reader:
+			if row[0] == "network":
+				continue
+			if row[1] == "":
+				writer.writerow([row[0],row[2],row[7],row[8]])
+			else:
+				writer.writerow([row[0],row[1],row[7],row[8]])
+	o.close()
+f.close()

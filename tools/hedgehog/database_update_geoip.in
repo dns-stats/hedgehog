@@ -77,44 +77,20 @@ fi
 unzip -oj GeoLite2-City-CSV.zip
 
 echo "Preparing City Blocks data..."
-# Remove header lines, use $3 if $2 is empty,
-# the if clause ensures that rows with no
-# latitude/logitude contain null not 0.
-awk -F, "
-	{ if (\$1 ~ /network/) { next }}
-    { \$2 ~ /^$/ ? a=\$3 : a=\$2 }
-    { if (\$8 ~ /^$/ || \$9 ~ /^$/) {
-        printf \"%s, %i,,\n\", \$1, a
-      } else {
-        printf \"%s,%i,%8.4f,%8.4f\n\", \$1, a, \$8, \$9
-      }
-    }
-    " /tmp/GeoLite2-City-Blocks-IPv6.csv /tmp/GeoLite2-City-Blocks-IPv4.csv > /tmp/blocks_ready_to_import.csv
+@LIBEXEC@/utility_prepare_GeoLite2-City-Blocks-IPvX
 
 echo "Preparing Location data..."
-# Remove header line (this time we only have one input file so we can
-# just remove row 1), subsitute odd ' and " in the city field,
-# the if clause ensures that rows with no
-# city contain null.
-awk -F, " 
-    NR == 1 { next }
-    { gsub(/\"/,\"\",\$11) }
-    { gsub(/'/,\"\",\$11) }
-    { if (\$11 ~ /^$/) {
-       printf \"%i,%s,\n\", \$1, \$5
-      } else {
-       printf \"%i,%s,%s\n\", \$1, \$5, \$11
-      }
-    }
-    " /tmp/GeoLite2-City-Locations-en.csv > /tmp/locations_ready_to_import.csv
+@LIBEXEC@/utility_prepare_GeoLite2-City-Locations-en
 			
 psql -h $hhconfig_database_host $DB_NAME << EOF                                                                                                                                          
 BEGIN;
 delete from geoip;
 \copy geoip (ip_range, geoname, latitude, longitude) from '/tmp/blocks_ready_to_import.csv' (HEADER false, DELIMITER ',', FORMAT 'csv')
 delete from locations;
-\copy locations (geoname_id, country_iso_code, city) from '/tmp/locations_ready_to_import.csv' (HEADER false, DELIMITER ',', FORMAT 'csv')
+\copy locations (geoname_id, name, city) from '/tmp/locations_ready_to_import.csv' (HEADER false, DELIMITER ',', FORMAT 'csv')
 COMMIT;
 EOF
+
+rm -f /tmp/blocks_ready_to_import.csv /tmp/locations_ready_to_import.csv
 
 echo "$(date): $0 COMPLETED"
