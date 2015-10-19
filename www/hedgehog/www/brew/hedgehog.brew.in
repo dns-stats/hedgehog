@@ -391,14 +391,18 @@ if (is.null(hh_config$database$read_pass)) {
     db_password <- hh_config$database$read_pass
 }
 dsccon <- try(dbConnect(dbdrv, dbname = hh_config$database$name, user = hh_config$database$read_user, port = hh_config$database$port, host = hh_config$database$host, password = db_password))
-dbconstr <<-paste('dbname = ', hh_config$database$name, ', user = ', hh_config$database$read_user, ', port = ', hh_config$database$port, ', host = ', hh_config$database$host, ', password = ', hh_config$database$read_pass, sep="")
+dbconstr <<-paste('dbname = \'', hh_config$database$name, '\', user = \'', hh_config$database$read_user, '\', port = ', hh_config$database$port, ', host = \'', hh_config$database$host, '\', password = \'', hh_config$database$read_pass,'\'', sep="")
+if (hh_debug) {
+  msg <- paste('logger -p user.notice dsccon: ', dbconstr)
+  system(msg)
+}
 
 if (class(dsccon) != "try-error") {
 	dbSendQuery(dsccon, "set statement_timeout to 300000;")
 	source(paste(hh_config$directories$web_source, "/R/prepareStatement.R", sep = ""))
 	source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep = ""))
 	switch(GET$type,
-	    validateDBVersion  = {validateDbVersion()},
+		validateDBVersion  = {validateDbVersion()},
 		initPlotDDHtml     = {initPlotDDHtml()},
 		initServerDDHtml   = {initServerDDHtml()},
 		initNodeTabsHtml   = {initNodeTabsHtml()},

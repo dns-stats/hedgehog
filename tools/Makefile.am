@@ -27,17 +27,20 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000013_ddl_node_subgroup \
                          hedgehog/DDL_updates/000014_ddl_loadtime \
                          hedgehog/DDL_updates/000015_ddl_ip2asn \
+                         hedgehog/DDL_updates/000016_ddl_ip2asn_part2 \
                          hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
                          hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
-                   $(srcdir)/hedgehog/sql/insert_lookup_data.sql
+                   $(srcdir)/hedgehog/sql/insert_lookup_data.sql \
+                   $(srcdir)/hedgehog/sql/dns.sql
 
 subst_LIBEXECDATA = sed -e "s|@LIBEXEC@|@libexecdir@/hedgehog|" -e "s|@DATA@|@datadir@|"
 subst_DB_VERSION = sed -e "s|@DB_VERSION@|@DB_SCHEMA_VERSION@|"
 subst_BIN = sed -e "s|@BIN@|@bindir@|"
 do_subst_python = sed -e 's|@PYTHON_EXE@|$(PYTHON)|' -e 's|@HHPYSITEDIR@|$(pythondir)|'
-subst_sql = sed -e 's|@SQL_PATH@|$(datadir)/hedgehog/sql|'
+subst_sql = sed -e 's|<SQL_PATH>|$(datadir)/hedgehog/sql|'
+subst_version = sed -e 's|<VERSION>|@VERSION@|'
 
 hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX: $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX.in Makefile
 	$(do_subst_python) < $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX.in > hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX
@@ -57,7 +60,7 @@ hedgehog/conf_read: $(srcdir)/hedgehog/conf_read.in Makefile
 
 hedgehog/check_user_db_api: $(srcdir)/hedgehog/check_user_db_api.in Makefile
 	mkdir -p hedgehog
-	$(subst_DB_VERSION) < $(srcdir)/hedgehog/check_user_db_api.in | $(subst_LIBEXECDATA) > hedgehog/check_user_db_api
+	$(subst_DB_VERSION) < $(srcdir)/hedgehog/check_user_db_api.in | $(subst_LIBEXECDATA) | $(subst_version) > hedgehog/check_user_db_api
 	
 hedgehog/database_init: $(srcdir)/hedgehog/database_init.in Makefile
 	mkdir -p hedgehog
@@ -141,7 +144,11 @@ hedgehog/DDL_updates/000014_ddl_loadtime: $(srcdir)/hedgehog/DDL_updates/000014_
 
 hedgehog/DDL_updates/000015_ddl_ip2asn: $(srcdir)/hedgehog/DDL_updates/000015_ddl_ip2asn.in Makefile
 	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000015_ddl_ip2asn | $(subst_DB_VERSION) | $(subst_sql) > hedgehog/DDL_updates/000015_ddl_ip2asn
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000015_ddl_ip2asn.in | $(subst_DB_VERSION) | $(subst_sql) | $(subst_version) > hedgehog/DDL_updates/000015_ddl_ip2asn
+
+hedgehog/DDL_updates/000016_ddl_ip2asn_part2: $(srcdir)/hedgehog/DDL_updates/000016_ddl_ip2asn_part2.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000016_ddl_ip2asn_part2.in | $(subst_DB_VERSION) | $(subst_sql) | $(subst_version) > hedgehog/DDL_updates/000016_ddl_ip2asn_part2
 
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
