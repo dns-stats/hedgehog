@@ -243,8 +243,9 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
           }
       }else{
           # Need to order the table before passing it to gviz
-          # write.table(de, file="/temp/de.out")
-          de$total <- rowSums(de, na.rm=TRUE);
+          #write.table(de, file="/tmp/de.out")
+          # Dont include the IP ddress in the sum!
+          de$total <- rowSums(de[,-1], na.rm=TRUE);
           de <-arrange(de, desc(total));
           de$total <- NULL
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
@@ -252,7 +253,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
                                          vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'12'}}", sep=""), 
                                          hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), 
                                          legend=paste("{textStyle:{fontSize:'12'}}", sep=""), 
-                                         chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
+                                         chartArea="{left:105,top:50,width:\"75%\",height:\"80%\"}"))
       }
       cat(p$html$chart,file=f)
     }else{
