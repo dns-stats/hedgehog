@@ -87,8 +87,8 @@ as $$
       ctx = GD['teamcymrulookupctx']
   else:
       ctx = getdns.Context()
+      ctx.resolution_type = getdns.RESOLUTION_STUB
       GD['teamcymrulookupctx'] = ctx
-  ctx.resolution_type = getdns.RESOLUTION_STUB
   
   try:
     results = ctx.general(name=qname, request_type=getdns.RRTYPE_TXT, extensions={})
@@ -107,3 +107,14 @@ as $$
   plpy.info('Function teamcymrulookup: No data returned from DNS query')
   return None
 $$ LANGUAGE plpythonu;
+
+CREATE or REPLACE FUNCTION dsc.iptruncate (addr dsc.ipaddress)
+  RETURNS dsc.iprange
+as $$
+BEGIN
+  CASE family(addr)
+    WHEN 4 then RETURN addr / 8;
+    WHEN 6 then RETURN addr / 32;
+  END CASE;
+END
+$$ LANGUAGE plpgsql;
