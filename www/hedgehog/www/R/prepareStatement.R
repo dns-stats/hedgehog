@@ -23,7 +23,7 @@
 prepStmnt <- function(statementNm, dsccon){
 
     if(class(dsccon) != "try-error"){
-      all_nodes_sql="AND node_id = ANY (string_to_array($6, ',')::integer[])"
+      select_nodes_sql="AND node_id = ANY (string_to_array($6, ',')::integer[])"
       all_nodes_prep="(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS"
       select_nodes_prep="(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS"
       
@@ -124,12 +124,51 @@ prepStmnt <- function(statementNm, dsccon){
                geochart                            = { rs <- try(dbSendQuery(dsccon, "PREPARE geochart              (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS   select l.name as location, sum(d.value) as count, 1 as color, 'Queries' as type FROM dsc.data d, geoip g, locations l  where cast(d.key2 as ipaddress) <<= g.ip_range and l.geoname_id=g.geoname and server_id=$1 AND plot_id=$2 AND d.starttime >=$3 AND starttime<=$4 AND d.node_id = ANY (string_to_array($5, ',')::integer[]) and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') group by location union select n.city as location, count(*), 2 as color, n.city || ' nodes' as type from node n where n.id = ANY (string_to_array($5, ',')::integer[]) group by n.city;"))},
                geochart_all_nodes                  = { rs <- try(dbSendQuery(dsccon, "PREPARE geochart_all_nodes    (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS         select l.name as location, sum(d.value) as count, 1 as color, 'Queries' as type FROM dsc.data d, geoip g, locations l  where cast(d.key2 as ipaddress) <<= g.ip_range and l.geoname_id=g.geoname and server_id=$1 AND plot_id=$2 AND d.starttime >=$3 AND starttime<=$4 and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') group by location union select n.city as location, count(*), 2 as color, n.city || ' nodes' as type from node n group by n.city;"))},
 
-               format3_bgpprefix                    = { rs <- try(dbSendQuery(dsccon, "PREPARE format3_bgpprefix                        (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS           SELECT xx / ip2bgpprefix(xx) AS x, y FROM (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND node_id = ANY (string_to_array($6, ',')::integer[]) AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;"))},
-               format3_bgpprefix_all_nodes          = { rs <- try(dbSendQuery(dsccon, "PREPARE format3_bgpprefix_all_nodes              (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS                 SELECT xx / ip2bgpprefix(xx) AS x, y FROM (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;"))},
-               format3_asn                          = { rs <- try(dbSendQuery(dsccon, "PREPARE format3_asn                        (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS           SELECT ip2asn(xx) AS x, y FROM (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND node_id = ANY (string_to_array($6, ',')::integer[]) AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;"))},
-               format3_asn_all_nodes                = { rs <- try(dbSendQuery(dsccon, "PREPARE format3_asn_all_nodes              (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS                 SELECT ip2asn(xx) AS x, y FROM (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;"))},
+               format3_bgpprefix  = {
+                 sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
+                 "SELECT xx / ip2bgpprefix(xx) AS x, y FROM
+                  (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y 
+                  FROM dsc.data 
+                  WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
+                  select_nodes_sql,
+                  "AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+                  GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;", sep=" ")
+                sql=gsub("\n"," ",sql_joined)
+                rs <- try(dbSendQuery(dsccon, sql))},
                
+               format3_bgpprefix_all_nodes= {
+                 sql_joined <- paste("PREPARE", statementNm, all_nodes_prep, 
+                 "SELECT xx / ip2bgpprefix(xx) AS x, y FROM 
+                  (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y
+                   FROM dsc.data
+                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5
+                   AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
+                   GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;", sep=" ")
+                sql=gsub("\n"," ",sql_joined)
+                rs <- try(dbSendQuery(dsccon, sql))},
 
+               format3_asn = {
+                 sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
+                 "SELECT ip2asn(xx) AS x, y FROM
+                  (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y 
+                   FROM dsc.data 
+                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
+                   select_nodes_sql,
+                   "AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
+                   GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;", sep=" ")
+                sql=gsub("\n"," ",sql_joined)
+                rs <- try(dbSendQuery(dsccon, sql))},
+               
+               format3_asn_all_nodes = {
+                 sql_joined <- paste("PREPARE", statementNm, all_nodes_prep, 
+                 "SELECT ip2asn(xx) AS x, y FROM 
+                  (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y 
+                   FROM dsc.data 
+                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5
+                   AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
+                   GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;", sep=" ")
+                 sql=gsub("\n"," ",sql_joined)
+                 rs <- try(dbSendQuery(dsccon, sql))},
                
                client_addr_vs_rcode_accum_asn = {
                sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
@@ -138,8 +177,9 @@ prepStmnt <- function(statementNm, dsccon){
                    FROM dsc.data d, iana_lookup il 
                    WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5
                    AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
-                   AND il.registry = 'rcode' AND d.key2::text = il.value::text 
-                   GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                   AND il.registry = 'rcode' AND d.key2::text = il.value::text",
+                   select_nodes_sql,
+                   "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
               sql=gsub("\n"," ",sql_joined)
               rs <- try(dbSendQuery(dsccon, sql))},
               
@@ -150,9 +190,8 @@ prepStmnt <- function(statementNm, dsccon){
                   FROM dsc.data d, iana_lookup il 
                   WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5
                   AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
-                  AND il.registry = 'rcode' AND d.key2::text = il.value::text",
-                  all_nodes_sql,
-                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                  AND il.registry = 'rcode' AND d.key2::text = il.value::text
+                  GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
              sql=gsub("\n"," ",sql_joined)
              rs <- try(dbSendQuery(dsccon, sql))},
  
@@ -163,8 +202,9 @@ prepStmnt <- function(statementNm, dsccon){
                  FROM dsc.data d, iana_lookup il 
                  WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5
                  AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
-                 AND il.registry = 'rcode' AND d.key2::text = il.value::text 
-                 GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                 AND il.registry = 'rcode' AND d.key2::text = il.value::text",
+                 select_nodes_sql,
+                 "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
             sql=gsub("\n"," ",sql_joined)
             rs <- try(dbSendQuery(dsccon, sql))},
             
@@ -175,9 +215,8 @@ prepStmnt <- function(statementNm, dsccon){
                 FROM dsc.data d, iana_lookup il 
                 WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5
                 AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
-                AND il.registry = 'rcode' AND d.key2::text = il.value::text",
-                all_nodes_sql,
-                "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                AND il.registry = 'rcode' AND d.key2::text = il.value::text
+                GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},
 

@@ -74,28 +74,28 @@ BEGIN;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('asn','7.Client Subnet Statistics','Busiest Client ASNs','Busiest Client ASNs') 
+    VALUES ('asn','7.Client Subnet Statistics','Busiest Client ASNs','Client ASNs for the busiest /24(IPv4) or /96(IPv6)') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('bgpprefix','7.Client Subnet Statistics','Busiest Client BGP Prefix','Busiest Clients by BGP Prefix') 
+    VALUES ('bgpprefix','7.Client Subnet Statistics','Busiest Client BGP Prefix','Clients by BGP Prefix for the busiest /24(IPv4) or /96(IPv6)') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('client_addr_vs_rcode_accum_asn','7.Client Subnet Statistics','RCODE by Client ASNs','RCODE by Client ASNs') 
+    VALUES ('client_addr_vs_rcode_accum_asn','7.Client Subnet Statistics', 'RCODE by Client ASNs', 'RCODE by Client ASNs for the busiest /24(IPv4) or /96(IPv6)') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET2} FROM rows;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('client_addr_vs_rcode_accum_bgpprefix','7.Client Subnet Statistics','RCODE by Client BGP Prefix','RCODE by Clients by BGP Prefix') 
+    VALUES ('client_addr_vs_rcode_accum_bgpprefix','7.Client Subnet Statistics', 'RCODE by Clients by BGP Prefix', 'RCODE by Client BGP Prefix for the busiest /24(IPv4) or /96(IPv6)')
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET2} FROM rows;
