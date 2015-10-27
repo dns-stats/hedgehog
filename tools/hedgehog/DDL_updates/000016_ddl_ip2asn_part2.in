@@ -68,6 +68,7 @@ echo "$(date): $0 COMMENCED"
 
 DATASET=$(psql $CONN_STRING -qtc "SELECT id FROM dataset WHERE name = 'client_subnet_accum';")
 DATASET2=$(psql $CONN_STRING -qtc "SELECT id FROM dataset WHERE name = 'client_addr_vs_rcode_accum';")
+DATASET3=$(psql $CONN_STRING -qtc "SELECT id FROM dataset WHERE name = 'client_subnet2_accum';")
 
 psql $CONN_STRING <<EOF
 BEGIN;
@@ -99,6 +100,20 @@ WITH rows AS (
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET2} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('client_subnet2_accum_asn','8.Classification', 'Query classification by Client ASNs', 'Query classification by Client ASNs for the busiest /24(IPv4) or /96(IPv6)') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${DATASET3} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('client_subnet2_accum_bgpprefix','8.Classification', 'Query classification by Clients by BGP Prefix', 'Query classification by Client BGP Prefix for the busiest /24(IPv4) or /96(IPv6)')
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${DATASET3} FROM rows;
 
 UPDATE visible_plot SET title='Busiest client subnets (Fixed IPv4/8 or IPv6/32)', display_name='Busiest client subnets (Fixed size)' where name='client_subnet_accum';
 
