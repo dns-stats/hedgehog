@@ -34,8 +34,8 @@ prepStmnt <- function(statementNm, dsccon){
                getsrvr_display_name_from_id         = { rs <- try(dbSendQuery(dsccon, "PREPARE getsrvr_display_name_from_id AS      SELECT display_name FROM dsc.server where id=$1;"))},
                getgroups                            = { rs <- try(dbSendQuery(dsccon, "PREPARE getgroups (INTEGER) AS               SELECT DISTINCT region FROM dsc.node WHERE server_id=$1 ORDER BY region;"))},
 
-               getnodes                             = { rs <- try(dbSendQuery(dsccon, "PREPARE getnodes         (INTEGER) AS        SELECT id, name, subgroup FROM dsc.node WHERE server_id=$1 ORDER BY name;"))},
-               getnodesbyregion                     = { rs <- try(dbSendQuery(dsccon, "PREPARE getnodesbyregion (INTEGER, TEXT) AS  SELECT id, name, subgroup FROM dsc.node WHERE server_id=$1 AND region=$2 ORDER BY name;"))},
+               getnodes                             = { rs <- try(dbSendQuery(dsccon, "PREPARE getnodes         (INTEGER) AS        SELECT id, name, country, city, subgroup FROM dsc.node WHERE server_id=$1 ORDER BY name;"))},
+               getnodesbyregion                     = { rs <- try(dbSendQuery(dsccon, "PREPARE getnodesbyregion (INTEGER, TEXT) AS  SELECT id, name, country, city, subgroup FROM dsc.node WHERE server_id=$1 AND region=$2 ORDER BY name;"))},
 
                getdatasetids                        = { rs <- try(dbSendQuery(dsccon, "PREPARE getdatasetids    (INTEGER) AS        SELECT dataset_id FROM dsc.plot WHERE id=$1;"))},
                getdefaultpltid                      = { rs <- try(dbSendQuery(dsccon, "PREPARE getdefaultpltid  (TEXT) AS           SELECT id FROM dsc.plot WHERE name=$1;"))},
