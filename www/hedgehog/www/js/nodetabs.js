@@ -18,9 +18,6 @@
 
 function initNodeHtml(nodes_raw) {
 
-    // FIXME[node grouping]: This doesn't yet work or country or city
-    // FIXME[node grouping]: Check if the all of the 'each' loops are really needed. There was a bug in the id name that stopped direct lookup working that is now fixed.
-    
     // Example data format
     // var nodes = [
     //   { server:     "Server-A",
@@ -31,7 +28,6 @@ function initNodeHtml(nodes_raw) {
     //                  {group_name: "America", node_list: [{node_name: "Node-7", node_id: "7"}, {node_name: "Node-8", node_id: "8", node_country: "US", node_city: "City-1", node_sg: "Subgroup-3"}}]}]}];
 
     nodes= jQuery.parseJSON(nodes_raw);
-    // FIXME[node grouping]: Check for errors e.g. empty data
 
     // Append requires a full element and will close any open elements so need care when using it.
     $('#nodetabs').append("<div class='sixteen columns' id='groupcontent'></div>");
@@ -42,6 +38,11 @@ function initNodeHtml(nodes_raw) {
     $('#srvr_select').append("<input type='radio'          id='ng_city'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_city'     >City </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_subgroup' name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_subgroup' >Instance </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_none'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_none'     >No grouping </label>");
+
+    // Check for no servers is made earlier, so just check for nodes here
+    // if (nodes_raw = "[]") {
+    //     alert("No nodes found in the database");
+    // }
 
     // For each server, construct the groups.
     for (var i = 0; i < nodes.length; i++) {
@@ -81,57 +82,39 @@ function initNodeHtml(nodes_raw) {
                 // Loop over the groups/nodes
                 for (var x = start_group; x < stop_group; x++) {
                     for (var k = 0; k < nodes[i].groups[x].node_list.length; k++) {
-                        var node_name            = nodes[i].groups[x].node_list[k].node_name;
-                        var node_id              = nodes[i].groups[x].node_list[k].node_id;
-                        var node_sg              = nodes[i].groups[x].node_list[k].node_sg;
-                        var node_city            = nodes[i].groups[x].node_list[k].node_city;
-                        var node_country          = nodes[i].groups[x].node_list[k].node_country;
-                        // FIXME[node grouping]: 'Other' may need special handling on select......
-                        if (!node_sg)      node_sg       = 'No Instance';
-                        if (!node_city)    node_city     = 'No City';
-                        if (!node_country) node_country  = 'No Country';
-                        var node_id_group_server = node_id + "_" + group_server_basic;
+                        var node                 = nodes[i].groups[x].node_list[k]
+                        var node_id_group_server = node.node_id + "_" + group_server_basic;
                         if (node_grouping_options == 0) {
                             $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' onclick='selectNode(\"" + node_id_group_server + "\")'>");
-                            $('#' + group_server + '_node_cbs_id').append("<label for='" + node_id_group_server + "' title='Toggle node selection'>" + node_name + "</label>");
-                        } else if (node_grouping_options == 1) {
-                            // use tilde not underscores so current code doesn't trigger off this
-                            var node_sg_group_server = node_sg + "~" + group + "~" + nodes[i].server;
-                            if($("input[type='checkbox'][id='" + node_sg_group_server + "']").length == 0) {
-                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='subgroupselection' id='" + node_sg_group_server + "' name='cb-" + node_sg_group_server + "' value='" + node_id_group_server + "' onclick='selectSubGroup(this)'>");
-                                $('#' + group_server + '_node_cbs_id').append("<label for='" + node_sg_group_server + "' title='Toggle node selection for:\n" + node_name + "'>" + node_sg + "</label>");
-                            } else {
-                                var my_label = $("label[for='" + node_sg_group_server + "']").attr("title");
-                                $("label[for='" + node_sg_group_server + "']").attr("title", my_label + "\n" + node_name);
-                                var my_cb = $("input[type='checkbox'][id='" + node_sg_group_server + "']");
-                                $.each(my_cb, function() {
-                                   this.value = this.value + "~" + node_id_group_server; 
-                                });
+                            $('#' + group_server + '_node_cbs_id').append("<label for='" + node_id_group_server + "' title='Toggle node selection'>" + node.node_name + "</label>");
+                        } else {
+                            if (node_grouping_options == 1) {
+                                var node_groupby_label   = node.node_sg;
+                                if (!node_groupby_label) node_groupby_label = 'No Instance';
+                                var node_groupby_class   = 'subgroupselection';
+                                var node_groupby_onclick = 'selectSubGroup'
                             }
-                        } else if (node_grouping_options == 2) {
-                            // use tilde not underscores so current code doesn't trigger off this
-                            var node_city_group_server = node_city + "~" + group + "~" + nodes[i].server;
-                            if($("input[type='checkbox'][id='" + node_city_group_server + "']").length == 0) {
-                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='cityselection' id='" + node_city_group_server + "' name='cb-" + node_city_group_server + "' value='" + node_id_group_server + "' onclick='selectCity(this)'>");
-                                $('#' + group_server + '_node_cbs_id').append("<label for='" + node_city_group_server + "' title='Toggle node selection for:\n" + node_name + "'>" + node_city + "</label>");
-                            } else {
-                                var my_label = $("label[for='" + node_city_group_server + "']").attr("title");
-                                $("label[for='" + node_city_group_server + "']").attr("title", my_label + "\n" + node_name);
-                                var my_cb = $("input[type='checkbox'][id='" + node_city_group_server + "']");
-                                $.each(my_cb, function() {
-                                   this.value = this.value + "~" + node_id_group_server; 
-                                });
+                            if (node_grouping_options == 2) {
+                                var node_groupby_label   = node.node_city;
+                                if (!node_groupby_label) node_groupby_label = 'No City';
+                                var node_groupby_class   = 'cityselection';
+                                var node_groupby_onclick = 'selectCity'
+                            }   
+                            if (node_grouping_options == 3) {
+                                var node_groupby_label   = node.node_country;
+                                if (!node_groupby_label) node_groupby_label  = 'No Country';
+                                var node_groupby_class   = 'countryselection';
+                                var node_groupby_onclick = 'selectCountry'
                             }
-                        } else if (node_grouping_options == 3) {
-                            // use tilde not underscores so current code doesn't trigger off this
-                            var node_country_group_server = node_country + "~" + group + "~" + nodes[i].server;
-                            if($("input[type='checkbox'][id='" + node_country_group_server + "']").length == 0) {
-                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='countryselection' id='" + node_country_group_server + "' name='cb-" + node_country_group_server + "' value='" + node_id_group_server + "' onclick='selectCountry(this)'>");
-                                $('#' + group_server + '_node_cbs_id').append("<label for='" + node_country_group_server + "' title='Toggle node selection for:\n" + node_name + "'>" + node_country + "</label>");
+                            // use tilde not underscores as delimiter so other code doesn't trigger off this
+                            var node_groupby_group_server = node_groupby_label + "~" + group + "~" + nodes[i].server;
+                            if($("input[type='checkbox'][id='" + node_groupby_group_server + "']").length == 0) {
+                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='" + node_groupby_onclick + "(this)'>");
+                                $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + "</label>");
                             } else {
-                                var my_label = $("label[for='" + node_country_group_server + "']").attr("title");
-                                $("label[for='" + node_country_group_server + "']").attr("title", my_label + "\n" + node_name);
-                                var my_cb = $("input[type='checkbox'][id='" + node_country_group_server + "']");
+                                var my_label = $("label[for='" + node_groupby_group_server + "']").attr("title");
+                                $("label[for='" + node_groupby_group_server + "']").attr("title", my_label + "\n" + node.node_name);
+                                var my_cb = $("input[type='checkbox'][id='" + node_groupby_group_server + "']");
                                 $.each(my_cb, function() {
                                    this.value = this.value + "~" + node_id_group_server; 
                                 });
