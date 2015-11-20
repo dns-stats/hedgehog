@@ -44,11 +44,13 @@ function initNodeHtml(nodes_raw) {
     //     alert("No nodes found in the database");
     // }
 
+    //*** SERVERS ***//
     // For each server, construct the groups.
     for (var i = 0; i < nodes.length; i++) {
         $('#groupcontent'                ).append(  "<div class='hidden' id='" + nodes[i].server + "'>");
         $('#' + nodes[i].server          ).append(  "<div class='Tabs'   id='" + nodes[i].server + "_tabs'>");
         $('#' + nodes[i].server + '_tabs').append(  "<ul                 id='" + nodes[i].server +"_tabs_ul'>");
+        //***  GROUPS (REGIONS) ***//
         // For each group, add a tab and fill in the nodes
         for (var j = -1; j < nodes[i].groups.length; j++) {
             // Special case for the 'All' tabs are needed here
@@ -76,6 +78,7 @@ function initNodeHtml(nodes_raw) {
                     $('#' + group_server + '_allnone').append("<input type='button' id='selectAllRegionBtn'  value='Include all " + group + "' title='Include all the nodes in this region for plotting'   onclick='selectAll(\"cb_"  + group_server_basic + "\")'> ");
                     $('#' + group_server + '_allnone').append("<input type='button' id='selectNoneRegionBtn' value='Exclude all " + group + "' title='De-select all the nodes in this region for plotting' onclick='selectNone(\"cb_" + group_server_basic + "\")'><hr> ");
                 }
+                //*** NODES AND GROUPING OPTIONS***//
                 // Add all the nodes to the 'All' tab or just the group nodes for all other cases
                 if (j == -1) {var start_group = 0; var stop_group = nodes[i].groups.length; }
                 else         {var start_group = j; var stop_group  = j + 1}
@@ -92,25 +95,22 @@ function initNodeHtml(nodes_raw) {
                                 var node_groupby_label   = node.node_sg;
                                 if (!node_groupby_label) node_groupby_label = 'No Instance';
                                 var node_groupby_class   = 'subgroupselection';
-                                var node_groupby_onclick = 'selectSubGroup'
                             }
                             if (node_grouping_options == 2) {
                                 var node_groupby_label   = node.node_city;
                                 if (!node_groupby_label) node_groupby_label = 'No City';
                                 var node_groupby_class   = 'cityselection';
-                                var node_groupby_onclick = 'selectCity'
                             }   
                             if (node_grouping_options == 3) {
                                 var node_groupby_label   = node.node_country;
                                 if (!node_groupby_label) node_groupby_label  = 'No Country';
                                 var node_groupby_class   = 'countryselection';
-                                var node_groupby_onclick = 'selectCountry'
                             }
                             // use tilde not underscores as delimiter so other code doesn't trigger off this
                             var node_groupby_group_server = node_groupby_label + "~" + group + "~" + nodes[i].server;
                             if($("input[type='checkbox'][id='" + node_groupby_group_server + "']").length == 0) {
-                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='" + node_groupby_onclick + "(this)'>");
-                                $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + "</label>");
+                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='selectGrouping(this)'>");
+                                $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + " <img id='cb_" + node_groupby_group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></label>");
                             } else {
                                 var my_label = $("label[for='" + node_groupby_group_server + "']").attr("title");
                                 $("label[for='" + node_groupby_group_server + "']").attr("title", my_label + "\n" + node.node_name);
@@ -153,6 +153,41 @@ function setServersGroups() {
     });
 }
 
+function selectSisterGrouping(grp_class) {
+    $("input[type='checkbox']." + grp_class).each(function(){
+         node_list = this.value.split("~");
+         var all = true;
+         var none = true;
+         $.each(node_list, function(i, value){
+             var node_cb = $("#" + value);
+             if($(node_cb).is(':checked')){
+                 none = false;
+             }else{
+                 all = false;
+             }
+         });
+         if (all == true) {
+             $(this).prop('checked', true);
+             $("label[for='" + this.id + "']").css("color", '#000');
+             document.getElementById("cb_" + this.id + "_img").src="images/all.png";
+             document.getElementById("cb_" + this.id + "_img").alt="all selected";
+         } else if (none == true) {
+             $(this).prop('checked', false);
+             $("label[for='" + this.id + "']").css("color", '#999');
+             document.getElementById("cb_" + this.id + "_img").src="images/none.png";
+             document.getElementById("cb_" + this.id + "_img").alt="none selected";
+         } else {
+             $(this).prop('checked', true);
+             $("label[for='" + this.id + "']").css("color", '#0072B2');
+             $("label[for='" + this.id + "']").css("color", '#000');
+             var temp = $("#cb_" + this.id + "_img");
+             document.getElementById("cb_" + this.id + "_img").src="images/some.png";
+             document.getElementById("cb_" + this.id + "_img").alt="some selected";
+         }
+     });
+}
+
+
 function selectSister(idList, ckd) {
     // finds all checkboxes where their node id
     // is in idList and sets their checked status
@@ -176,79 +211,11 @@ function selectSister(idList, ckd) {
     });
     
     // update to also set the cbs in the grouping tabs
-    // FIXME[node grouping]: move this to a separate function
-     $("input[type='checkbox'].subgroupselection").each(function(){
-         node_list = this.value.split("~");
-         var all = true;
-         var none = true;
-         $.each(node_list, function(i, value){
-             var node_cb = $("#" + value);
-             if($(node_cb).is(':checked')){
-                 none = false;
-             }else{
-                 all = false;
-             }
-         });
-         if (all == true) {
-             $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#000');
-         } else if (none == true) {
-             $(this).prop('checked', false);
-             $("label[for='" + this.id + "']").css("color", '#999');
-         } else {
-             $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#0072B2');
-         }
-     });
+    var grouping = ["subgroupselection", "cityselection", "countryselection"]; 
+    for (i = 0; i < 3; i++) { 
+        selectSisterGrouping(grouping[i]);
+    }
 
-     $("input[type='checkbox'].cityselection").each(function(){
-         node_list = this.value.split("~");
-         var all = true;
-         var none = true;
-         $.each(node_list, function(i, value){
-             var node_cb = $("#" + value);
-             if($(node_cb).is(':checked')){
-                 none = false;
-             }else{
-                 all = false;
-             }
-         });
-         if (all == true) {
-             $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#000');
-         } else if (none == true) {
-             $(this).prop('checked', false);
-             $("label[for='" + this.id + "']").css("color", '#999');
-         } else {
-             $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#0072B2');
-         }
-     });
-
-     $("input[type='checkbox'].countryselection").each(function(){
-         node_list = this.value.split("~");
-         var all = true;
-         var none = true;
-         $.each(node_list, function(i, value){
-             var node_cb = $("#" + value);
-             if($(node_cb).is(':checked')){
-                 none = false;
-             }else{
-                 all = false;
-             }
-         });
-         if (all == true) {
-             $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#000');
-         } else if (none == true) {
-             $(this).prop('checked', false);
-             $("label[for='" + this.id + "']").css("color", '#999');
-         } else {
-             $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#0072B2');
-         }
-     });
-         
     // set group tab images to reflect
     // whether all, some or no checkboxes
     // are selected
@@ -310,44 +277,16 @@ function selectNode(ckbxid) {
     selectSister(idList, $("#" + ckbxid).is(':checked'));
 }
 
-function selectSubGroup(subgroup) {
-    idList = subgroup.value.split("~");
-    selectSister(idList, $(subgroup).is(':checked'));
-    var my_subgroup = subgroup.id.split("~")[0];
-    var my_server   = subgroup.id.split("~")[2];
-    $("input[type='checkbox'].subgroupselection").each(function(){
+function selectGrouping(item) {
+    idList = item.value.split("~");
+    selectSister(idList, $(item).is(':checked'));
+    var my_subgroup = item.id.split("~")[0];
+    var my_server   = item.id.split("~")[2];
+    $("input[type='checkbox']." + item.class).each(function(){
         var this_subgroup = this.id.split("~")[0];
         var this_server = this.id.split("~")[2];
         if (my_server == this_server && my_subgroup == this_subgroup) {
-            this.checked = $(subgroup).is(':checked');
-        }
-    });
-}
-
-function selectCity(city) {
-    idList = city.value.split("~");
-    selectSister(idList, $(city).is(':checked'));
-    var my_city = city.id.split("~")[0];
-    var my_server   = city.id.split("~")[2];
-    $("input[type='checkbox'].cityselection").each(function(){
-        var this_city = this.id.split("~")[0];
-        var this_server = this.id.split("~")[2];
-        if (my_server == this_server && my_city == this_city) {
-            this.checked = $(city).is(':checked');
-        }
-    });
-}
-
-function selectCountry(country) {
-    idList = country.value.split("~");
-    selectSister(idList, $(country).is(':checked'));
-    var my_country = country.id.split("~")[0];
-    var my_server   = country.id.split("~")[2];
-    $("input[type='checkbox'].countryselection").each(function(){
-        var this_country = this.id.split("~")[0];
-        var this_server = this.id.split("~")[2];
-        if (my_server == this_server && my_country == this_country) {
-            this.checked = $(country).is(':checked');
+            this.checked = $(item).is(':checked');
         }
     });
 }
