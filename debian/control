@@ -11,7 +11,6 @@ Build-Depends: apache2-dev (>= 2.4),
                libtool,
                libxt-dev,
                r-base-dev,
-	       r-cran-rpostgresql,
 	       dh-autoreconf
 Standards-Version: 3.9.6
 Homepage: http://dns-stats.org/
@@ -85,8 +84,7 @@ Package: r-hedgehog-rpostgresqlhelper
 Architecture: all
 Section: gnu-r
 Depends: ${R:Depends},
-         ${misc:Depends},
-	 r-cran-rpostgresql
+         ${misc:Depends}
 Description: GNU R package for Hedgehog R PostgreSQL Helper
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
