@@ -11,7 +11,7 @@ Build-Depends: apache2-dev (>= 2.4),
                libtool,
                libxt-dev,
                r-base-dev,
-	       dh-autoreconf
+               dh-autoreconf
 Standards-Version: 3.9.6
 Homepage: http://dns-stats.org/
 Vcs-Git: https://github.com/dns-stats/hedgehog.git
@@ -19,7 +19,8 @@ Vcs-Browser: https://github.com/dns-stats/hedgehog
 
 Package: hedgehog-common
 Architecture: all
-Depends: ${misc:Depends}
+Depends: libyaml-tiny-perl,
+         ${misc:Depends}
 Recommends: hedgehog
 Suggests: dsc-statistics-collector
 Description: visualisation tool for DNS [common files]
@@ -47,7 +48,6 @@ Depends: hedgehog-common (>= ${source:Version}~),
 	 apache2 (>= 2.4),
          libapache2-mod-r-base,
          libyaml-tiny-perl,
-         pgbouncer,
          postgresql,
          postgresql-client,
          postgresql-contrib,
@@ -58,10 +58,11 @@ Depends: hedgehog-common (>= ${source:Version}~),
          r-cran-digest,
          r-cran-ggplot2,
          r-cran-reshape,
-	 r-hedgehog-rpostgresqlhelper,
+         r-hedgehog-rpostgresqlhelper,
          ${misc:Depends}
 Recommends: dsc-statistics-collector
-Suggests: hedgehog-doc
+Suggests: pgbouncer,
+          hedgehog-doc
 Description: visualisation tool for DNS [web]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.

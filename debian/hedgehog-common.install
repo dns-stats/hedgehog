@@ -1,6 +1,5 @@
 usr/share/hedgehog/sql/
 usr/bin/hedgehogctl
-usr/bin/refile_and_grok
 usr/sbin/rssacd
 usr/lib/hedgehog/*
 usr/lib/python2.7/dist-packages/*
