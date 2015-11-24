@@ -41,7 +41,7 @@ Description: visualisation tool for DNS [documentation]
  .
  This package contains documentation for Hedgehog.
 
-Package: hedgehog
+Package: hedgehog-gui
 Architecture: all
 Section: web
 Depends: hedgehog-common (>= ${source:Version}~),
