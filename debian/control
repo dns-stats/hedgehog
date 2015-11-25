@@ -24,7 +24,8 @@ Depends: libyaml-tiny-perl,
          ${python:Depends},
          python-yaml,
          python-dnspython,
-         python-psycopg2
+         python-psycopg2,
+         postgresql-client-common
 Recommends: hedgehog-gui
 Suggests: dsc-statistics-collector
 Description: visualisation tool for DNS [common files]
