@@ -21,7 +21,10 @@ Package: hedgehog-common
 Architecture: all
 Depends: libyaml-tiny-perl,
          ${misc:Depends},
-         ${python:Depends}
+         ${python:Depends},
+         python-yaml,
+         python-dnspython,
+         python-psycopg2
 Recommends: hedgehog-gui
 Suggests: dsc-statistics-collector
 Description: visualisation tool for DNS [common files]
