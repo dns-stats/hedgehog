@@ -21,7 +21,7 @@ Package: hedgehog-common
 Architecture: all
 Depends: libyaml-tiny-perl,
          ${misc:Depends}
-Recommends: hedgehog
+Recommends: hedgehog-gui
 Suggests: dsc-statistics-collector
 Description: visualisation tool for DNS [common files]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
@@ -33,7 +33,7 @@ Package: hedgehog-doc
 Architecture: all
 Section: doc
 Depends: ${misc:Depends}
-Recommends: hedgehog
+Recommends: hedgehog-gui
 Suggests: dsc-statistics-collector
 Description: visualisation tool for DNS [documentation]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
