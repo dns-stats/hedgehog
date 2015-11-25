@@ -20,7 +20,8 @@ Vcs-Browser: https://github.com/dns-stats/hedgehog
 Package: hedgehog-common
 Architecture: all
 Depends: libyaml-tiny-perl,
-         ${misc:Depends}
+         ${misc:Depends},
+         ${python:Depends}
 Recommends: hedgehog-gui
 Suggests: dsc-statistics-collector
 Description: visualisation tool for DNS [common files]
