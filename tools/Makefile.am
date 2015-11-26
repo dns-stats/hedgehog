@@ -169,4 +169,4 @@ refile_and_grok.1: refile_and_grok Makefile
 	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 ./refile_and_grok -o refile_and_grok.1
 
 hedgehog_database_create.1: $(srcdir)/hedgehog/hedgehog_database_create Makefile
-	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 $(srcdir)/hedgehog/hedgehog_database_create -o hedgehog_database_create.1
+	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 -n "This script is to aid the database adiministrator with creating the hedgehog database." $(srcdir)/hedgehog/hedgehog_database_create -o hedgehog_database_create.1
