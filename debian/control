@@ -21,8 +21,8 @@ Package: hedgehog-database
 Architecture: all
 Depends: ${misc:Depends},
          ${python:Depends},
-         postgresql-9.3-ip4r
-         postgresql-plpython-9.3
+         postgresql-9.3-ip4r,
+         postgresql-plpython-9.3,
          python-ipy
 Description: visualisation tool for DNS [Database setup file]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
