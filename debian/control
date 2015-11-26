@@ -13,6 +13,9 @@ Build-Depends: apache2-dev (>= 2.4),
                r-base-dev,
                dh-autoreconf,
                python,
+               python-yaml,
+               python-dnspython,
+               python-psycopg2,
                help2man
 Standards-Version: 3.9.5
 Homepage: http://dns-stats.org/
