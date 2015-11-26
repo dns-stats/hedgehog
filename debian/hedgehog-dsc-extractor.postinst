@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
 
-adduser --system hedgehog
+adduser --system --no-create-home --home /nonexistent hedgehog
