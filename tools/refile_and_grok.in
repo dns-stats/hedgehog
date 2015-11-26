@@ -46,13 +46,21 @@ usage () {
     echo "${PROG} - finds all input files in working directory and processes to output format"
     echo 
     echo "-w Working directory to search for input files (default: ${WD})"
+    echo
     echo "-i Input file format <XML|DAT> (default: ${INPUT})"
+    echo
     echo "-o Output file format <DAT|DB> (default: ${OUTPUT})"
+    echo
     echo "-c Non-interactive mode - use this flag when being run by a cron job"
+    echo
     echo "-s Start date from which to process incoming data (XML input only)"
+    echo
     echo "-r Disable processing of rssac data. Default is to process all data."
+    echo
     echo "-R Reserved processors. Number of CPUS processors to exclude from import (default 0)."
+    echo
     echo "-a Append output to the $PROG.stdout file (default is overwrite)"
+    echo
     echo "-h Show this help."
     echo
 }

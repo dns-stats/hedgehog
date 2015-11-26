@@ -55,3 +55,13 @@ rssac_server.py: $(srcdir)/rssac_server/rssac_server.in Makefile
 	
 rssacd: $(srcdir)/rssac_server/rssacd.in Makefile
 	$(do_subst_python) < $(srcdir)/rssac_server/rssacd.in > rssacd
+
+dist_man_MANS = rssacd.8 \
+                dsc-extractor.1
+
+rssacd.8: rssacd Makefile
+	chmod 755 rssacd
+	$(HELP2MAN) --version-string=@PACKAGE_VERSION@ -N -s 8 ./rssacd -o rssacd.8
+
+dsc-extractor.1: dsc-extractor Makefile
+	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 --no-discard-stderr ./dsc-extractor -o dsc-extractor.1

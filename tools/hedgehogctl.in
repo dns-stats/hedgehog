@@ -34,7 +34,7 @@ usage () {
 	echo "Usage: $(basename $0) [help|list] [COMMAND] [command_options]"
 	echo
 	echo "The list of COMMANDs is:"
-	printf '  %s\n' "${TOOLS[@]}"
+	printf '  %s\n\n' "${TOOLS[@]}"
 	echo
   exit 1
 }
