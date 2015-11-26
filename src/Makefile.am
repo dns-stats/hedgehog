@@ -59,7 +59,7 @@ rssacd: $(srcdir)/rssac_server/rssacd.in Makefile
 dist_man_MANS = rssacd.8 \
                 dsc-extractor.1
 
-rssacd.8: rssacd rssac_server.py rssac_server/rssac.py rssac_server/threadpool.py Makefile
+rssacd.8: rssacd rssac_server.py rssac.py threadpool.py Makefile
 	chmod 755 rssacd
 	$(HELP2MAN) --version-string=@PACKAGE_VERSION@ -N -s 8 ./rssacd -o rssacd.8
 
