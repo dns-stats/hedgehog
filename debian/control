@@ -11,7 +11,8 @@ Build-Depends: apache2-dev (>= 2.4),
                libtool,
                libxt-dev,
                r-base-dev,
-               dh-autoreconf
+               dh-autoreconf,
+               python
 Standards-Version: 3.9.5
 Homepage: http://dns-stats.org/
 Vcs-Git: https://github.com/dns-stats/hedgehog.git
