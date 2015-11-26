@@ -1,6 +1,8 @@
 usr/share/hedgehog/sql/
 usr/bin/hedgehogctl
+usr/share/man/man1/hedgehogctl.1
 usr/sbin/rssacd
+usr/share/man/man8/rssacd.8
 usr/lib/hedgehog/*
 usr/lib/python2.7/dist-packages/*
 etc/hedgehog/*sample /usr/share/doc/hedgehog/examples/

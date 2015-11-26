@@ -1,2 +1,4 @@
 usr/bin/dsc-extractor
 usr/bin/refile_and_grok
+usr/share/man/man1/dsc-extractor.1
+usr/share/man/man1/refile_and_grok.1
