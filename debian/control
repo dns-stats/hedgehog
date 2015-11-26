@@ -12,7 +12,7 @@ Build-Depends: apache2-dev (>= 2.4),
                libxt-dev,
                r-base-dev,
                dh-autoreconf
-Standards-Version: 3.9.6
+Standards-Version: 3.9.5
 Homepage: http://dns-stats.org/
 Vcs-Git: https://github.com/dns-stats/hedgehog.git
 Vcs-Browser: https://github.com/dns-stats/hedgehog
