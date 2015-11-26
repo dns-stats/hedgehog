@@ -1,11 +1,11 @@
 CLEANFILES = $(bin_SCRIPTS)
 
 bin_SCRIPTS = refile_and_grok \
+              hedgehog/hedgehog_database_create \
               hedgehogctl
 
 nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/check_user_db_api \
-                         hedgehog/database_create \
                          hedgehog/database_init \
                          hedgehog/database_manage_partitions \
                          hedgehog/database_update_geoip \
