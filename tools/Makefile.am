@@ -26,8 +26,8 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
                          hedgehog/DDL_updates/000013_ddl_node_subgroup \
                          hedgehog/DDL_updates/000014_ddl_loadtime \
-						 hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
-						 hedgehog/utility_prepare_GeoLite2-City-Locations-en
+                         hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
+                         hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
 nobase_data_DATA = $(srcdir)/hedgehog/sql/initialise_database.sql \
                    $(srcdir)/hedgehog/sql/insert_lookup_data.sql
@@ -155,3 +155,18 @@ install-data-hook:
 	mkdir -p ${DESTDIR}$(localstatedir)/hedgehog/data
 	chmod -R 775 ${DESTDIR}$(localstatedir)/hedgehog/data
 
+
+dist_man_MANS = hedgehogctl.1 \
+                refile_and_grok.1 \
+                hedgehog_database_create.1
+
+hedgehogctl.1: hedgehogctl Makefile
+	chmod 755 hedgehogctl
+	$(HELP2MAN) -h help --version-string=@PACKAGE_VERSION@ -N -s 1 ./hedgehogctl -o hedgehogctl.1
+	
+refile_and_grok.1: refile_and_grok Makefile
+	chmod 755 refile_and_grok
+	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 ./refile_and_grok -o refile_and_grok.1
+
+hedgehog_database_create.1: $(srcdir)/hedgehog/hedgehog_database_create Makefile
+	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 $(srcdir)/hedgehog/hedgehog_database_create -o hedgehog_database_create.1
