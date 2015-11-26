@@ -42,6 +42,11 @@ AC_PROG_LN_S
 AC_PROG_LIBTOOL
 LT_INIT
 AM_PATH_PYTHON
+AC_PATH_PROG(HELP2MAN, help2man)
+if test -z "$HELP2MAN"
+then
+  AC_MSG_ERROR("help2man not found")
+fi
 
 AC_CONFIG_FILES(Makefile conf/Makefile tools/Makefile)
 
