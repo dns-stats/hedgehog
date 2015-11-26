@@ -20,6 +20,7 @@ Vcs-Browser: https://github.com/dns-stats/hedgehog
 Package: hedgehog-database
 Architecture: all
 Depends: ${misc:Depends},
+         ${python:Depends},
          postgresql-9.3-ip4r
          postgresql-plpython-9.3
          python-ipy
