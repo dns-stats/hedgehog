@@ -17,6 +17,18 @@ Homepage: http://dns-stats.org/
 Vcs-Git: https://github.com/dns-stats/hedgehog.git
 Vcs-Browser: https://github.com/dns-stats/hedgehog
 
+Package: hedgehog-database
+Architecture: all
+Depends: ${misc:Depends},
+         postgresql-9.3-ip4r
+         postgresql-plpython-9.3
+         python-ipy
+Description: visualisation tool for DNS [Database setup file]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains a script to assist with the Postgresql database setup
+
 Package: hedgehog-common
 Architecture: all
 Depends: libyaml-tiny-perl,
