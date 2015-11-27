@@ -123,7 +123,7 @@ Developed by Sinodun IT (www.sinodun.com)
         auto populated by gengraph.js
    --></div>
       <hr style='margin-top:5px;margin-bottom:5px'/>
-      <div class="two-thirds column" id="srvr_select">
+      <div class="sixteen columms" id="srvr_select">
       <label for="servers">Servers</label>
       <select name="servers" id="servers" onchange="serverTab()">
 <!-- 

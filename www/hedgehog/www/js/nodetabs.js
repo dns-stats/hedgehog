@@ -33,7 +33,7 @@ function initNodeHtml(nodes_raw) {
     $('#nodetabs').append("<div class='sixteen columns' id='groupcontent'></div>");
     $('#nodetabs').append("<br class='clear'>");
     $('#nodetabs').append("<div class='sixteen columns' id='nodecontent'>");
-    $('#srvr_select').append("<a style='font-weight:bold; font-size:80%; text-decoration: none; padding-left: 20px; padding-right: 5px;'>Group by:</a>");
+    $('#srvr_select').append("<a style='font-weight:bold; font-size:80%; text-decoration: none; padding-left: 20px; padding-right: 5px;'>Group nodes by:</a>");
     $('#srvr_select').append("<input type='radio'          id='ng_country'  name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_country'  >Country </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_city'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_city'     >City </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_subgroup' name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_subgroup' >Instance </label>");
@@ -52,10 +52,8 @@ function initNodeHtml(nodes_raw) {
         $('#' + nodes[i].server + '_tabs').append(  "<ul                 id='" + nodes[i].server +"_tabs_ul'>");
         //***  GROUPS (REGIONS) ***//
         // For each group, add a tab and fill in the nodes
-        for (var j = -1; j < nodes[i].groups.length; j++) {
-            // Special case for the 'All' tabs are needed here
-            if (j == -1) var group = "All"; 
-            else         var group =  nodes[i].groups[j].group_name;
+        for (var j = 0; j < nodes[i].groups.length; j++) {
+            var group =  nodes[i].groups[j].group_name;
             var group_server       = group + "_" + nodes[i].server;
             var group_server_basic = group_server;
             // Create the top tab with a list entry
@@ -79,46 +77,40 @@ function initNodeHtml(nodes_raw) {
                     $('#' + group_server + '_allnone').append("<input type='button' id='selectNoneRegionBtn' value='Exclude all " + group + "' title='De-select all the nodes in this region for plotting' onclick='selectNone(\"cb_" + group_server_basic + "\")'><hr> ");
                 }
                 //*** NODES AND GROUPING OPTIONS***//
-                // Add all the nodes to the 'All' tab or just the group nodes for all other cases
-                if (j == -1) {var start_group = 0; var stop_group = nodes[i].groups.length; }
-                else         {var start_group = j; var stop_group  = j + 1}
-                // Loop over the groups/nodes
-                for (var x = start_group; x < stop_group; x++) {
-                    for (var k = 0; k < nodes[i].groups[x].node_list.length; k++) {
-                        var node                 = nodes[i].groups[x].node_list[k]
-                        var node_id_group_server = node.node_id + "_" + group_server_basic;
-                        if (node_grouping_options == 0) {
-                            $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' onclick='selectNode(\"" + node_id_group_server + "\")'>");
-                            $('#' + group_server + '_node_cbs_id').append("<label for='" + node_id_group_server + "' title='Toggle node selection'>" + node.node_name + "</label>");
+                for (var k = 0; k < nodes[i].groups[j].node_list.length; k++) {
+                    var node                 = nodes[i].groups[j].node_list[k]
+                    var node_id_group_server = node.node_id + "_" + group_server_basic;
+                    if (node_grouping_options == 0) {
+                        $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' onclick='selectNode(\"" + node_id_group_server + "\")'>");
+                        $('#' + group_server + '_node_cbs_id').append("<label for='" + node_id_group_server + "' title='Toggle node selection for " + node.node_name + "\n Country: " + node.node_country + "\n City: " + node.node_city + "\n Instance: " + node.node_sg + "'>" + node.node_name + "</label>");
+                    } else {
+                        if (node_grouping_options == 1) {
+                            var node_groupby_label   = node.node_sg;
+                            if (!node_groupby_label) node_groupby_label = 'No Instance';
+                            var node_groupby_class   = 'subgroupselection';
+                        }
+                        if (node_grouping_options == 2) {
+                            var node_groupby_label   = node.node_city;
+                            if (!node_groupby_label) node_groupby_label = 'No City';
+                            var node_groupby_class   = 'cityselection';
+                        }   
+                        if (node_grouping_options == 3) {
+                            var node_groupby_label   = node.node_country;
+                            if (!node_groupby_label) node_groupby_label  = 'No Country';
+                            var node_groupby_class   = 'countryselection';
+                        }
+                        // use tilde not underscores as delimiter so other code doesn't trigger off this
+                        var node_groupby_group_server = node_groupby_label + "~" + group + "~" + nodes[i].server;
+                        if($("input[type='checkbox'][id='" + node_groupby_group_server + "']").length == 0) {
+                            $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='selectGrouping(this)'>");
+                            $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + " <img id='cb_" + node_groupby_group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></label>");
                         } else {
-                            if (node_grouping_options == 1) {
-                                var node_groupby_label   = node.node_sg;
-                                if (!node_groupby_label) node_groupby_label = 'No Instance';
-                                var node_groupby_class   = 'subgroupselection';
-                            }
-                            if (node_grouping_options == 2) {
-                                var node_groupby_label   = node.node_city;
-                                if (!node_groupby_label) node_groupby_label = 'No City';
-                                var node_groupby_class   = 'cityselection';
-                            }   
-                            if (node_grouping_options == 3) {
-                                var node_groupby_label   = node.node_country;
-                                if (!node_groupby_label) node_groupby_label  = 'No Country';
-                                var node_groupby_class   = 'countryselection';
-                            }
-                            // use tilde not underscores as delimiter so other code doesn't trigger off this
-                            var node_groupby_group_server = node_groupby_label + "~" + group + "~" + nodes[i].server;
-                            if($("input[type='checkbox'][id='" + node_groupby_group_server + "']").length == 0) {
-                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='selectGrouping(this)'>");
-                                $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + " <img id='cb_" + node_groupby_group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></label>");
-                            } else {
-                                var my_label = $("label[for='" + node_groupby_group_server + "']").attr("title");
-                                $("label[for='" + node_groupby_group_server + "']").attr("title", my_label + "\n" + node.node_name);
-                                var my_cb = $("input[type='checkbox'][id='" + node_groupby_group_server + "']");
-                                $.each(my_cb, function() {
-                                   this.value = this.value + "~" + node_id_group_server; 
-                                });
-                            }
+                            var my_label = $("label[for='" + node_groupby_group_server + "']").attr("title");
+                            $("label[for='" + node_groupby_group_server + "']").attr("title", my_label + "\n" + node.node_name);
+                            var my_cb = $("input[type='checkbox'][id='" + node_groupby_group_server + "']");
+                            $.each(my_cb, function() {
+                               this.value = this.value + "~" + node_id_group_server; 
+                            });
                         }
                     }
                 }
@@ -126,6 +118,7 @@ function initNodeHtml(nodes_raw) {
         }
     }
     // Enable all subgroups by default
+    // TODO: This should be a config option
     $("input[type='checkbox'].subgroupselection").each(function(){
         this.checked = true;
     });

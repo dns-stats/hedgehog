@@ -128,26 +128,37 @@ initNodeData <- function() {
             srvr_id <- servers_df[s,1]
             srvr_nm <- servers_df[s,2]
             groups_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getgroups(", srvr_id, ");", sep=""))
-            if (!is.null(groups_df) && nrow(groups_df) >= 1) {
-                for (g in 1:nrow(groups_df)) {
-                    nodes=list()
+            
+            for (g in 0:nrow(groups_df)) {
+                nodes=list()
+                if (g == 0) {
+                    gp_nm = 'All'
+                    nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodes(", srvr_id, ");", sep=""))
+                    system('logger -p user.notice In initNodeTabsHtml for all')
+                } else {
                     gp_nm <- groups_df[g,1]
-                    nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
-                    for (n in 1:nrow(nodes_df)) {
-                        nd_id <- nodes_df[n,1]
-                        nd_nm <- nodes_df[n,2]
-                        if (is.na(nodes_df[n,3])) {nd_country=''} else {nd_country = nodes_df[n,3]}
-                        if (is.na(nodes_df[n,4])) {nd_city=''}    else {nd_city    = nodes_df[n,4]}
-                        if (is.na(nodes_df[n,5])) {nd_sg=''}      else {nd_sg      = nodes_df[n,5]}
-                        node  = list(node_name=nd_nm, node_id=nd_id, node_country=nd_country, node_city=nd_city, node_sg=nd_sg)
-                        nodes = c(nodes, list(node))
+                    # Other should really appear at the end of the list......
+                    if  (gp_nm == 'Other'){
+                        nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ",'');", sep=""))
+                        system('logger -p user.notice In initNodeTabsHtml for other')
+                    } else {
+                        nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
                     }
-                    group=list(group_name=gp_nm, node_list=nodes)
-                    group_list=c(group_list, list(group))
                 }
-                server_list=list(server=srvr_nm, groups=group_list)
-                server=c(server, list(server_list))
+                for (n in 1:nrow(nodes_df)) {
+                    nd_id <- nodes_df[n,1]
+                    nd_nm <- nodes_df[n,2]
+                    if (is.null(nodes_df[n,3])) {nd_country=''} else {nd_country = nodes_df[n,3]}
+                    if (is.null(nodes_df[n,4])) {nd_city=''}    else {nd_city    = nodes_df[n,4]}
+                    if (is.null(nodes_df[n,5])) {nd_sg=''}      else {nd_sg      = nodes_df[n,5]}
+                    node  = list(node_name=nd_nm, node_id=nd_id, node_country=nd_country, node_city=nd_city, node_sg=nd_sg)
+                    nodes = c(nodes, list(node))
+                }
+                group=list(group_name=gp_nm, node_list=nodes)
+                group_list=c(group_list, list(group))
             }
+            server_list=list(server=srvr_nm, groups=group_list)
+            server=c(server, list(server_list))
         }
         node_json = rjson::toJSON(server)
         output = cat(node_json)
@@ -217,9 +228,6 @@ generatePlot <- function(){
 	# Initialise plot parameters
 	initPlotOptions()
 	
-    # if ( subgroup == '1' && pltnm == 'by_node') {
-    #   pltnm <- "by_subgroup"
-    # }
 	
 	# Initialise name of plot file and make sure the cache directory exists
 	plot_dir = paste(hh_config$directories$plotcache, "/", svrnm, "/", pltnm, sep="") 

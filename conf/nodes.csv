@@ -1,6 +1,8 @@
 ######################### NODES CONFIGURATION FILE ###################
-# Format is:     server-name, node-name, [node-group],[country],[city],[node-subgroup],[node-ip]
+# Format is:     server-name, node-name, [node-group],[node-country],
+                 [node-city],[node-subgroup],[node-ip]
 # Each field can contain alphanumeric characters and hyphens (-) only 
+# All the commas are required, even if all optional fields are blank
 # '#' is the comment character
 # 
 # server-name   - This must be unique and it must match the name used in the
@@ -13,13 +15,13 @@
 #                 It is optional and if not
 #                 specified the node is added to a group called 'Other'.
 # node-country  - This is the country that the node is located in
-#                 It is optional and if not specified is left blank
+#                 It is optional and if not specified 'No Country' is used.
 # node-city     - This is the city that the node is located in
-#                 It is optional and if not specified is left blank
+#                 It is optional and if not specified 'No City' is used.
 # node-instance - This is used to collect nodes into subgroups called 'Instances' 
 #                 (e.g. nodes within the same city) for convenient selection
 #                 and plotting. It should be unique for a given group. It is 
-#                 optional and if not specified is left blank.
+#                 optional and if not specified 'No Instance' is used.
 # node-ip       - The management IP address of the node (IPv4 or IPv6)
 #                 It is optional and if not specified is left blank. This is 
 #                 required if rssac loadtime/serial data is to be collected.
@@ -27,13 +29,13 @@
 # Example input: (uncomment the following)
 #
 #Server-A,Node-1,Region-1,Country-1,City-1,Instance-1,10.0.0.2
-#Server-A,Node-2,Region-1,Country-2,City-2,Instance-1,
-#Server-A,Node-3,Region-1,,,Instance-2,
-#Server-A,Node-4,Region-1,,,Instance-2,
-#Server-A,Node-5,Region-2,,,Instance-3,
-#Server-A,Node-6,Region-2,,,Instance-3,
-#Server-A,Node-7,Region-3,,,,10.0.0.3
-#Server-B,Node-1,Region-1,,,,
-#Server-B,Node-2,Region-2,,,,
-#Server-C,Node-5,Region-4,,,,
+#Server-A,Node-2,Region-1,Country-1,City-2,Instance-2,
+#Server-A,Node-3,Region-1,Country-2,City-3,Instance-3,
+#Server-A,Node-4,Region-1,Country-2,City-3,Instance-3,
+#Server-A,Node-5,Region-2,Country-3,City-4,Instance-4,
+#Server-A,Node-6,Region-2,Country-3,City-4,Instance-4,
+#Server-A,Node-7,Region-3,Country-3,City-4,Instance-5,10.0.0.3
+#Server-B,Node-1,Region-1,Country-4,,,
+#Server-B,Node-2,Region-2,,,Instance-6,
+#Server-C,Node-5,,,,,
 ######################################################################
