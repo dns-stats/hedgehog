@@ -40,7 +40,7 @@ function initNodeHtml(nodes_raw) {
     $('#srvr_select').append("<a style='font-weight:bold; font-size:80%; text-decoration: none; padding-left: 20px; padding-right: 5px;'>Group nodes by:</a>");
     $('#srvr_select').append("<input type='radio'          id='ng_country'  name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_country'  >Country </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_city'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_city'     >City </label>");
-    $('#srvr_select').append("<input type='radio'          id='ng_subgroup' name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_subgroup' >Instance </label>");
+    $('#srvr_select').append("<input type='radio'          id='ng_instance' name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_instance' >Instance </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_none'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_none'     >No grouping </label>");
 
     // Check for no servers is made earlier, so just check for nodes here
@@ -123,11 +123,6 @@ function initNodeHtml(nodes_raw) {
             }
         }
     }
-    // Enable grouping by subgroups as default
-    // TODO: This should be a config option
-    $("input[type='checkbox'].subgroupselection").each(function(){
-        this.checked = true;
-    });
 }
 
 function ngChanged() {
@@ -338,7 +333,7 @@ function gpTab(gpnm) {
     old_content = $(".group_showing");
     old_content.removeClass("group_showing");
     old_content.addClass("hidden");
-    if ($('#ng_subgroup').prop('checked') === true) gpnm = gpnm + "_subgroup";
+    if ($('#ng_instance').prop('checked') === true) gpnm = gpnm + "_subgroup";
     if ($('#ng_city').prop('checked')     === true) gpnm = gpnm + "_city";
     if ($('#ng_country').prop('checked')  === true) gpnm = gpnm + "_country";
     $("#" + gpnm).removeClass("hidden");

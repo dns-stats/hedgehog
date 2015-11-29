@@ -29,6 +29,7 @@ www:
   default_interactive_plot_type : svg         # 'flash' -> plot requires flash
                                               # 'svg'   -> plot is SVG/VML and does not require flash
                                               # (but with svg plots some legends do not wrap properly)
+  default_node_grouping         : instance    # choose from 'none', 'instance', 'city' or 'country'
   use_plot_caching              : 1           # '1' -> true, use cached plots when possible
                                               # '0' -> false, never use cached plots
   caching_delay_in_hours        : 1           # If 'use_plot_caching=1' then only plots with an end time

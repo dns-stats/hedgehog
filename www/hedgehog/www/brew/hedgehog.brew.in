@@ -191,6 +191,24 @@ getDefaultPlotId <- function() {
 	%><%=as.integer(defaultpltid[1])%><%
 }
 
+getDefaultGrouping <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In getDefaultGrouping')
+	}
+	
+	grouping = gui_config$www$default_node_grouping
+    if      (grouping == "instance") {%>instance<%} 
+    else if (grouping == "city")     {%>city<%}
+    else if (grouping == "country")  {%>country<%} 
+    else if (grouping == "none")     {%>none<%}
+	else {
+    	system('logger -p user.warning Unsupported Node Grouping present in config file. Using None.')
+    	%>none<%
+	}
+	return(TRUE)
+}
+
 generatePlot <- function(){
 
     #TODO(refactor): Move more of this code out to the generatePlot.R file
@@ -386,14 +404,15 @@ if (class(dsccon) != "try-error") {
 	source(paste(hh_config$directories$web_source, "/R/prepareStatement.R", sep = ""))
 	source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep = ""))
 	switch(GET$type,
-	    validateDBVersion = {validateDbVersion()},
-		initPlotDDHtml    = {initPlotDDHtml()},
-		initServerDDHtml  = {initServerDDHtml()},
-		initNodeTabsHtml  = {initNodeTabsHtml()},
-		initNodeData      = {initNodeData()},
-		getDefaultPlotId  = {getDefaultPlotId()},
-		generatePlot      = {generatePlot()},
-		generateYaml      = {generateYaml(dsccon)}
+	    validateDBVersion  = {validateDbVersion()},
+		initPlotDDHtml     = {initPlotDDHtml()},
+		initServerDDHtml   = {initServerDDHtml()},
+		initNodeTabsHtml   = {initNodeTabsHtml()},
+		initNodeData       = {initNodeData()},
+		getDefaultPlotId   = {getDefaultPlotId()},
+		getDefaultGrouping = {getDefaultGrouping()},
+		generatePlot       = {generatePlot()},
+		generateYaml       = {generateYaml(dsccon)}
 	)
 	dbDisconnect(dsccon)
 } else {
