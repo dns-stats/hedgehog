@@ -383,10 +383,6 @@ input[type="button"][disabled]:hover {
     color: #000;
 }
 
-.subgroup_partial input[type="checkbox"]:checked + label {
-    color: #0072B2;
-}
-
 .group_showing input[type="button"] {
     margin: 0 0 2px 16px;
     padding: 2px 8px;

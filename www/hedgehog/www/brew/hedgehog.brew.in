@@ -146,11 +146,12 @@ initNodeData <- function() {
                     }
                 }
                 for (n in 1:nrow(nodes_df)) {
-                    nd_id <- nodes_df[n,1]
-                    nd_nm <- nodes_df[n,2]
-                    if (is.null(nodes_df[n,3])) {nd_country=''} else {nd_country = nodes_df[n,3]}
-                    if (is.null(nodes_df[n,4])) {nd_city=''}    else {nd_city    = nodes_df[n,4]}
-                    if (is.null(nodes_df[n,5])) {nd_sg=''}      else {nd_sg      = nodes_df[n,5]}
+                    # Query fills in blank fields so we don't need to check here
+                    nd_id      = nodes_df[n,1]
+                    nd_nm      = nodes_df[n,2]
+                    nd_country = nodes_df[n,3]
+                    nd_city    = nodes_df[n,4]
+                    nd_sg      = nodes_df[n,5]
                     node  = list(node_name=nd_nm, node_id=nd_id, node_country=nd_country, node_city=nd_city, node_sg=nd_sg)
                     nodes = c(nodes, list(node))
                 }

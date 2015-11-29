@@ -16,6 +16,10 @@
 /// Developed by Sinodun IT (www.sinodun.com)
 ///
 
+var sortByText = function (a, b) {
+     return $.trim($(a).text()) > $.trim($(b).text());
+}
+
 function initNodeHtml(nodes_raw) {
 
     // Example data format
@@ -86,24 +90,21 @@ function initNodeHtml(nodes_raw) {
                     } else {
                         if (node_grouping_options == 1) {
                             var node_groupby_label   = node.node_sg;
-                            if (!node_groupby_label) node_groupby_label = 'No Instance';
                             var node_groupby_class   = 'subgroupselection';
                         }
                         if (node_grouping_options == 2) {
                             var node_groupby_label   = node.node_city;
-                            if (!node_groupby_label) node_groupby_label = 'No City';
                             var node_groupby_class   = 'cityselection';
                         }   
                         if (node_grouping_options == 3) {
                             var node_groupby_label   = node.node_country;
-                            if (!node_groupby_label) node_groupby_label  = 'No Country';
                             var node_groupby_class   = 'countryselection';
                         }
                         // use tilde not underscores as delimiter so other code doesn't trigger off this
                         var node_groupby_group_server = node_groupby_label + "~" + group + "~" + nodes[i].server;
                         if($("input[type='checkbox'][id='" + node_groupby_group_server + "']").length == 0) {
-                            $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='selectGrouping(this)'>");
-                            $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + " <img id='cb_" + node_groupby_group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></label>");
+                            $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + " <img id='cb_" + node_groupby_group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'>");
+                            $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='selectGrouping(this)'></label>");
                         } else {
                             var my_label = $("label[for='" + node_groupby_group_server + "']").attr("title");
                             $("label[for='" + node_groupby_group_server + "']").attr("title", my_label + "\n" + node.node_name);
@@ -114,10 +115,15 @@ function initNodeHtml(nodes_raw) {
                         }
                     }
                 }
+                if (node_grouping_options != 0) {
+                    // We must sort the country, city and instances alphabetically
+                    var sorted = $('#' + group_server + '_node_cbs_id label').sort(sortByText);
+                    $('#' + group_server + '_node_cbs_id').append(sorted);
+                }
             }
         }
     }
-    // Enable all subgroups by default
+    // Enable grouping by subgroups as default
     // TODO: This should be a config option
     $("input[type='checkbox'].subgroupselection").each(function(){
         this.checked = true;
@@ -171,7 +177,7 @@ function selectSisterGrouping(grp_class) {
              document.getElementById("cb_" + this.id + "_img").alt="none selected";
          } else {
              $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#0072B2');
+             //$("label[for='" + this.id + "']").css("color", '#0072B2');
              $("label[for='" + this.id + "']").css("color", '#000');
              var temp = $("#cb_" + this.id + "_img");
              document.getElementById("cb_" + this.id + "_img").src="images/some.png";
