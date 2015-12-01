@@ -61,7 +61,7 @@ dist_man_MANS = rssacd.8 \
 
 rssacd.8: rssacd rssac_server.py rssac_server/rssac.py rssac_server/threadpool.py Makefile
 	chmod 755 rssacd
-	PYTHONPATH=./rssac_server $(HELP2MAN) --version-string=@PACKAGE_VERSION@ -N -s 8 -n "This listens for notifies and records zone size and the time for propogation of zones" ./rssacd -o rssacd.8
+	PYTHONPATH=./rssac_server $(HELP2MAN) --version-string=@PACKAGE_VERSION@ -N -s 8 -n "This listens for DNS Notify messages and records the zone size and the time for propogation of zones. This is only needed for the generation of RSSAC reports" ./rssacd -o rssacd.8
 
 dsc-extractor.1: dsc-extractor Makefile
-	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 --no-discard-stderr ./dsc-extractor -o dsc-extractor.1
+	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 --no-discard-stderr -n "Application to extract DSC data from XML or DAT files and insert it in to a Postgresql database. Users are recommended to use the refile_and_grok wrapper script in preference to using this exectutable directly." ./dsc-extractor -o dsc-extractor.1
