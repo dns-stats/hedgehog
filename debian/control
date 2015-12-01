@@ -69,7 +69,7 @@ Package: hedgehog-gui
 Architecture: all
 Section: web
 Depends: hedgehog-common (>= ${source:Version}~),
-	 apache2 (>= 2.4),
+         apache2 (>= 2.4),
          libapache2-mod-r-base,
          libyaml-tiny-perl,
          postgresql,
@@ -82,6 +82,7 @@ Depends: hedgehog-common (>= ${source:Version}~),
          r-cran-digest,
          r-cran-ggplot2,
          r-cran-reshape,
+         r-cran-rjson,
          r-hedgehog-rpostgresqlhelper,
          ${misc:Depends}
 Recommends: dsc-statistics-collector
