@@ -1,3 +1,3 @@
-usr/share/hedgehog/conf/hedgehog.conf /etc/apache2/sites-available/hedgehog
+usr/share/hedgehog/conf/hedgehog.conf /etc/apache2/sites-available
 usr/share/hedgehog/conf/rssac.yaml /etc/hedgehog/rssac.yaml
 usr/share/hedgehog/www/
