@@ -162,11 +162,11 @@ dist_man_MANS = hedgehogctl.1 \
 
 hedgehogctl.1: hedgehogctl Makefile
 	chmod 755 hedgehogctl
-	$(HELP2MAN) -h help --version-string=@PACKAGE_VERSION@ -N -s 1 ./hedgehogctl -o hedgehogctl.1
+	$(HELP2MAN) -h help --version-string=@PACKAGE_VERSION@ -N -s 1 -n "Wrapper around hedgehog management scripts" ./hedgehogctl -o hedgehogctl.1
 	
 refile_and_grok.1: refile_and_grok Makefile
 	chmod 755 refile_and_grok
-	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 ./refile_and_grok -o refile_and_grok.1
+	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 -n "Wrapper around the dsc-extractor application that launches multipe eextractors to process data" ./refile_and_grok -o refile_and_grok.1
 
 hedgehog_database_create.1: $(srcdir)/hedgehog/hedgehog_database_create Makefile
 	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 -n "This script is to aid the database adiministrator with creating the hedgehog database." $(srcdir)/hedgehog/hedgehog_database_create -o hedgehog_database_create.1
