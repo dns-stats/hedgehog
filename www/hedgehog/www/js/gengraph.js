@@ -44,7 +44,7 @@ $(document).ready(function() {
 
     // populate plot and server dropdowns and nodetabs then generate default plot    
     // , brew("initnodeslist"),
-    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeData"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss,  nd, dp){
+    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nd, dg, dp){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -81,8 +81,7 @@ $(document).ready(function() {
 
         // initialise node tabs and grouping
         initNodeHtml(nd[0]);
-        // FIXME[node grouping]: this should be a config options
-        $('#ng_subgroup').prop('checked', true);
+        $('#ng_' + dg[0]).prop('checked', true);
 
         setServersGroups();
         initnodetabs();

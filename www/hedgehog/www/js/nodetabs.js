@@ -16,48 +16,57 @@
 /// Developed by Sinodun IT (www.sinodun.com)
 ///
 
+var sortByText = function (a, b) {
+     return $.trim($(a).text()) > $.trim($(b).text());
+}
+
 function initNodeHtml(nodes_raw) {
 
-    // FIXME[node grouping]: This doesn't yet work or country or city
-    // FIXME[node grouping]: Check if the all of the 'each' loops are really needed. There was a bug in the id name that stopped direct lookup working that is now fixed.
-    
     // Example data format
     // var nodes = [
     //   { server:     "Server-A",
-    //     groups:     [{group_name: "Region-1", node_list: [{node_name: "Node-1", node_id: "1"}, {node_name: "Node-2", node_id: "2", node_sg: "Subgroup-1"}]},
-    //                  {group_name: "Region-2", node_list: [{node_name: "Node-3", node_id: "3"}, {node_name: "Node-4", node_id: "4", node_sg: "Subgroup-2"}]}]},
+    //     groups:     [{group_name: "Region-1", node_list: [{node_name: "Node-1", node_id: "1"}, {node_name: "Node-2", node_id: "2", node_country: "US", node_city: "City-1", node_sg: "Subgroup-1"}]},
+    //                  {group_name: "Region-2", node_list: [{node_name: "Node-3", node_id: "3"}, {node_name: "Node-4", node_id: "4", node_country: "US", node_city: "City-1", node_sg: "Subgroup-2"}]}]},
     //   { server:     "L-root",
-    //     groups:     [{group_name: "Europe",  node_list: [{node_name: "Node-5", node_id: "5"}, {node_name: "Node-6", node_id: "6", node_sg: "Subgroup-3"}}]},
-    //                  {group_name: "America", node_list: [{node_name: "Node-7", node_id: "7"}, {node_name: "Node-8", node_id: "8", node_sg: "Subgroup-3"}}]}]}];
+    //     groups:     [{group_name: "Europe",  node_list: [{node_name: "Node-5", node_id: "5"}, {node_name: "Node-6", node_id: "6", node_country: "US", node_city: "City-1", node_sg: "Subgroup-3"}}]},
+    //                  {group_name: "America", node_list: [{node_name: "Node-7", node_id: "7"}, {node_name: "Node-8", node_id: "8", node_country: "US", node_city: "City-1", node_sg: "Subgroup-3"}}]}]}];
 
     nodes= jQuery.parseJSON(nodes_raw);
-    // FIXME[node grouping]: Check for errors e.g. empty data
 
     // Append requires a full element and will close any open elements so need care when using it.
     $('#nodetabs').append("<div class='sixteen columns' id='groupcontent'></div>");
     $('#nodetabs').append("<br class='clear'>");
     $('#nodetabs').append("<div class='sixteen columns' id='nodecontent'>");
-    $('#srvr_select').append("<a style='font-weight:bold; font-size:80%; text-decoration: none; padding-left: 20px; padding-right: 5px;'>Group by:</a>");
-    $('#srvr_select').append("<input type='radio'          id='ng_subgroup' name='node_grouping' onclick='ngChanged()' >  <label style='font-weight:bold;' for='ng_subgroup' >Sub-group</label>");
-    $('#srvr_select').append("<input type='radio'          id='ng_none'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_none'     >None</label>");
+    $('#srvr_select').append("<a style='font-weight:bold; font-size:80%; text-decoration: none; padding-left: 20px; padding-right: 5px;'>Group nodes by:</a>");
+    $('#srvr_select').append("<input type='radio'          id='ng_country'  name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_country'  >Country </label>");
+    $('#srvr_select').append("<input type='radio'          id='ng_city'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_city'     >City </label>");
+    $('#srvr_select').append("<input type='radio'          id='ng_instance' name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_instance' >Instance </label>");
+    $('#srvr_select').append("<input type='radio'          id='ng_none'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_none'     >No grouping </label>");
 
+    // Check for no servers is made earlier, so just check for nodes here
+    // if (nodes_raw = "[]") {
+    //     alert("No nodes found in the database");
+    // }
+
+    //*** SERVERS ***//
     // For each server, construct the groups.
     for (var i = 0; i < nodes.length; i++) {
         $('#groupcontent'                ).append(  "<div class='hidden' id='" + nodes[i].server + "'>");
         $('#' + nodes[i].server          ).append(  "<div class='Tabs'   id='" + nodes[i].server + "_tabs'>");
         $('#' + nodes[i].server + '_tabs').append(  "<ul                 id='" + nodes[i].server +"_tabs_ul'>");
+        //***  GROUPS (REGIONS) ***//
         // For each group, add a tab and fill in the nodes
-        for (var j = -1; j < nodes[i].groups.length; j++) {
-            // Special case for the 'All' tabs are needed here
-            if (j == -1) var group = "All"; 
-            else         var group =  nodes[i].groups[j].group_name;
+        for (var j = 0; j < nodes[i].groups.length; j++) {
+            var group =  nodes[i].groups[j].group_name;
             var group_server       = group + "_" + nodes[i].server;
             var group_server_basic = group_server;
             // Create the top tab with a list entry
             $('#' + nodes[i].server + '_tabs_ul').append("<li id='li_" + group_server + "' onclick='gpTab(\"" + group_server + "\")'>  <a>" + group + "<img id='cb_" + group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></a></li>");
             //Now the node content divs
-            for (var node_grouping_options = 0; node_grouping_options <=1;node_grouping_options++) {
-                if (node_grouping_options == 1) group_server = group_server + "_subgroup";
+            for (var node_grouping_options = 0; node_grouping_options <=3; node_grouping_options++) {
+                if (node_grouping_options == 1)      {group_server = group + "_" + nodes[i].server + "_subgroup";}
+                else if (node_grouping_options == 2) {group_server = group + "_" + nodes[i].server + "_city";}
+                else if (node_grouping_options == 3) {group_server = group + "_" + nodes[i].server + "_country";}
                 $('#nodecontent'                 ).append("<div class='group_showing'   id='" + group_server + "'>");
                 $('#' + group_server             ).append("<div class='allnone'         id='" + group_server + "_allnone'>");
                 $('#' + group_server             ).append("<div class='node_cbs'        id='" + group_server + "_node_cbs_id'>");
@@ -71,45 +80,49 @@ function initNodeHtml(nodes_raw) {
                     $('#' + group_server + '_allnone').append("<input type='button' id='selectAllRegionBtn'  value='Include all " + group + "' title='Include all the nodes in this region for plotting'   onclick='selectAll(\"cb_"  + group_server_basic + "\")'> ");
                     $('#' + group_server + '_allnone').append("<input type='button' id='selectNoneRegionBtn' value='Exclude all " + group + "' title='De-select all the nodes in this region for plotting' onclick='selectNone(\"cb_" + group_server_basic + "\")'><hr> ");
                 }
-                // Add all the nodes to the 'All' tab or just the group nodes for all other cases
-                if (j == -1) {var start_group = 0; var stop_group = nodes[i].groups.length; }
-                else         {var start_group = j; var stop_group  = j + 1}
-                // Loop over the groups/nodes
-                for (var x = start_group; x < stop_group; x++) {
-                    for (var k = 0; k < nodes[i].groups[x].node_list.length; k++) {
-                        var node_name            = nodes[i].groups[x].node_list[k].node_name;
-                        var node_id              = nodes[i].groups[x].node_list[k].node_id;
-                        var node_sg              = nodes[i].groups[x].node_list[k].node_sg;
-                        // FIXME[node grouping]: 'Other' may need special handling on select......
-                        if (!node_sg) node_sg    = 'Other';
-                        var node_id_group_server = node_id + "_" + group_server_basic;
-                        // use tilde not underscores so current code doesn't trigger off this
-                        var node_sg_group_server = node_sg + "~" + group + "~" + nodes[i].server;
-                        if (node_grouping_options == 0) {
-                            $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' onclick='selectNode(\"" + node_id_group_server + "\")'>");
-                            $('#' + group_server + '_node_cbs_id').append("<label for='" + node_id_group_server + "' title='Toggle node selection'>" + node_name + "</label>");
+                //*** NODES AND GROUPING OPTIONS***//
+                for (var k = 0; k < nodes[i].groups[j].node_list.length; k++) {
+                    var node                 = nodes[i].groups[j].node_list[k]
+                    var node_id_group_server = node.node_id + "_" + group_server_basic;
+                    if (node_grouping_options == 0) {
+                        $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='nodeselection' id='" + node_id_group_server + "' name='cb_" + group_server + "' onclick='selectNode(\"" + node_id_group_server + "\")'>");
+                        $('#' + group_server + '_node_cbs_id').append("<label for='" + node_id_group_server + "' title='Toggle node selection for " + node.node_name + "\n Country: " + node.node_country + "\n City: " + node.node_city + "\n Instance: " + node.node_sg + "'>" + node.node_name + "</label>");
+                    } else {
+                        if (node_grouping_options == 1) {
+                            var node_groupby_label   = node.node_sg;
+                            var node_groupby_class   = 'subgroupselection';
+                        }
+                        if (node_grouping_options == 2) {
+                            var node_groupby_label   = node.node_city;
+                            var node_groupby_class   = 'cityselection';
+                        }   
+                        if (node_grouping_options == 3) {
+                            var node_groupby_label   = node.node_country;
+                            var node_groupby_class   = 'countryselection';
+                        }
+                        // use tilde not underscores as delimiter so other code doesn't trigger off this
+                        var node_groupby_group_server = node_groupby_label + "~" + group + "~" + nodes[i].server;
+                        if($("input[type='checkbox'][id='" + node_groupby_group_server + "']").length == 0) {
+                            $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + " <img id='cb_" + node_groupby_group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'>");
+                            $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='selectGrouping(this)'></label>");
                         } else {
-                            if($("input[type='checkbox'][id='" + node_sg_group_server + "']").length == 0) {
-                                $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='subgroubselection' id='" + node_sg_group_server + "' name='cb-" + node_sg_group_server + "' value='" + node_id_group_server + "' onclick='selectSubGroup(this)'>");
-                                $('#' + group_server + '_node_cbs_id').append("<label for='" + node_sg_group_server + "' title='Toggle node selection for:\n" + node_name + "'>" + node_sg + "</label>");
-                            } else {
-                                var my_label = $("label[for='" + node_sg_group_server + "']").attr("title");
-                                $("label[for='" + node_sg_group_server + "']").attr("title", my_label + "\n" + node_name);
-                                var my_cb = $("input[type='checkbox'][id='" + node_sg_group_server + "']");
-                                $.each(my_cb, function() {
-                                   this.value = this.value + "~" + node_id_group_server; 
-                                });
-                            }
+                            var my_label = $("label[for='" + node_groupby_group_server + "']").attr("title");
+                            $("label[for='" + node_groupby_group_server + "']").attr("title", my_label + "\n" + node.node_name);
+                            var my_cb = $("input[type='checkbox'][id='" + node_groupby_group_server + "']");
+                            $.each(my_cb, function() {
+                               this.value = this.value + "~" + node_id_group_server; 
+                            });
                         }
                     }
+                }
+                if (node_grouping_options != 0) {
+                    // We must sort the country, city and instances alphabetically
+                    var sorted = $('#' + group_server + '_node_cbs_id label').sort(sortByText);
+                    $('#' + group_server + '_node_cbs_id').append(sorted);
                 }
             }
         }
     }
-    // Enable all subgroups by default
-    $("input[type='checkbox'].subgroubselection").each(function(){
-        this.checked = true;
-    });
 }
 
 function ngChanged() {
@@ -134,6 +147,41 @@ function setServersGroups() {
     });
 }
 
+function selectSisterGrouping(grp_class) {
+    $("input[type='checkbox']." + grp_class).each(function(){
+         node_list = this.value.split("~");
+         var all = true;
+         var none = true;
+         $.each(node_list, function(i, value){
+             var node_cb = $("#" + value);
+             if($(node_cb).is(':checked')){
+                 none = false;
+             }else{
+                 all = false;
+             }
+         });
+         if (all == true) {
+             $(this).prop('checked', true);
+             $("label[for='" + this.id + "']").css("color", '#000');
+             document.getElementById("cb_" + this.id + "_img").src="images/all.png";
+             document.getElementById("cb_" + this.id + "_img").alt="all selected";
+         } else if (none == true) {
+             $(this).prop('checked', false);
+             $("label[for='" + this.id + "']").css("color", '#999');
+             document.getElementById("cb_" + this.id + "_img").src="images/none.png";
+             document.getElementById("cb_" + this.id + "_img").alt="none selected";
+         } else {
+             $(this).prop('checked', true);
+             //$("label[for='" + this.id + "']").css("color", '#0072B2');
+             $("label[for='" + this.id + "']").css("color", '#000');
+             var temp = $("#cb_" + this.id + "_img");
+             document.getElementById("cb_" + this.id + "_img").src="images/some.png";
+             document.getElementById("cb_" + this.id + "_img").alt="some selected";
+         }
+     });
+}
+
+
 function selectSister(idList, ckd) {
     // finds all checkboxes where their node id
     // is in idList and sets their checked status
@@ -157,31 +205,11 @@ function selectSister(idList, ckd) {
     });
     
     // update to also set the cbs in the grouping tabs
-    // FIXME[node grouping]: move this to a separate function
-     $("input[type='checkbox'].subgroubselection").each(function(){
-         node_list = this.value.split("~");
-         var all = true;
-         var none = true;
-         $.each(node_list, function(i, value){
-             var node_cb = $("#" + value);
-             if($(node_cb).is(':checked')){
-                 none = false;
-             }else{
-                 all = false;
-             }
-         });
-         if (all == true) {
-             $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#000');
-         } else if (none == true) {
-             $(this).prop('checked', false);
-             $("label[for='" + this.id + "']").css("color", '#999');
-         } else {
-             $(this).prop('checked', true);
-             $("label[for='" + this.id + "']").css("color", '#0072B2');
-         }
-     });
-         
+    var grouping = ["subgroupselection", "cityselection", "countryselection"]; 
+    for (i = 0; i < 3; i++) { 
+        selectSisterGrouping(grouping[i]);
+    }
+
     // set group tab images to reflect
     // whether all, some or no checkboxes
     // are selected
@@ -243,16 +271,16 @@ function selectNode(ckbxid) {
     selectSister(idList, $("#" + ckbxid).is(':checked'));
 }
 
-function selectSubGroup(subgroup) {
-    idList = subgroup.value.split("~");
-    selectSister(idList, $(subgroup).is(':checked'));
-    var my_subgroup = subgroup.id.split("~")[0];
-    var my_server   = subgroup.id.split("~")[2];
-    $("input[type='checkbox'].subgroubselection").each(function(){
+function selectGrouping(item) {
+    idList = item.value.split("~");
+    selectSister(idList, $(item).is(':checked'));
+    var my_subgroup = item.id.split("~")[0];
+    var my_server   = item.id.split("~")[2];
+    $("input[type='checkbox']." + item.class).each(function(){
         var this_subgroup = this.id.split("~")[0];
         var this_server = this.id.split("~")[2];
         if (my_server == this_server && my_subgroup == this_subgroup) {
-            this.checked = $(subgroup).is(':checked');
+            this.checked = $(item).is(':checked');
         }
     });
 }
@@ -305,7 +333,9 @@ function gpTab(gpnm) {
     old_content = $(".group_showing");
     old_content.removeClass("group_showing");
     old_content.addClass("hidden");
-    if ($('#ng_subgroup').prop('checked') === true) gpnm = gpnm + "_subgroup";
+    if ($('#ng_instance').prop('checked') === true) gpnm = gpnm + "_subgroup";
+    if ($('#ng_city').prop('checked')     === true) gpnm = gpnm + "_city";
+    if ($('#ng_country').prop('checked')  === true) gpnm = gpnm + "_country";
     $("#" + gpnm).removeClass("hidden");
     $("#" + gpnm).addClass("group_showing");
 }
