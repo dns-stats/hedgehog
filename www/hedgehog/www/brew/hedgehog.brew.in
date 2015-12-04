@@ -134,13 +134,11 @@ initNodeData <- function() {
                 if (g == 0) {
                     gp_nm = 'All'
                     nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodes(", srvr_id, ");", sep=""))
-                    system('logger -p user.notice In initNodeTabsHtml for all')
                 } else {
                     gp_nm <- groups_df[g,1]
                     # Other should really appear at the end of the list......
                     if  (gp_nm == 'Other'){
                         nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ",'');", sep=""))
-                        system('logger -p user.notice In initNodeTabsHtml for other')
                     } else {
                         nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
                     }
@@ -215,8 +213,7 @@ getSupportURL <- function() {
 	    system('logger -p user.notice In getSupportURL')
 	}
 
-	#%>http://sinodun.com<%
-	%><%
+	%><%=gui_config$www$support_url%><%
 
 	return(TRUE)
 }

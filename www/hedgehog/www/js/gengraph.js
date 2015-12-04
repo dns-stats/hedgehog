@@ -89,10 +89,8 @@ $(document).ready(function() {
         serverTab();
         
         // checks for undefined, null and empty string
-        if (!!su[0]) {
-            alert("Default support link");
-        } else {
-            $("#support_link").href(su[0]);
+        if (!(!su[0] || su[0].length === 0 || !su[0].trim())) {
+            $("#support_link").attr('href', su[0]);
         }
 
         // generate default plot
