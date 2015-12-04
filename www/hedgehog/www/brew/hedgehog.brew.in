@@ -209,6 +209,18 @@ getDefaultGrouping <- function() {
 	return(TRUE)
 }
 
+getSupportURL <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In getSupportURL')
+	}
+
+	#%>http://sinodun.com<%
+	%><%
+
+	return(TRUE)
+}
+
 generatePlot <- function(){
 
     #TODO(refactor): Move more of this code out to the generatePlot.R file
@@ -411,6 +423,7 @@ if (class(dsccon) != "try-error") {
 		initNodeData       = {initNodeData()},
 		getDefaultPlotId   = {getDefaultPlotId()},
 		getDefaultGrouping = {getDefaultGrouping()},
+		getSupportURL      = {getSupportURL()},
 		generatePlot       = {generatePlot()},
 		generateYaml       = {generateYaml(dsccon)}
 	)

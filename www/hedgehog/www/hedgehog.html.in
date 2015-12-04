@@ -142,6 +142,7 @@ Developed by Sinodun IT (www.sinodun.com)
     <div class="eight columns" id="ext_links" >
       <hr style='margin-bottom:5px;' />
       External Links:  &nbsp; <a href="https://github.com/dns-stats/hedgehog/wiki" target="_blank">Hedgehog Homepage</a> &nbsp; <a href="http://dns-stats.org/" target="_blank">dns-stats.org</a>
+      &nbsp; <a id="support_link" href="https://github.com/dns-stats/hedgehog/issues" target="_blank">Support</a>
     </div>
     <div class="sixteen columns" id="copyright" >
       <hr style='margin-top:5px;' />

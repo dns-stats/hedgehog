@@ -44,7 +44,8 @@ $(document).ready(function() {
 
     // populate plot and server dropdowns and nodetabs then generate default plot    
     // , brew("initnodeslist"),
-    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nd, dg, dp){
+    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), 
+           brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), brew("getSupportURL")).done(function(db,rp, pt, ss, nd, dg, dp, su){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -86,6 +87,13 @@ $(document).ready(function() {
         setServersGroups();
         initnodetabs();
         serverTab();
+        
+        // checks for undefined, null and empty string
+        if (!!su[0]) {
+            alert("Default support link");
+        } else {
+            $("#support_link").href(su[0]);
+        }
 
         // generate default plot
         genDSCGraph();
