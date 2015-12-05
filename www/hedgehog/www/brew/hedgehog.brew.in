@@ -291,6 +291,8 @@ generatePlot <- function(){
     
 	# OK - we have a plot file so now lets generate the html to hold that
 	now <- format(Sys.time(), '%Y-%m-%dT%H:%M')
+	
+	plot_file_raw = gsub('../','/',plot_file)
 	if (plot_file != "plots/no_graph.png" && plot_file != "plots/no_results.png" && plot_file != "plots/no_connection.png") {
 		plot_file <- sub(hh_config$directories$plotcache, "../plotcache", plot_file)
         
@@ -301,10 +303,7 @@ generatePlot <- function(){
 			</div>
 			<div id="plink" class="" style="height:27px; width:960px;">
 				<label style="font-size:80%" for="ploturi">Static Link</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
-				<script>
-					document.getElementById("ploturi").value=document.getElementById("plotframe").src
-				</script>
+				<input type="text" id="ploturi" readonly="readonly" value="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',plot_file)%>" style="width: 870px; height:7px; font-size:80%">
 			</div><%
 		}
 		else if (pltnm %in% log_option) {
@@ -326,10 +325,7 @@ generatePlot <- function(){
 			</div>
 			<div id="plink" class="" style="height:27px; width:960px;">
 				<label style="font-size:80%" for="ploturi">Static Link</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
-				<script>
-					document.getElementById("ploturi").value=document.getElementById("liny").src
-				</script>
+				<input type="text" id="ploturi" readonly="readonly" value="http://<%=SERVER$hostname%><%=gsub('\\.\\./','/',plot_file)%>" style="width: 870px; height:7px; font-size:80%">
 			</div><%
 		}
 		else {
@@ -339,10 +335,7 @@ generatePlot <- function(){
 			</div>
 			<div id="plink" class="" style="height:27px; width:960px;">
 				<label style="font-size:80%" for="ploturi">Static Link</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
-				<script>
-					document.getElementById("ploturi").value=document.getElementById("staticplot").src
-				</script>
+				<input type="text" id="ploturi" readonly="readonly" value="http://<%=SERVER$hostname%><%=gsub('\\.\\./','/',plot_file)%>" style="width: 870px; height:7px; font-size:80%">
 			</div><%
 		}
 	}

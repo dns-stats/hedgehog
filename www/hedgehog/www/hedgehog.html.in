@@ -56,7 +56,7 @@ Developed by Sinodun IT (www.sinodun.com)
   <div class="container">
     <hr style='margin-bottom:5px; margin-top:1px;'/>
     <div class="three columns">
-      <img id="helpimg" src="images/HH_logo.png" alt="About" height="70" width="200" title="Help" />
+      <img id="helpimg" src="images/HH_logo.png" alt="About" height="70" width="190" title="Help" />
       <!--<h4 class="remove-bottom">DNS-STATS:</h4>
       <h4 class="remove-bottom">Hedgehog</h4>-->
       
