@@ -26,7 +26,7 @@ Developed by Sinodun IT (www.sinodun.com)
 	<!-- Basic Page Needs
   ================================================== -->
 	<meta charset="utf-8">
-	<title>Hedgehog</title>
+	<title>DNS-STATS:Hedgehog</title>
 	<meta name="Hedgehog" content="">
 	<meta name="jad@sinodun.com" content="">
 
@@ -56,8 +56,10 @@ Developed by Sinodun IT (www.sinodun.com)
   <div class="container">
     <hr style='margin-bottom:5px; margin-top:1px;'/>
     <div class="three columns">
-      <h2 class="remove-bottom">Hedgehog</h2>
-      <h5>Version @HH_PACKAGE_VERSION@ <a href="about.html"><img id="helpimg" src="images/help.png" alt="About" height="24" width="24" title="Help" /></a></h5>
+      <img id="helpimg" src="images/HH_logo.png" alt="About" height="70" width="200" title="Help" />
+      <!--<h4 class="remove-bottom">DNS-STATS:</h4>
+      <h4 class="remove-bottom">Hedgehog</h4>-->
+      
     </div>
     <form method="get" name="plotParams">
       <div class="four columns" id="timedisplay"><!-- 
@@ -136,7 +138,7 @@ Developed by Sinodun IT (www.sinodun.com)
     </form>
     <div class="eight columns" id="local_links" >
       <hr style='margin-bottom:5px;' />
-      Local Links: &nbsp; <a href="../rssac" target="_blank">RSSAC reports</a> &nbsp; <a href="about.html" target="_blank">Hedgehog QuickHelp</a>
+      Local Links: &nbsp; <a href="../rssac" target="_blank">RSSAC reports</a> &nbsp; <a href="about.html" target="_blank">Hedgehog QuickHelp<img id="helpimg" src="images/help.png" alt="About" height="20" width="20" title="Help" /></a>
     </div>
     <!-- TODO: Better job of links -->
     <div class="eight columns" id="ext_links" >
@@ -146,7 +148,7 @@ Developed by Sinodun IT (www.sinodun.com)
     </div>
     <div class="sixteen columns" id="copyright" >
       <hr style='margin-top:5px;' />
-      &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
+      &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Version @HH_PACKAGE_VERSION@. Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
     
       <hr style='margin-top:5px;' />
       This product includes GeoLite2 data created by MaxMind, available from
