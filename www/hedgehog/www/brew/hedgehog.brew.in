@@ -315,7 +315,7 @@ generatePlot <- function(){
 				<label for="rbstack"  title="Stacked line plot with linear y-axis">Stacked linear</label>
 			</div>
 			<div id="plot">
-> 				<img src="<%=plot_file%>?nocache=<%=now%>" id= "liny" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',plot_file)%>"/>
+				<img src="<%=plot_file%>?nocache=<%=now%>" id= "liny" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',plot_file)%>"/>
 				<img src="<%=log_file%>?nocache=<%=now%>" class="hidden" id="logy" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',log_file)%>" />
 				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',stack_file)%>"/>
 			</div><%
