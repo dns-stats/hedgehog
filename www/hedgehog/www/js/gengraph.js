@@ -44,7 +44,8 @@ $(document).ready(function() {
 
     // populate plot and server dropdowns and nodetabs then generate default plot    
     // , brew("initnodeslist"),
-    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nd, dg, dp){
+    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), 
+           brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), brew("getSupportURL")).done(function(db,rp, pt, ss, nd, dg, dp, su){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -86,6 +87,11 @@ $(document).ready(function() {
         setServersGroups();
         initnodetabs();
         serverTab();
+        
+        // checks for undefined, null and empty string
+        if (!(!su[0] || su[0].length === 0 || !su[0].trim())) {
+            $("#support_link").attr('href', su[0]);
+        }
 
         // generate default plot
         genDSCGraph();
@@ -219,19 +225,19 @@ function toggle_plot() {
         $('#liny').removeClass('hidden');
         $('#logy').addClass('hidden');
         $('#stack').addClass('hidden');
-        $("#ploturi").val($("#liny").prop("src"));
+        $("#ploturi").val($("#liny").prop("name"));
     } else if ($("#rblogy").prop('checked')) {
         window.selectedOpt = "#rblogy";
         $('#liny').addClass('hidden');
         $('#logy').removeClass('hidden');
         $('#stack').addClass('hidden');
-        $("#ploturi").val($("#logy").prop("src"));
+        $("#ploturi").val($("#logy").prop("name"));
     } else if ($("#rbstack").prop('checked')) {
         window.selectedOpt = "#rbstack";
         $('#liny').addClass('hidden');
         $('#logy').addClass('hidden');
         $('#stack').removeClass('hidden');
-        $("#ploturi").val($("#stack").prop("src"));
+        $("#ploturi").val($("#stack").prop("name"));
     }
 }
 

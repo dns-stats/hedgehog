@@ -22,6 +22,7 @@ nobase_dist_data_DATA = hedgehog/www/images/ajax-loader.gif \
 						hedgehog/www/images/all.png \
 						hedgehog/www/images/info.png \
 						hedgehog/www/images/help.png \
+						hedgehog/www/images/HH_logo.png \
 						hedgehog/www/js/datetimes.js \
 						hedgehog/www/js/gengraph.js \
 						hedgehog/www/js/nodetabs.js \

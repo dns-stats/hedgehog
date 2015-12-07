@@ -37,4 +37,6 @@ www:
                                               # More recent plots are not cached as data may still be
                                               # being imported
   presentation_delay_in_hours   : 0           # Number of hours behind now for which the GUI will display data
+  support_url                   :             # configurable target for "Support" external link on Homepage.
+                                              # The default dns-stats.org issue tracker used if left blank
 ...

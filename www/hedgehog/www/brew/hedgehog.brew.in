@@ -134,13 +134,11 @@ initNodeData <- function() {
                 if (g == 0) {
                     gp_nm = 'All'
                     nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodes(", srvr_id, ");", sep=""))
-                    system('logger -p user.notice In initNodeTabsHtml for all')
                 } else {
                     gp_nm <- groups_df[g,1]
                     # Other should really appear at the end of the list......
                     if  (gp_nm == 'Other'){
                         nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ",'');", sep=""))
-                        system('logger -p user.notice In initNodeTabsHtml for other')
                     } else {
                         nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
                     }
@@ -206,6 +204,17 @@ getDefaultGrouping <- function() {
     	system('logger -p user.warning Unsupported Node Grouping present in config file. Using None.')
     	%>none<%
 	}
+	return(TRUE)
+}
+
+getSupportURL <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice In getSupportURL')
+	}
+
+	%><%=gui_config$www$support_url%><%
+
 	return(TRUE)
 }
 
@@ -282,6 +291,8 @@ generatePlot <- function(){
     
 	# OK - we have a plot file so now lets generate the html to hold that
 	now <- format(Sys.time(), '%Y-%m-%dT%H:%M')
+	
+	plot_file_raw = gsub('../','/',plot_file)
 	if (plot_file != "plots/no_graph.png" && plot_file != "plots/no_results.png" && plot_file != "plots/no_connection.png") {
 		plot_file <- sub(hh_config$directories$plotcache, "../plotcache", plot_file)
         
@@ -289,13 +300,6 @@ generatePlot <- function(){
 			%><div id="plot">
 				<hr />
 				<iframe scrolling="no" width="100%" height=600px" frameborder="0" id="plotframe" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
-			</div>
-			<div id="plink" class="" style="height:27px; width:960px;">
-				<label style="font-size:80%" for="ploturi">Static Link</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
-				<script>
-					document.getElementById("ploturi").value=document.getElementById("plotframe").src
-				</script>
 			</div><%
 		}
 		else if (pltnm %in% log_option) {
@@ -311,31 +315,21 @@ generatePlot <- function(){
 				<label for="rbstack"  title="Stacked line plot with linear y-axis">Stacked linear</label>
 			</div>
 			<div id="plot">
-				<img src="<%=plot_file%>?nocache=<%=now%>" id= "liny" />
-				<img src="<%=log_file%>?nocache=<%=now%>" class="hidden" id="logy" />
-				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" />
-			</div>
-			<div id="plink" class="" style="height:27px; width:960px;">
-				<label style="font-size:80%" for="ploturi">Static Link</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
-				<script>
-					document.getElementById("ploturi").value=document.getElementById("liny").src
-				</script>
+				<img src="<%=plot_file%>?nocache=<%=now%>" id= "liny" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',plot_file)%>"/>
+				<img src="<%=log_file%>?nocache=<%=now%>" class="hidden" id="logy" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',log_file)%>" />
+				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',stack_file)%>"/>
 			</div><%
 		}
 		else {
 			%><div id="plot">
 				<hr />
 				<img id="staticplot" src="<%=plot_file%>?nocache=<%=now%>" />
-			</div>
-			<div id="plink" class="" style="height:27px; width:960px;">
-				<label style="font-size:80%" for="ploturi">Static Link</label>
-				<input type="text" id="ploturi" readonly="readonly" style="width: 870px; height:7px; font-size:80%">
-				<script>
-					document.getElementById("ploturi").value=document.getElementById("staticplot").src
-				</script>
 			</div><%
 		}
+		%><div id="plink" class="" style="height:27px; width:960px;">
+			<label style="font-size:80%" for="ploturi">Static Link</label>
+			<input type="text" id="ploturi" readonly="readonly" value="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',plot_file)%>" style="width: 870px; height:7px; font-size:80%">
+		</div><%
 	}
 	else {
 		%><div id="plot">
@@ -411,6 +405,7 @@ if (class(dsccon) != "try-error") {
 		initNodeData       = {initNodeData()},
 		getDefaultPlotId   = {getDefaultPlotId()},
 		getDefaultGrouping = {getDefaultGrouping()},
+		getSupportURL      = {getSupportURL()},
 		generatePlot       = {generatePlot()},
 		generateYaml       = {generateYaml(dsccon)}
 	)
