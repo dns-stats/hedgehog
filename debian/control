@@ -85,6 +85,9 @@ Depends: hedgehog-common (>= ${source:Version}~),
          r-cran-rjson,
          r-hedgehog-rpostgresqlhelper,
          unifont,
+         libcairo2-dev,
+         libxt-dev,
+         libpq-dev,
          ${misc:Depends}
 Recommends: dsc-statistics-collector
 Suggests: pgbouncer,
