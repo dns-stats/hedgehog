@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+chown hedgehog:nogroup /var/lib/hedgehog/data
+
+#DEBHELPER#
