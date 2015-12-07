@@ -89,8 +89,8 @@ Depends: hedgehog-common (>= ${source:Version}~),
          libxt-dev,
          libpq-dev,
          ${misc:Depends}
-Recommends: dsc-statistics-collector
-Suggests: pgbouncer,
+Suggests: dsc-statistics-collector
+          pgbouncer,
           hedgehog-doc
 Description: visualisation tool for DNS [web]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
