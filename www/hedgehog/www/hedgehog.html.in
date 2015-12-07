@@ -56,7 +56,7 @@ Developed by Sinodun IT (www.sinodun.com)
   <div class="container">
     <hr style='margin-bottom:5px; margin-top:1px;'/>
     <div class="three columns">
-      <img id="helpimg" src="images/HH_logo.png" alt="About" height="70" width="190" title="Help" />
+      <img id="helpimg" src="images/HH_logo.png" alt="About" height="70" width="190" title="About Hedgehog" />
       <!--<h4 class="remove-bottom">DNS-STATS:</h4>
       <h4 class="remove-bottom">Hedgehog</h4>-->
       
@@ -138,12 +138,12 @@ Developed by Sinodun IT (www.sinodun.com)
     </form>
     <div class="eight columns" id="local_links" >
       <hr style='margin-bottom:5px;' />
-      Local Links: &nbsp; <a href="../rssac" target="_blank">RSSAC reports</a> &nbsp; <a href="about.html" target="_blank">Hedgehog QuickHelp<img id="helpimg" src="images/help.png" alt="About" height="20" width="20" title="Help" /></a>
+      Local Links: &nbsp; <a href="../rssac" target="_blank">RSSAC reports</a> &nbsp; <a href="about.html" target="_blank">Hedgehog QuickHelp</a>
     </div>
     <!-- TODO: Better job of links -->
     <div class="eight columns" id="ext_links" >
       <hr style='margin-bottom:5px;' />
-      External Links:  &nbsp; <a href="https://github.com/dns-stats/hedgehog/wiki" target="_blank">Hedgehog Homepage</a> &nbsp; <a href="http://dns-stats.org/" target="_blank">dns-stats.org</a>
+      External Links:  &nbsp; <a href="https://github.com/dns-stats/hedgehog/wiki" target="_blank">Hedgehog Wiki</a> &nbsp; <a href="http://dns-stats.org/" target="_blank">dns-stats.org</a>
       &nbsp; <a id="support_link" href="https://github.com/dns-stats/hedgehog/issues" target="_blank">Support</a>
     </div>
     <div class="sixteen columns" id="copyright" >
