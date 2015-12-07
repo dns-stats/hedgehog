@@ -89,7 +89,7 @@ Depends: hedgehog-common (>= ${source:Version}~),
          libxt-dev,
          libpq-dev,
          ${misc:Depends}
-Suggests: dsc-statistics-collector
+Suggests: dsc-statistics-collector,
           pgbouncer,
           hedgehog-doc
 Description: visualisation tool for DNS [web]
