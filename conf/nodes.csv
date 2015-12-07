@@ -1,6 +1,6 @@
 ######################### NODES CONFIGURATION FILE ###################
 # Format is:     server-name, node-name, [node-group],[node-country],
-                 [node-city],[node-subgroup],[node-ip]
+#                 [node-city],[node-subgroup],[node-ip]
 # Each field can contain alphanumeric characters and hyphens (-) only 
 # All the commas are required, even if all optional fields are blank
 # '#' is the comment character
