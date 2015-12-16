@@ -781,7 +781,7 @@ initPlotOptions <- function() {
   formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
 
   formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "qtype_vs_othertld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", 
-                                "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_instance", "by_city", "by_country", "load_time", "zone_size")
+                                "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_instance", "by_city", "by_country", "load_time", "zone_size", "server_addr")
 
   rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
   
@@ -795,11 +795,11 @@ initPlotOptions <- function() {
   # now create other useful groups    
   passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
   avgoverwindow           <<- c(format3, format3_bgpprefix, format3_asn, 'qtype_vs_tld', 'qtype_vs_legacygtld', 'qtype_vs_cctld', 'qtype_vs_newgtld', 'qtype_vs_othertld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype', 'client_addr_vs_rcode_accum_asn', 'client_addr_vs_rcode_accum_bgpprefix', "client_subnet2_accum_asn", "client_subnet2_accum_bgpprefix")
-  lineplots               <<- c(format1, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume")
+  lineplots               <<- c(format1, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr")
   facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
   facetedlineplots        <<- c("traffic_volume")
   faceteddifflineplots    <<- c("traffic_volume_difference")
-  log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume")
+  log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr")
 }
 
 # create plot file if not cached

@@ -52,7 +52,8 @@ Format1DSCStrategy::preprocess_data(const DSCUMap &orig_dscdata, DSCUMap &new_ds
         accum2d_to_trace(orig_dscdata, new_dscdata);
     } else if ( plot_name_ == "client_port_range" || 
                 plot_name_ == "edns_bufsiz"  ||
-                plot_name_ == "rcode") {
+                plot_name_ == "rcode" ||
+                plot_name_ == "server_addr") {
         new_dscdata = orig_dscdata;
     } else {
         new_dscdata = orig_dscdata;
