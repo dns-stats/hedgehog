@@ -267,6 +267,40 @@ prepStmnt <- function(statementNm, dsccon){
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},               
 
+           server_addr = {
+             sql_joined <- paste("PREPARE", statementNm, "(INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS",
+               "select to_timestamp((extract(epoch from sq.sx)::int /
+                 (extract(epoch from $4::timestamp - $3::timestamp + interval '1 minute')/1440)::int )*
+                 (extract(epoch from $4::timestamp - $3::timestamp + interval '1 minute')/1440)::int) AS x,
+                sq.skey as key, avg(sq.sy) as y from
+                  (SELECT d.starttime AS sx, d.key1 AS skey, sum(d.value)/60.0 AS sy
+                   FROM dsc.data d
+                   WHERE d.server_id=$1
+                    AND d.plot_id=$2 AND d.starttime>=$3 AND d.starttime<=$4
+                    AND d.node_id = ANY (string_to_array($5, ',')::integer[])
+                   GROUP BY sx, skey) as sq
+                GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+
+           server_addr_all_nodes = {
+             sql_joined <- paste("PREPARE", statementNm, "(INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS",
+             "select to_timestamp((extract(epoch from sq.sx)::int /
+               (extract(epoch from $4::timestamp - $3::timestamp + interval '1 minute')/1440)::int )*
+               (extract(epoch from $4::timestamp - $3::timestamp + interval '1 minute')/1440)::int) AS x,
+              sq.skey as key, avg(sq.sy) as y from
+                (SELECT d.starttime AS sx, d.key1 AS skey,
+                sum(d.value)/60.0 AS sy 
+                FROM dsc.data d
+                WHERE d.server_id=$1 AND d.plot_id=$2
+                  AND d.starttime>=$3 AND d.starttime<=$4 
+                GROUP BY sx, skey) as sq
+              GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+
         )
 
         if(class(rs) == "try-error"){

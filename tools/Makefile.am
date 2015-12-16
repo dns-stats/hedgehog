@@ -28,6 +28,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000014_ddl_loadtime \
                          hedgehog/DDL_updates/000015_ddl_ip2asn \
                          hedgehog/DDL_updates/000016_ddl_ip2asn_part2 \
+                         hedgehog/DDL_updates/000017_ddl_server_addr \
                          hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
                          hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
@@ -149,6 +150,10 @@ hedgehog/DDL_updates/000015_ddl_ip2asn: $(srcdir)/hedgehog/DDL_updates/000015_dd
 hedgehog/DDL_updates/000016_ddl_ip2asn_part2: $(srcdir)/hedgehog/DDL_updates/000016_ddl_ip2asn_part2.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000016_ddl_ip2asn_part2.in | $(subst_DB_VERSION) | $(subst_sql) | $(subst_version) > hedgehog/DDL_updates/000016_ddl_ip2asn_part2
+
+hedgehog/DDL_updates/000017_ddl_server_addr: $(srcdir)/hedgehog/DDL_updates/000017_ddl_server_addr.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000017_ddl_server_addr.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000017_ddl_server_addr
 
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
