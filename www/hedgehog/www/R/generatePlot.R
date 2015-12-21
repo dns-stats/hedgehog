@@ -243,16 +243,17 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
           }
       }else{
           # Need to order the table before passing it to gviz
-          #write.table(de, file="/tmp/de.out")
+          # write.table(de, file="/tmp/de.out")
           # Dont include the IP ddress in the sum!
           de$total <- rowSums(de[,-1], na.rm=TRUE);
           de <-arrange(de, desc(total));
           de$total <- NULL
+          # p <- gvisTable(de)
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
                             options=list(isStacked=TRUE, title=title, height=600, width=940,
-                                         vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""), 
-                                         hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""), 
-                                         legend=paste("{textStyle:{fontSize:'12'}}", sep=""), 
+                                         vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""),
+                                         hAxis=paste("{title:'",ylabel,"',textStyle:{fontSize:'14'}}", sep=""),
+                                         legend=paste("{textStyle:{fontSize:'12'}}", sep=""),
                                          chartArea="{left:110,top:50,width:\"75%\",height:\"80%\"}"))
       }
       cat(p$html$chart,file=f)
@@ -781,7 +782,8 @@ initPlotOptions <- function() {
   formattraffic           <<- c("traffic_volume", "traffic_volume_difference")
 
   formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "qtype_vs_othertld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", 
-                                "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_instance", "by_city", "by_country", "load_time", "zone_size", "server_addr")
+                                "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_instance", "by_city", "by_country",
+                                "load_time", "zone_size", "server_addr", "client_subnet_vs_tld")
 
   rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
   
@@ -794,7 +796,9 @@ initPlotOptions <- function() {
 
   # now create other useful groups    
   passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
-  avgoverwindow           <<- c(format3, format3_bgpprefix, format3_asn, 'qtype_vs_tld', 'qtype_vs_legacygtld', 'qtype_vs_cctld', 'qtype_vs_newgtld', 'qtype_vs_othertld', 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype', 'client_addr_vs_rcode_accum_asn', 'client_addr_vs_rcode_accum_bgpprefix', "client_subnet2_accum_asn", "client_subnet2_accum_bgpprefix")
+  avgoverwindow           <<- c(format3, format3_bgpprefix, format3_asn, 'qtype_vs_tld', 'qtype_vs_legacygtld', 'qtype_vs_cctld', 'qtype_vs_newgtld', 'qtype_vs_othertld',
+                                'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype', 'client_addr_vs_rcode_accum_asn', 'client_addr_vs_rcode_accum_bgpprefix',
+                                "client_subnet2_accum_asn", "client_subnet2_accum_bgpprefix", "client_subnet_vs_tld")
   lineplots               <<- c(format1, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr")
   facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
   facetedlineplots        <<- c("traffic_volume")
@@ -806,7 +810,8 @@ initPlotOptions <- function() {
 generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, simple_stop, svrid, pltid, gvis, ndarr, dsccon) {
   
   if (hh_debug) {
-    system('logger -p user.notice In generatePlotFile')
+    msg <- paste('logger -p user.notice In generatePlotFile. Plot name =', pltnm, sep=" ")
+    system(msg)
   }
 
   mytitle <- paste(plttitle, "\nfrom ", simple_start, " UTC to ", simple_stop," UTC ", sep="")
@@ -900,7 +905,8 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
            pltnm == 'qtype_vs_newgtld' ||
            pltnm == 'qtype_vs_othertld')             {stackedBarPlot(df, plot_file, mytitle, "TLD",                        "Average Query Rate (q/sec)", gvis, pltnm)}
   else if (pltnm == 'client_addr_vs_rcode_accum' || 
-           pltnm == 'client_subnet2_accum')           {stackedBarPlot(df, plot_file, mytitle, "Subnet (IPv4/8 or IPv6/32)", "Average Query Rate (q/sec)", gvis, pltnm)}
+           pltnm == 'client_subnet2_accum' ||
+           pltnm == 'client_subnet_vs_tld')           {stackedBarPlot(df, plot_file, mytitle, "Subnet (IPv4/8 or IPv6/32)", "Average Query Rate (q/sec)", gvis, pltnm)}
   else if (pltnm == 'client_addr_vs_rcode_accum_asn') {stackedBarPlot(df, plot_file, mytitle, "Subnet by ASN", "Average Query Rate (q/sec)", gvis, pltnm)}
   else if (pltnm == 'client_addr_vs_rcode_accum_bgpprefix') {stackedBarPlot(df, plot_file, mytitle, "Subnet as seen in BGP", "Average Query Rate (q/sec)", gvis, pltnm)}
   else if (pltnm == 'client_subnet2_accum_asn')       {stackedBarPlot(df, plot_file, mytitle, "Subnet by ASN", "Average Query Rate (q/sec)", gvis, pltnm)}
