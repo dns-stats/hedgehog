@@ -169,7 +169,9 @@ function genDSCGraph() {
         }
         ndarr = ndarr.substring(0, ndarr.length - 1);
         if(ndarr === '') {
-            ndarr = -1;
+            // ndarr = -1;
+            window.alert("You must select at least one node")
+            return
         }
     }
     

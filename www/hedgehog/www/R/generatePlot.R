@@ -542,7 +542,7 @@ geochart <- function(df, f, title, xlabel, ylabel, gvis) {
   if(gvis == 1){
     title <- sub("\n", " ", title)
     p <- gvisGeoChart(df, locationvar='location', sizevar='count', colorvar='color', hovervar='type',
-                      options=list(displayMode='markers', height=600, width=940, colorAxis="{colors:['red','green']}", legend="'none'",
+                      options=list(displayMode='markers', height=600, width=940, colorAxis="{colors:['red','green']}", legend="'none'", tooltip="{showColorCode:false}",
                                    chartArea="{left:80,top:50,width:\"80%\",height:\"80%\"}"))
     cat(p$html$chart,file=f)
   }
