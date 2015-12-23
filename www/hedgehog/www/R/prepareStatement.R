@@ -120,10 +120,61 @@ prepStmnt <- function(statementNm, dsccon){
                zone_size                            = { rs <- try(dbSendQuery(dsccon, "PREPARE zone_size                        (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS               SELECT d.starttime, avg(d.value) AS y, d.key2 AS x FROM dsc.data d, dsc.node n WHERE d.node_id = n.id AND d.server_id=$1 AND d.plot_id=$2 AND d.starttime>=$3 AND d.starttime<=$4 AND d.node_id = ANY (string_to_array($5, ',')::integer[]) group by d.starttime, d.key2 order by x;"))},
                zone_size_all_nodes                  = { rs <- try(dbSendQuery(dsccon, "PREPARE zone_size_all_nodes              (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS                     SELECT d.starttime, avg(d.value) AS y, d.key2 AS x FROM dsc.data d, dsc.node n WHERE d.node_id = n.id AND d.server_id=$1 AND d.plot_id=$2 AND d.starttime>=$3 AND d.starttime<=$4 group by d.starttime, d.key2 order by x;"))},
 
-               geomap                              = { rs <- try(dbSendQuery(dsccon, "PREPARE geomap                (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS   select g.latitude || ':' || g.longitude as location, sum(d.value) FROM dsc.data d, geoip g where cast(d.key2 as ipaddress) <<= g.ip_range and server_id=$1 AND plot_id=$2 AND d.starttime >=$3 AND starttime<=$4 AND d.node_id = ANY (string_to_array($5, ',')::integer[]) and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') group by location;"))},
-               geomap_all_nodes                    = { rs <- try(dbSendQuery(dsccon, "PREPARE geomap_all_nodes      (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS         select g.latitude || ':' || g.longitude as location, sum(d.value) FROM dsc.data d, geoip g where cast(d.key2 as ipaddress) <<= g.ip_range and server_id=$1 AND plot_id=$2 AND d.starttime >=$3 AND starttime<=$4 and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') group by location;"))},
-               geochart                            = { rs <- try(dbSendQuery(dsccon, "PREPARE geochart              (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS   select l.name as location, sum(d.value) as count, 1 as color, 'Queries' as type FROM dsc.data d, geoip g, locations l  where cast(d.key2 as ipaddress) <<= g.ip_range and l.geoname_id=g.geoname and server_id=$1 AND plot_id=$2 AND d.starttime >=$3 AND starttime<=$4 AND d.node_id = ANY (string_to_array($5, ',')::integer[]) and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') group by location union select n.city as location, count(*), 2 as color, n.city || ' nodes' as type from node n where n.id = ANY (string_to_array($5, ',')::integer[]) group by n.city;"))},
-               geochart_all_nodes                  = { rs <- try(dbSendQuery(dsccon, "PREPARE geochart_all_nodes    (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS         select l.name as location, sum(d.value) as count, 1 as color, 'Queries' as type FROM dsc.data d, geoip g, locations l  where cast(d.key2 as ipaddress) <<= g.ip_range and l.geoname_id=g.geoname and server_id=$1 AND plot_id=$2 AND d.starttime >=$3 AND starttime<=$4 and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') group by location union select n.city as location, count(*), 2 as color, n.city || ' nodes' as type from node n group by n.city;"))},
+               geomap = {
+                 sql_joined <- paste("PREPARE", statementNm, "(INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS
+                 select g.latitude || ':' || g.longitude as location, sum(d.value) 
+                 FROM dsc.data d, geoip g where cast(d.key2 as ipaddress) <<= g.ip_range 
+                 and server_id=$1 AND plot_id=$2 AND d.starttime >=$3 
+                 AND starttime<=$4 AND d.node_id = ANY (string_to_array($5, ',')::integer[]) 
+                 and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+                 group by location;", sep=" ")
+                sql=gsub("\n"," ",sql_joined)
+                rs <- try(dbSendQuery(dsccon, sql))},
+               
+               geomap_all_nodes = {
+                 sql_joined <- paste("PREPARE", statementNm, "(INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS
+                 select g.latitude || ':' || g.longitude as location, sum(d.value) 
+                 FROM dsc.data d, geoip g 
+                 where cast(d.key2 as ipaddress) <<= g.ip_range 
+                 and server_id=$1 AND plot_id=$2 AND d.starttime >=$3 
+                 AND starttime<=$4 and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+                 group by location;", sep=" ")
+                sql=gsub("\n"," ",sql_joined)
+                rs <- try(dbSendQuery(dsccon, sql))},
+               
+               geochart = {
+                 sql_joined <- paste("PREPARE", statementNm, "(INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS
+                 select l.name as location, sum(d.value) as count, 1 as color, 'Queries' as type 
+                 FROM dsc.data d, geoip g, locations l  
+                 where cast(d.key2 as ipaddress) <<= g.ip_range 
+                 and l.geoname_id=g.geoname and server_id=$1 AND plot_id=$2 
+                 AND d.starttime >=$3 AND starttime<=$4 
+                 AND d.node_id = ANY (string_to_array($5, ',')::integer[]) 
+                 and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+                 group by location 
+                 union 
+                 select n.city as location, count(*), 2 as color, n.city || ' nodes' as type 
+                 from node n 
+                 where n.id = ANY (string_to_array($5, ',')::integer[]) 
+                 group by n.city;", sep=" ")
+                sql=gsub("\n"," ",sql_joined)
+                rs <- try(dbSendQuery(dsccon, sql))},
+               
+               geochart_all_nodes = {
+                 sql_joined <- paste("PREPARE", statementNm,  "(INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS
+                 select l.name as location, sum(d.value) as count, 1 as color, 'Queries' as type 
+                 FROM dsc.data d, geoip g, locations l  
+                 where cast(d.key2 as ipaddress) <<= g.ip_range 
+                   and l.geoname_id=g.geoname and server_id=$1 AND plot_id=$2 
+                   AND d.starttime >=$3 AND starttime<=$4 
+                   and d.key2 not in ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+                 group by location 
+                 union 
+                 select n.city as location, count(*), 2 as color, n.city || ' nodes' as type 
+                 from node n 
+                 group by n.city;", sep=" ")
+                sql=gsub("\n"," ",sql_joined)
+                rs <- try(dbSendQuery(dsccon, sql))},
 
                format3_bgpprefix  = {
                  sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
