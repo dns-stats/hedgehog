@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   000014_ddl_loadtime
+# File:   000014_ddl_server_addr
 #
 
 eval $(@LIBEXEC@/conf_read)
@@ -79,7 +79,7 @@ WITH rows AS (
 INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
 
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
-INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new load_time and zone_size for rssac', now() );
+INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new server address dataset', now() );
 
 COMMIT;
 EOF

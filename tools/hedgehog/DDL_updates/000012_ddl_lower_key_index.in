@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   000009_ddl_traffic_difference
+# File:   000009_ddl_lower_key_index
 #
 
 eval $(@LIBEXEC@/conf_read)
@@ -109,7 +109,7 @@ fi
 psql -h $hhconfig_database_host $DB_NAME <<EOF
 BEGIN;
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
-INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new query/response difference plot for rssac', now() );
+INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added lower case index to data tables', now() );
 COMMIT;
 EOF
 
