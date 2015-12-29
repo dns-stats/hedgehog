@@ -69,7 +69,7 @@ Format4DSCStrategy::preprocess_data(const DSCUMap &orig_dscdata, DSCUMap &new_ds
         close_file();
         merge_accum2d(tmp_dscdata, new_dscdata);
         // Trimmer: runs once per hour of xml data
-        if ( plot_name_ == "client_subnet2_accum" || plot_name_ == "qtype_vs_tld" ) {
+        if ( plot_name_ == "client_subnet2_accum" || plot_name_ == "qtype_vs_tld" || plot_name_ == "client_subnet_vs_tld") {
                 int tmp_value;
                 stringstream(dtime[1]) >> tmp_value;
                 if ((59*60) == (tmp_value % 3600)) {
@@ -201,7 +201,7 @@ Format4DSCStrategy::write_db(const DSCUMap &old_dscdata, string dtime[], int ser
     stringstream(dtime[1]) >> tmp_value;
     if ((59*60) == (tmp_value % 3600)) {
         if ( debug == 1 ) cout << "Trimmer Started." << endl;
-        if ( plot_name_ == "client_subnet2_accum" || plot_name_ == "qtype_vs_tld" ) {
+        if ( plot_name_ == "client_subnet2_accum" || plot_name_ == "qtype_vs_tld" || plot_name_ == "client_subnet_vs_tld") {
             if ( debug == 1 ) cout << "Trimmer found plot " << plot_name_ << endl;
             
             

@@ -300,6 +300,37 @@ prepStmnt <- function(statementNm, dsccon){
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},
 
+           client_subnet_vs_tld = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS",
+             "SELECT dsc.iptruncate(key1::ipaddress)::text AS x, key2 AS key, sum(value)/$1 As y 
+             FROM dsc.data 
+             WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5  AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-', 'com', 'arpa', 'net')
+               AND node_id = ANY (string_to_array($6, ',')::integer[])
+               AND dsc.iptruncate(key1::ipaddress) IN 
+               (SELECT dsc.iptruncate(key1::ipaddress) AS k1 
+                 FROM dsc.data 
+                 WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 
+                 AND starttime<=$5 AND node_id = ANY (string_to_array($6, ',')::integer[]) 
+                 AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-', 'com', 'arpa', 'net') 
+                 GROUP BY k1 ORDER BY sum(value)/$1 DESC LIMIT 40)
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           client_subnet_vs_tld_all_nodes = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS",
+             "SELECT dsc.iptruncate(key1::ipaddress)::text AS x, key2 AS key, sum(value)/$1 As y
+             FROM dsc.data
+             WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-', 'com', 'arpa', 'net')
+               AND dsc.iptruncate(key1::ipaddress) IN
+               (SELECT dsc.iptruncate(key1::ipaddress) AS k1
+                 FROM dsc.data
+                 WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4
+                 AND starttime<=$5 AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-', 'com', 'arpa', 'net')
+               GROUP BY k1 ORDER BY sum(value)/$1 DESC LIMIT 40)
+             GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
 
         )
 
