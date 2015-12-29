@@ -111,7 +111,7 @@ INSERT INTO dataset_visible_plot SELECT id, ${DATASET} FROM rows;
 UPDATE visible_plot set display_category = '3.1.QTYPE vs TLD' where id=${DATASET};
 
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
-INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new query/response difference plot for rssac', now() );
+INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new TLD tables and datasets', now() );
 COMMIT;
 EOF
 
