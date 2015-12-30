@@ -70,9 +70,9 @@ echo "`date`: $0 COMMENCED"
 # Read CSV file with the following fields in order:
 fields=(server_name node_name node_region node_country node_city node_subgroup node_ip)
 
-NAME_REGEX="^[a-zA-Z0-9-]+$"
+NAME_REGEX="^[a-zA-Z0-9\\.-]+$"
 NAME_SPACE_REGEX="^[[:space:]a-zA-Z0-9\\-]+$"
-NAME_ERROR="It may contain alphanumeric characters and hyphens (-) only."
+NAME_ERROR="It may contain alphanumeric characters, hyphens (-) and full stops (.) only."
 NAME_SPACE_ERROR="It may contain alphanumeric characters, spaces and hyphens (-) only."
 IP_REGEXP="^[a-fA-F0-9:\\.]*$"
 IP_ERROR="It must be a valid IPv4 or IPv6 address."
