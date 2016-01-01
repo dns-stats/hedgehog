@@ -1,27 +1,26 @@
-# Format is: alabel, ulabel, english, type
+# Format is: alabel, type
 
-aero, null, null, Legacy-gTLD
-arpa, null, null, Legacy-gTLD
-asia, null, null, Legacy-gTLD
-biz, null, null, Legacy-gTLD
-cat, null, null, Legacy-gTLD
-com, null, null, Legacy-gTLD
-coop, null, null, Legacy-gTLD
-edu, null, null, Legacy-gTLD
-gov, null, null, Legacy-gTLD
-info, null, null, Legacy-gTLD
-int, null, null, Legacy-gTLD
-jobs, null, null, Legacy-gTLD
-mil, null, null, Legacy-gTLD
-mobi, null, null, Legacy-gTLD
-museum, null, null, Legacy-gTLD
-name, null, null, Legacy-gTLD
-net, null, null, Legacy-gTLD
-org, null, null, Legacy-gTLD
-post, null, null, Legacy-gTLD
-pro, null, null, Legacy-gTLD
-sncf, null, null, Legacy-gTLD
-tel, null, null, Legacy-gTLD
-travel, null, null, Legacy-gTLD
-xn--cg4bki, 삼성, Samsung, Legacy-gTLD
-xxx, null, null, Legacy-gTLD
+aero, Legacy-gTLD
+arpa, Legacy-gTLD
+asia, Legacy-gTLD
+biz, Legacy-gTLD
+cat, Legacy-gTLD
+com, Legacy-gTLD
+coop, Legacy-gTLD
+edu, Legacy-gTLD
+gov, Legacy-gTLD
+info, Legacy-gTLD
+int, Legacy-gTLD
+jobs, Legacy-gTLD
+mil, Legacy-gTLD
+mobi, Legacy-gTLD
+museum, Legacy-gTLD
+name, Legacy-gTLD
+net, Legacy-gTLD
+org, Legacy-gTLD
+post, Legacy-gTLD
+pro, Legacy-gTLD
+sncf, Legacy-gTLD
+tel, Legacy-gTLD
+travel, Legacy-gTLD
+xxx, Legacy-gTLD

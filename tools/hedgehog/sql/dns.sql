@@ -83,12 +83,12 @@ as $$
     return None
     
   ''' Store/retrieve the context in/from the global dict. '''
-  if 'teamcymrulookupctx' in GD.keys():
-      ctx = GD['teamcymrulookupctx']
+  if 'getdnsctx' in GD.keys():
+      ctx = GD['getdnsctx']
   else:
       ctx = getdns.Context()
       ctx.resolution_type = getdns.RESOLUTION_STUB
-      GD['teamcymrulookupctx'] = ctx
+      GD['getdnsctx'] = ctx
   
   try:
     results = ctx.general(name=qname, request_type=getdns.RRTYPE_TXT, extensions={})
@@ -118,3 +118,18 @@ BEGIN
   END CASE;
 END
 $$ LANGUAGE plpgsql;
+
+CREATE or REPLACE FUNCTION dsc.alabel2ulabel (alabel text)
+  RETURNS text
+as $$
+  
+  import getdns
+  
+  ''' Sanity Check '''
+  if alabel is None:
+    plpy.error('Function alabel2ulabel: a-label passed in was null')
+    return None
+  
+  ulabel = getdns.alabel_to_ulabel(alabel)
+  return ulabel
+$$ LANGUAGE plpythonu;

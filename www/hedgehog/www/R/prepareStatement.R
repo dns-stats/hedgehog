@@ -76,17 +76,6 @@ prepStmnt <- function(statementNm, dsccon){
                format3                              = { rs <- try(dbSendQuery(dsccon, "PREPARE format3                        (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS           SELECT dsc.iptruncate(key2::ipaddress) AS x, sum(value)/$1 AS y FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND node_id = ANY (string_to_array($6, ',')::integer[]) AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY x ORDER BY y DESC LIMIT 40;"))},
                format3_all_nodes                    = { rs <- try(dbSendQuery(dsccon, "PREPARE format3_all_nodes              (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS                 SELECT dsc.iptruncate(key2::ipaddress) AS x, sum(value)/$1 AS y FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND key2 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY x ORDER BY y DESC LIMIT 40;"))},
 
-               qtype_vs_tld                         = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_tld                     (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS         SELECT lower(d.key1) AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype'                                             WHERE d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.node_id = ANY (string_to_array($6, ',')::integer[]) AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND d.key1 IN (SELECT key1 FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND node_id = ANY (string_to_array($6, ',')::integer[]) AND key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY key1 ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_tld_all_nodes               = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_tld_all_nodes           (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS               SELECT lower(d.key1) AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype'                                             WHERE d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND d.key1 IN (SELECT key1 FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY key1 ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_cctld                       = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_cctld                   (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS         SELECT CASE WHEN (t.ulabel = t.alabel) then t.ulabel ELSE t.ulabel || '(' || t.alabel || ',' || t.english || ')' END as x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.node_id = ANY (string_to_array($6, ',')::integer[]) AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND lower(d.key1) IN (SELECT lower(dd.key1) FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name='ccTLD' AND dd.server_id=$2 AND dd.plot_id=$3 AND dd.starttime>=$4 AND dd.starttime<=$5 AND dd.node_id = ANY (string_to_array($6, ',')::integer[]) AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_cctld_all_nodes             = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_cctld_all_nodes         (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS               SELECT CASE WHEN (t.ulabel = t.alabel) then t.ulabel ELSE t.ulabel || '(' || t.alabel || ',' || t.english || ')' END AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND lower(d.key1) IN (SELECT lower(dd.key1) FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name='ccTLD' AND dd.server_id=$2 AND dd.plot_id=$3 AND dd.starttime>=$4 AND dd.starttime<=$5 AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_newgtld                     = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_newgtld                 (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS         SELECT CASE WHEN (t.ulabel = t.alabel) then t.ulabel ELSE t.ulabel || '(' || t.alabel || ',' || t.english || ')' END AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.node_id = ANY (string_to_array($6, ',')::integer[]) AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND lower(d.key1) IN (SELECT lower(dd.key1) FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name='New-gTLD' AND dd.server_id=$2 AND dd.plot_id=$3 AND dd.starttime>=$4 AND dd.starttime<=$5 AND dd.node_id = ANY (string_to_array($6, ',')::integer[]) AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_newgtld_all_nodes           = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_newgtld_all_nodes       (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS               SELECT CASE WHEN (t.ulabel = t.alabel) then t.ulabel ELSE t.ulabel || '(' || t.alabel || ',' || t.english || ')' END AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND lower(d.key1) IN (SELECT lower(dd.key1) FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name='New-gTLD' AND dd.server_id=$2 AND dd.plot_id=$3 AND dd.starttime>=$4 AND dd.starttime<=$5 AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_legacygtld                  = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_legacygtld              (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS         SELECT CASE WHEN (t.ulabel = t.alabel) then t.ulabel ELSE t.ulabel || '(' || t.alabel || ',' || t.english || ')' END AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.node_id = ANY (string_to_array($6, ',')::integer[]) AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND lower(d.key1) IN (SELECT lower(dd.key1) FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = tt.alabel LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name='Legacy-gTLD' AND dd.server_id=$2 AND dd.plot_id=$3 AND dd.starttime>=$4 AND dd.starttime<=$5 AND dd.node_id = ANY (string_to_array($6, ',')::integer[]) AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_legacygtld_all_nodes        = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_legacygtld_all_nodes    (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS               SELECT CASE WHEN (t.ulabel = t.alabel) then t.ulabel ELSE t.ulabel || '(' || t.alabel || ',' || t.english || ')' END AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND lower(d.key1) IN (SELECT lower(dd.key1) FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name='Legacy-gTLD' AND dd.server_id=$2 AND dd.plot_id=$3 AND dd.starttime>=$4 AND dd.starttime<=$5 AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_othertld                    = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_othertld                (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS         SELECT lower(d.key1) AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype'                                             WHERE d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.node_id = ANY (string_to_array($6, ',')::integer[]) AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND lower(d.key1) IN (SELECT lower(dd.key1) FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = tt.alabel LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name is NULL AND dd.server_id=$2 AND dd.plot_id=$3 AND dd.starttime>=$4 AND dd.starttime<=$5 AND dd.node_id = ANY (string_to_array($6, ',')::integer[]) AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-               qtype_vs_othertld_all_nodes          = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_othertld_all_nodes      (REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS               SELECT lower(d.key1) AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype'                                             WHERE d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND lower(d.key1) IN (SELECT lower(dd.key1) FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name is NULL AND dd.server_id=$2 AND dd.plot_id=$3 AND dd.starttime>=$4 AND dd.starttime<=$5 AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
-
                client_addr_vs_rcode_accum           = { rs <- try(dbSendQuery(dsccon, "PREPARE client_addr_vs_rcode_accum               (REAL, INTEGER, INTEGER,     TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS  SELECT dsc.iptruncate(key1::ipaddress) AS x, il.name AS key, sum(d.value)/$1 As y FROM dsc.data d, iana_lookup il WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND node_id = ANY (string_to_array($6, ',')::integer[]) AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND il.registry = 'rcode' AND d.key2::text = il.value::text AND dsc.iptruncate(key1::ipaddress) IN (SELECT dsc.iptruncate(key1::ipaddress) AS k1 FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND node_id = ANY (string_to_array($6, ',')::integer[]) AND key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY k1 ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
                client_addr_vs_rcode_accum_all_nodes = { rs <- try(dbSendQuery(dsccon, "PREPARE client_addr_vs_rcode_accum_all_nodes     (REAL, INTEGER, INTEGER,     TIMESTAMPTZ, TIMESTAMPTZ) AS        SELECT dsc.iptruncate(key1::ipaddress) AS x, il.name AS key, sum(d.value)/$1 As y FROM dsc.data d, iana_lookup il WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND il.registry = 'rcode' AND d.key2::text = il.value::text AND dsc.iptruncate(key1::ipaddress) IN (SELECT dsc.iptruncate(key1::ipaddress) AS k1 FROM dsc.data WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5 AND key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') GROUP BY k1 ORDER BY sum(value)/$1 DESC LIMIT 40) GROUP BY x, key;"))},
                qtype_vs_qnamelen                    = { rs <- try(dbSendQuery(dsccon, "PREPARE qtype_vs_qnamelen                     (INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS               SELECT il.name AS key, cast(d.key2 AS int) AS x, sum(d.value) AS y FROM dsc.data d, iana_lookup il WHERE server_id=$1 AND d.plot_id=$2 AND starttime>=$3 AND starttime<=$4 AND node_id = ANY (string_to_array($5, ',')::integer[]) AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND il.registry = 'qtype' AND d.key1::text = il.value::text AND cast(d.key2 AS int) < 100 GROUP BY key, x;"))},
@@ -382,6 +371,211 @@ prepStmnt <- function(statementNm, dsccon){
              GROUP BY x, key;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_tld = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS",
+             "SELECT lower(d.key1) AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype'
+             WHERE d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5
+               AND d.node_id = ANY (string_to_array($6, ',')::integer[])
+               AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
+               AND d.key1 IN
+                 (SELECT key1
+                   FROM dsc.data 
+                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5
+                   AND node_id = ANY (string_to_array($6, ',')::integer[])
+                   AND key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+                   GROUP BY key1 ORDER BY sum(value)/$1 DESC LIMIT 40)
+             GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_tld_all_nodes = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS", 
+             "SELECT lower(d.key1) AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype'
+             WHERE d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') AND d.key1 IN
+               (SELECT key1
+                 FROM dsc.data 
+                 WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5
+                 AND key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
+                 GROUP BY key1 ORDER BY sum(value)/$1 DESC LIMIT 40)
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_cctld = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS",
+             "SELECT alabel2ulabel(t.alabel) as x,
+             CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t
+             where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3
+             AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.node_id = ANY (string_to_array($6, ',')::integer[]) 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
+             AND lower(d.key1) IN
+               (SELECT lower(dd.key1)
+                 FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) 
+                   LEFT OUTER JOIN tld_types nn ON tt.type=nn.id 
+                 WHERE nn.type_name='ccTLD' AND dd.server_id=$2 AND dd.plot_id=$3 
+                 AND dd.starttime>=$4 AND dd.starttime<=$5
+                 AND dd.node_id = ANY (string_to_array($6, ',')::integer[])
+                 AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+                 GROUP BY lower(dd.key1)
+                 ORDER BY sum(value)/$1 DESC LIMIT 40)
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_cctld_all_nodes = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS",
+             "SELECT alabel2ulabel(t.alabel) as x,
+             CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t 
+             where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 
+             AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-')
+             AND lower(d.key1) IN 
+               (SELECT lower(dd.key1)
+               FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) 
+                 LEFT OUTER JOIN tld_types nn ON tt.type=nn.id 
+               WHERE nn.type_name='ccTLD' AND dd.server_id=$2 AND dd.plot_id=$3 
+               AND dd.starttime>=$4 AND dd.starttime<=$5 
+               AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+               GROUP BY lower(dd.key1) 
+               ORDER BY sum(value)/$1 DESC LIMIT 40) 
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_newgtld = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS",
+             "SELECT alabel2ulabel(t.alabel) as x,
+             CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t
+             where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 
+             AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.node_id = ANY (string_to_array($6, ',')::integer[]) 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+             AND lower(d.key1) IN 
+               (SELECT lower(dd.key1) 
+                 FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) 
+                 LEFT OUTER JOIN tld_types nn ON tt.type=nn.id 
+                 WHERE nn.type_name='New-gTLD' AND dd.server_id=$2 AND dd.plot_id=$3 
+                 AND dd.starttime>=$4 AND dd.starttime<=$5 
+                 AND dd.node_id = ANY (string_to_array($6, ',')::integer[]) 
+                 AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+                 GROUP BY lower(dd.key1) 
+                 ORDER BY sum(value)/$1 DESC LIMIT 40) 
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_newgtld_all_nodes = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS",
+             "SELECT alabel2ulabel(t.alabel) as x,
+             CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t 
+             where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 
+             AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+             AND lower(d.key1) IN 
+               (SELECT lower(dd.key1) 
+               FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) 
+               LEFT OUTER JOIN tld_types nn ON tt.type=nn.id 
+               WHERE nn.type_name='New-gTLD' AND dd.server_id=$2 AND dd.plot_id=$3 
+               AND dd.starttime>=$4 AND dd.starttime<=$5 
+               AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+               GROUP BY lower(dd.key1) 
+               ORDER BY sum(value)/$1 DESC LIMIT 40) 
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_legacygtld = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS",
+             "SELECT alabel2ulabel(t.alabel) as x, 
+             CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t 
+             where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 
+             AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.node_id = ANY (string_to_array($6, ',')::integer[]) 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+             AND lower(d.key1) IN 
+               (SELECT lower(dd.key1) 
+               FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = tt.alabel 
+               LEFT OUTER JOIN tld_types nn ON tt.type=nn.id 
+               WHERE nn.type_name='Legacy-gTLD' AND dd.server_id=$2 AND dd.plot_id=$3 
+               AND dd.starttime>=$4 AND dd.starttime<=$5 
+               AND dd.node_id = ANY (string_to_array($6, ',')::integer[]) 
+               AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+               GROUP BY lower(dd.key1) ORDER BY sum(value)/$1 DESC LIMIT 40) 
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_legacygtld_all_nodes = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS",
+             "SELECT alabel2ulabel(t.alabel) as x,
+             CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype', tlds t 
+             where lower(d.key1) = lower(t.alabel) AND d.server_id=$2 AND d.plot_id=$3 
+             AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+             AND lower(d.key1) IN 
+               (SELECT lower(dd.key1) 
+               FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) 
+               LEFT OUTER JOIN tld_types nn ON tt.type=nn.id 
+               WHERE nn.type_name='Legacy-gTLD' AND dd.server_id=$2 AND dd.plot_id=$3 
+               AND dd.starttime>=$4 AND dd.starttime<=$5 
+               AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+               GROUP BY lower(dd.key1) 
+               ORDER BY sum(value)/$1 DESC LIMIT 40) 
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_othertld = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ, TEXT) AS",
+             "SELECT alabel2ulabel(lower(d.key1)) AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype'
+             WHERE d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.node_id = ANY (string_to_array($6, ',')::integer[]) 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+             AND lower(d.key1) IN 
+               (SELECT lower(dd.key1) 
+               FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = tt.alabel 
+               LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name is NULL 
+               AND dd.server_id=$2 AND dd.plot_id=$3 
+               AND dd.starttime>=$4 AND dd.starttime<=$5 
+               AND dd.node_id = ANY (string_to_array($6, ',')::integer[]) 
+               AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+               GROUP BY lower(dd.key1) 
+               ORDER BY sum(value)/$1 DESC LIMIT 40) 
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
+           qtype_vs_othertld_all_nodes = {
+             sql_joined <- paste("PREPARE", statementNm, "(REAL, INTEGER, INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) AS",
+             "SELECT alabel2ulabel(lower(d.key1)) AS x, CASE WHEN il.name IS NULL THEN 'Other' ELSE il.name END AS key, sum(d.value)/$1 AS y 
+             FROM dsc.data d LEFT OUTER JOIN iana_lookup il ON d.key2::text = il.value::text AND il.registry = 'qtype'
+             WHERE d.server_id=$2 AND d.plot_id=$3 AND d.starttime>=$4 AND d.starttime<=$5 
+             AND d.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+             AND lower(d.key1) IN 
+               (SELECT lower(dd.key1) 
+               FROM dsc.data dd LEFT OUTER JOIN tlds tt ON lower(dd.key1) = lower(tt.alabel) 
+               LEFT OUTER JOIN tld_types nn ON tt.type=nn.id WHERE nn.type_name is NULL 
+               AND dd.server_id=$2 AND dd.plot_id=$3 
+               AND dd.starttime>=$4 AND dd.starttime<=$5 
+               AND dd.key1 NOT IN ('-:SKIPPED_SUM:-', '-:SKIPPED:-') 
+               GROUP BY lower(dd.key1) 
+               ORDER BY sum(value)/$1 DESC LIMIT 40) 
+            GROUP BY x, key;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
 
         )
 

@@ -1,41 +1,41 @@
-# Format is: alabel, ulabel, english, type
+# Format is: alabel, type
 
-xn--3e0b707e, 한국, kr, ccTLD
-xn--45brj9c, ভারত, in, ccTLD
-xn--80ao21a, қаз, kz, ccTLD
-xn--90a3ac, срб, rs, ccTLD
-xn--90ais, бел, by, ccTLD
-xn--clchc0ea0b2g2a9gcd, சிங்கப்பூர், sg, ccTLD
-xn--d1alf, мкд, mk, ccTLD
-xn--fiqs8s, 中国, cn, ccTLD
-xn--fiqz9s, 中國, cn, ccTLD
-xn--fpcrj9c3d, భారత్, in, ccTLD
-xn--fzc2c9e2c, ලංකා, lk, ccTLD
-xn--gecrj9c, ભારત, in, ccTLD
-xn--h2brj9c, भारत, in, ccTLD
-xn--j1amh, укр, ua, ccTLD
-xn--j6w193g, 香港, hk, ccTLD
-xn--kprw13d, 台湾, tw, ccTLD
-xn--kpry57d, 台灣, tw, ccTLD
-xn--l1acc, мон, mn, ccTLD
-xn--lgbbat1ad8j, الجزائر, dz, ccTLD
-xn--mgb9awbf, عمان, om, ccTLD
-xn--mgba3a4f16a, ایران, ir, ccTLD
-xn--mgbaam7a8h, امارات, ae, ccTLD
-xn--mgbayh7gpa, الاردن, jo, ccTLD
-xn--mgbbh1a71e, بھارت, in, ccTLD
-xn--mgbc0a9azcg, المغرب, ma, ccTLD
-xn--mgberp4a5d4ar, السعودية, sa, ccTLD
-xn--mgbx4cd0ab, مليسيا, my, ccTLD
-xn--node, გე, ge, ccTLD
-xn--o3cw4h, ไทย, th, ccTLD
-xn--ogbpf8fl, سورية, sy, ccTLD
-xn--p1ai, рф, ru, ccTLD
-xn--pgbs0dh, تونس, tn, ccTLD
-xn--s9brj9c, ਭਾਰਤ, in, ccTLD
-xn--wgbh1c, مصر, eg, ccTLD
-xn--wgbl6a, قطر, qa, ccTLD
-xn--xkc2al3hye2a, இலங்கை, lk, ccTLD
-xn--xkc2dl3a5ee0h, இந்தியா, in, ccTLD
-xn--yfro4i67o, 新加坡, sg, ccTLD
-xn--ygbi2ammx, فلسطين, ps, ccTLD
+xn--3e0b707e, ccTLD
+xn--45brj9c, ccTLD
+xn--80ao21a, ccTLD
+xn--90a3ac, ccTLD
+xn--90ais, ccTLD
+xn--clchc0ea0b2g2a9gcd, ccTLD
+xn--d1alf, ccTLD
+xn--fiqs8s, ccTLD
+xn--fiqz9s, ccTLD
+xn--fpcrj9c3d, ccTLD
+xn--fzc2c9e2c, ccTLD
+xn--gecrj9c, ccTLD
+xn--h2brj9c, ccTLD
+xn--j1amh, ccTLD
+xn--j6w193g, ccTLD
+xn--kprw13d, ccTLD
+xn--kpry57d, ccTLD
+xn--l1acc, ccTLD
+xn--lgbbat1ad8j, ccTLD
+xn--mgb9awbf, ccTLD
+xn--mgba3a4f16a, ccTLD
+xn--mgbaam7a8h, ccTLD
+xn--mgbayh7gpa, ccTLD
+xn--mgbbh1a71e, ccTLD
+xn--mgbc0a9azcg, ccTLD
+xn--mgberp4a5d4ar, ccTLD
+xn--mgbx4cd0ab, ccTLD
+xn--node, ccTLD
+xn--o3cw4h, ccTLD
+xn--ogbpf8fl, ccTLD
+xn--p1ai, ccTLD
+xn--pgbs0dh, ccTLD
+xn--s9brj9c, ccTLD
+xn--wgbh1c, ccTLD
+xn--wgbl6a, ccTLD
+xn--xkc2al3hye2a, ccTLD
+xn--xkc2dl3a5ee0h, ccTLD
+xn--yfro4i67o, ccTLD
+xn--ygbi2ammx, ccTLD
