@@ -82,8 +82,6 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
   	read -ra arrline <<< "$trimmed_line"
   	IFS=$OIFS
   	ALABEL=$(echo ${arrline[0]} | sed -e 's/^ *//' -e 's/ *$//')
-  	ULABEL=$(echo ${arrline[1]} | sed -e 's/^ *//' -e 's/ *$//')
-  	ENGLISH=$(echo ${arrline[2]} | sed -e 's/^ *//' -e 's/ *$//')
     TLDTYPE=$(echo ${arrline[3]} | sed -e 's/^ *//' -e 's/ *$//')
     
   	# First, validate the input	
@@ -95,31 +93,12 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
   	if ! [[ "${ALABEL}" =~ ^[a-zA-Z0-9\-]+$ ]] ; then
   		echo "alabel name '${ALABEL}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
   		continue
-  	fi	
-	
-  	if [ -z "$ULABEL" ] ; then
-  		echo "Missing ulabel field for alabel $ALABEL - alabel ignored"
-  		continue
   	fi
-
-  	if [ -z "$ENGLISH" ] ; then
-    	echo "Missing english field for alabel $ALABEL - alabel ignored"
-    	continue
-    fi
     
   	if [ -z $TLDTYPE ] ; then
     	echo "Missing TLD type field for alabel $ALABEL - alabel ignored"
     	continue
     fi
-    
-    shopt -s nocasematch
-    if [[ x$ULABEL == "xnull" ]] ; then
-      ULABEL=$ALABEL
-    fi
-    if [[ x$ENGLISH == "xnull" ]] ; then
-      ENGLISH=$ALABEL
-    fi
-    shopt -u nocasematch
     
     # Check if this tld already exists
     CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tlds where alabel = lower('${ALABEL}')")
@@ -127,7 +106,7 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name = '${TLDTYPE}'")
     [ ! $CHECK -eq 1 ] && continue
     
-    echo $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, ulabel, english, type) select lower('${ALABEL}'), lower('${ULABEL}'), lower('${ENGLISH}'), id from  tld_types where type_name='${TLDTYPE}'")
+    echo $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'")
 
   done < ${TLD_FILE}
 done

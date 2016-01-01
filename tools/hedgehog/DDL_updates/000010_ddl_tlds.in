@@ -76,8 +76,6 @@ INSERT INTO tld_types (type_name) VALUES
   ('ccTLD');
 CREATE TABLE tlds (id serial PRIMARY KEY,
                    alabel text,
-                   ulabel text,
-                   english text,
                    type int REFERENCES tld_types (id));
 
 WITH rows AS (
