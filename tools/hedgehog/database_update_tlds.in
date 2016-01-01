@@ -106,7 +106,7 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name = '${TLDTYPE}'")
     [ ! $CHECK -eq 1 ] && continue
     
-    echo $(psql -h $hhconfig_database_host $DB_NAME -qtc "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'")
+    echo $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'")
 
   done < ${TLD_FILE}
 done

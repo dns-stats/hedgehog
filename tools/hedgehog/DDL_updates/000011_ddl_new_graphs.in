@@ -130,12 +130,13 @@ INSERT INTO dataset_visible_plot SELECT id, ${TLD_DATASET} FROM rows;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('client_subnet_vs_tld','7.Client Subnet Statistics','Client subnet vs TLD','Client subnet vs TLD') 
+    VALUES ('client_subnet_vs_tld','7.Client Subnet Statistics','Busiest client subnet vs TLD','Client subnet vs TLD') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='client_subnet_vs_tld') FROM rows;
 
-UPDATE visible_plot set display_category = '3.1.QTYPE vs TLD' where id=${TLD_DATASET};
+UPDATE visible_plot set display_category = '3.1.QTYPE vs TLD' where name='qtype_vs_tld';
+UPDATE visible_plot set display_name='RCODE by client subnet (fixed size)' where name='client_addr_vs_rcode_accum';
 -- END TLDs
 
 -- START GEO

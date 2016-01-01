@@ -144,7 +144,6 @@ echo "Populate servers and nodes"
 #############  PARTITION DATA TABLES  #####################
 ###########################################################
 # Partition the dsc.data table: create 1 table per month per server per plot
-# TODO: replace this will a call to the manage_partitions script
 echo "Creating partitioned tables for dsc.data (1 table per month per server per plot type)"
 echo "This may take some time if there is a lot of historic data to import"
 i=1
@@ -159,3 +158,4 @@ do
   DNOW=`date --date="$DNOW_FIRST" +%Y-%m`
 done
 ###########################################################
+echo "database_init complete"

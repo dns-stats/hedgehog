@@ -19,19 +19,9 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/rssac_generate_reports \
                          hedgehog/database_process_rssac_data \
                          hedgehog/database_rm_old_rssac_data \
-                         hedgehog/DDL_updates/000008_ddl_traffic_difference \
-                         hedgehog/DDL_updates/000009_ddl_node_index \
-                         hedgehog/DDL_updates/000010_ddl_tlds \
                          hedgehog/DDL_updates/000010_ddl_python \
-                         hedgehog/DDL_updates/000011_ddl_geoip \
                          hedgehog/DDL_updates/000011_ddl_new_graphs \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
-                         hedgehog/DDL_updates/000013_ddl_node_subgroup \
-                         hedgehog/DDL_updates/000014_ddl_loadtime \
-                         hedgehog/DDL_updates/000015_ddl_ip2asn \
-                         hedgehog/DDL_updates/000016_ddl_ip2asn_part2 \
-                         hedgehog/DDL_updates/000017_ddl_server_addr \
-                         hedgehog/DDL_updates/000018_ddl_client_vs_tld \
                          hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
                          hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
@@ -118,25 +108,9 @@ hedgehog/database_rm_old_rssac_data: $(srcdir)/hedgehog/database_rm_old_rssac_da
 	mkdir -p hedgehog
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_rm_old_rssac_data.in | $(subst_DB_VERSION) > hedgehog/database_rm_old_rssac_data
 
-hedgehog/DDL_updates/000008_ddl_traffic_difference: $(srcdir)/hedgehog/DDL_updates/000008_ddl_traffic_difference.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000008_ddl_traffic_difference.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000008_ddl_traffic_difference
-
-hedgehog/DDL_updates/000009_ddl_node_index: $(srcdir)/hedgehog/DDL_updates/000009_ddl_node_index.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000009_ddl_node_index.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000009_ddl_node_index
-
-hedgehog/DDL_updates/000010_ddl_tlds: $(srcdir)/hedgehog/DDL_updates/000010_ddl_tlds.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000010_ddl_tlds.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000010_ddl_tlds
-
 hedgehog/DDL_updates/000010_ddl_python: $(srcdir)/hedgehog/DDL_updates/000010_ddl_python.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000010_ddl_python.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000010_ddl_python
-
-hedgehog/DDL_updates/000011_ddl_geoip: $(srcdir)/hedgehog/DDL_updates/000011_ddl_geoip.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000011_ddl_geoip.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000011_ddl_geoip
 
 hedgehog/DDL_updates/000011_ddl_new_graphs: $(srcdir)/hedgehog/DDL_updates/000011_ddl_new_graphs.in Makefile
 	mkdir -p hedgehog/DDL_updates
@@ -145,30 +119,6 @@ hedgehog/DDL_updates/000011_ddl_new_graphs: $(srcdir)/hedgehog/DDL_updates/00001
 hedgehog/DDL_updates/000012_ddl_lower_key_index: $(srcdir)/hedgehog/DDL_updates/000012_ddl_lower_key_index.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000012_ddl_lower_key_index.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000012_ddl_lower_key_index
-
-hedgehog/DDL_updates/000013_ddl_node_subgroup: $(srcdir)/hedgehog/DDL_updates/000013_ddl_node_subgroup.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000013_ddl_node_subgroup.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000013_ddl_node_subgroup
-	
-hedgehog/DDL_updates/000014_ddl_loadtime: $(srcdir)/hedgehog/DDL_updates/000014_ddl_loadtime.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_loadtime.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_loadtime
-
-hedgehog/DDL_updates/000015_ddl_ip2asn: $(srcdir)/hedgehog/DDL_updates/000015_ddl_ip2asn.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000015_ddl_ip2asn.in | $(subst_DB_VERSION) | $(subst_sql) | $(subst_version) > hedgehog/DDL_updates/000015_ddl_ip2asn
-
-hedgehog/DDL_updates/000016_ddl_ip2asn_part2: $(srcdir)/hedgehog/DDL_updates/000016_ddl_ip2asn_part2.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000016_ddl_ip2asn_part2.in | $(subst_DB_VERSION) | $(subst_sql) | $(subst_version) > hedgehog/DDL_updates/000016_ddl_ip2asn_part2
-
-hedgehog/DDL_updates/000017_ddl_server_addr: $(srcdir)/hedgehog/DDL_updates/000017_ddl_server_addr.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000017_ddl_server_addr.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000017_ddl_server_addr
-
-hedgehog/DDL_updates/000018_ddl_client_vs_tld : $(srcdir)/hedgehog/DDL_updates/000018_ddl_client_vs_tld.in Makefile
-	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000018_ddl_client_vs_tld.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000018_ddl_client_vs_tld
 
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
@@ -199,7 +149,7 @@ hedgehogctl.1: hedgehogctl Makefile
 	
 refile_and_grok.1: refile_and_grok Makefile
 	chmod 755 refile_and_grok
-	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 -n "Wrapper around the dsc-extractor application that launches multipe extractors to process data" ./refile_and_grok -o refile_and_grok.1
+	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 -n "Wrapper around the dsc-extractor application that launches multiple extractors to process data" ./refile_and_grok -o refile_and_grok.1
 
 hedgehog_database_create.1: $(srcdir)/hedgehog/hedgehog_database_create Makefile
-	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 -n "This script is to aid the database adiministrator with creating the hedgehog database." $(srcdir)/hedgehog/hedgehog_database_create -o hedgehog_database_create.1
+	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 -n "This script is to aid the database administrator with creating the hedgehog database." $(srcdir)/hedgehog/hedgehog_database_create -o hedgehog_database_create.1
