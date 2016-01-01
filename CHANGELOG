@@ -38,6 +38,9 @@ Features:
 * New config option to customise 'Support' link on Web page
 
 Maintenance/Bug fixes:
+* Improve DB performance by adding further indexes
+* Change to rssac scripts. Processing of unique_sources data now done by
+  'database_process_rssac_data' script which must be explicitly called.
 * Wrote check_user_db_api to do all user checks, check db access and data dir.
   access. Used in new database_update_nodes will gradually be used by all tools.
 * Improved chart sizes, font sizes and data ordering in some graphs

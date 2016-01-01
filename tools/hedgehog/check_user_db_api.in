@@ -33,27 +33,26 @@
 # export PGPASSWORD=$PGPASSWORD
 
 
-set -e
 eval $(@LIBEXEC@/conf_read)
 
 usage () {
   echo
-  echo "Check if we are a valid user and check that we can connect to the DB"
-  echo "By default we are a read only user and the databasee API is the one"
-  echo "specified at build time"
+  echo "Check if we are a valid read user and check that we can connect to the DB"
+  echo "Optionally specify DB version checking, directory permission checking"
+  echo "or check for write access to the DB."
   echo
   echo "Usage: $(basename $0) options"
   echo
   echo "Supported options:"
-  echo "  -C <API_VERSION> Specify DB API version to check for (implies -c)"
-  echo "  -c check databse API version"
-  echo "  -d run in debug mode"
+  echo "  -C <API_VERSION> specify DB API version to check for (implies -c)"
+  echo "  -s <SERIAL_NUMBER> check DB serial number"
+  echo "  -c check databse API version against the build time API version"
   echo "  -f check user has write permission to $hhconfig_directories_data"
   echo "  -g check user has write permission to $hhconfig_directories_rssac"
-  echo "  -P specify a password"
-  echo "  -s <number> check serial number"
-  echo "  -U specify a user"
-  echo "  -w check we are a write user"
+  echo "  -w check we are a write user of the DB"
+  echo "  -U specify a DB user"
+  echo "  -P specify a DB password"
+  echo "  -d run in debug mode"
   echo "  -h Show this help"
 }
 
@@ -139,6 +138,7 @@ if [ $? -ne 0 ] ; then
   exit 1
 fi
 
+# Now test the optional parameters...
 TEST=$(psql $CONN_STRING -tc "SELECT has_table_privilege('dsc.version', 'SELECT')" | tr -d '[:space:]')
 if [ $WRITER -eq 1 ] ; then
   TEST=$(psql $CONN_STRING -tc "SELECT has_table_privilege('dsc.version', 'INSERT')" | tr -d '[:space:]')
@@ -148,7 +148,7 @@ if [ "x$TEST" == "xt" ] ; then
   if [ $CHECK_API -eq 1 ] ; then
     DB_API_VERSION=$(psql $CONN_STRING -tc  "select version from dsc.version;")
     if [ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] ; then
-      echo "Error: Database API version incorrect."
+      echo "Error: Database API version incorrect: Found $DB_API_VERSION expected $REQUIRED_API_VERSION"
       exit 1
     fi
   fi
@@ -160,7 +160,7 @@ fi
 if [ $CHECK_SERIAL -eq 1 ] ; then
   LAST_SERIAL=$(psql $CONN_STRING -tc "select max(serial) from dsc.internal_version;")
   if [ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] ; then
-    echo "Error: ddl scripts not run in correct order."
+    echo "Error: DDL scripts have not been run in correct order. Running $REQUIRED_DDL_SERIAL, last run was $LAST_SERIAL"
     exit 1
   fi
 fi

@@ -1,0 +1,278 @@
+#!/bin/bash
+#
+# Copyright 2015 Internet Corporation for Assigned Names and Numbers.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   000011_ddl_new_graphs
+#
+
+eval $(@LIBEXEC@/conf_read)
+
+DB_NAME=$hhconfig_database_name
+DATA_DIR=$hhconfig_directories_data
+SQ="'"
+export PGPASSWORD=$hhconfig_database_owner_pass
+
+NEW_DDL_SERIAL=11
+REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
+NEW_API_VERSION=9
+REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 1 ))
+
+DSC_SCHEMA="dsc"
+
+usage () {
+    echo
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+    exit 1
+}
+
+
+while getopts ":csh" opt; do
+    case $opt in
+        h  ) usage ;;
+        \? ) usage ;;
+    esac
+done
+
+# Need a write user to update DB
+echo "`date`: $0 COMMENCED"
+a=$(@LIBEXEC@/check_user_db_api -w -C $REQUIRED_API_VERSION -s $REQUIRED_DDL_SERIAL)
+if [ $? -ne 0 ] ; then
+  echo $a
+  exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+echo "Starting"
+
+# START TLD
+TLD_DATASET=$(psql -h $hhconfig_database_host $DB_NAME -qtc "SELECT id FROM dataset WHERE name = 'qtype_vs_tld';")
+# END  TLD
+# START GEOIP
+psql -h $hhconfig_database_host $DB_NAME -qtc '\dx' | grep ip4r | grep dsc
+[ $? -eq 1 ] && \
+echo "No ip4r extension installed. Ensure that the ip4r package is installed." && \
+echo "Then connect to the $DB_NAME database as a superuser and run the command \"CREATE EXTENSION ip4r SCHEMA dsc;\"" && \
+exit 1
+GEO_DATASET=$(psql -h $hhconfig_database_host $DB_NAME -qtc "SELECT id FROM dataset WHERE name = 'client_subnet_accum';")
+# END GEOIP
+# START IP2ASN
+IP2ASN_DATASET=$(psql $CONN_STRING -qtc "SELECT id FROM dataset WHERE name = 'client_subnet_accum';")
+IP2ASN_DATASET2=$(psql $CONN_STRING -qtc "SELECT id FROM dataset WHERE name = 'client_addr_vs_rcode_accum';")
+IP2ASN_DATASET3=$(psql $CONN_STRING -qtc "SELECT id FROM dataset WHERE name = 'client_subnet2_accum';")
+# END IP2ASN
+
+echo "Adding graphs"
+
+
+psql -h $hhconfig_database_host $DB_NAME <<EOF
+BEGIN;
+-- START TLDs
+CREATE TABLE tld_types (id serial PRIMARY KEY, type_name text);
+INSERT INTO tld_types (type_name) VALUES
+  ('New-gTLD'),
+  ('Legacy-gTLD'),
+  ('ccTLD');
+CREATE TABLE tlds (id serial PRIMARY KEY,
+                   alabel text,
+                   type int REFERENCES tld_types (id));
+
+INSERT INTO dataset (name) VALUES ('client_subnet_vs_tld');
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('qtype_vs_cctld','3.1.QTYPE vs TLD','QTYPE for most popular ccTLDs','QTYPE value for most popular ccTLDs queried') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${TLD_DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title)
+    VALUES ('qtype_vs_newgtld','3.1.QTYPE vs TLD','QTYPE for most popular New gTLDs','QTYPE value for most popular New gTLDs queried') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${TLD_DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('qtype_vs_legacygtld','3.1.QTYPE vs TLD','QTYPE for most popular Legacy gTLDs','QTYPE value for most popular Legacy gTLDs queried') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot select id, ${TLD_DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('qtype_vs_othertld','3.1.QTYPE vs TLD','QTYPE for most popular Undelegated TLDs','QTYPE value for most popular Undelegated TLDs queried') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${TLD_DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('client_subnet_vs_tld','7.Client Subnet Statistics','Client subnet vs TLD','Client subnet vs TLD') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='client_subnet_vs_tld') FROM rows;
+
+UPDATE visible_plot set display_category = '3.1.QTYPE vs TLD' where id=${TLD_DATASET};
+-- END TLDs
+
+-- START GEO
+DROP TABLE IF EXISTS geo;
+DROP SEQUENCE IF EXISTS geo_id_seq;
+
+CREATE TABLE geoip (
+  ip_range iprange PRIMARY KEY,
+  latitude real,
+  longitude real,
+  geoname integer );
+
+CREATE INDEX ix_ip_range ON geoip USING gist (ip_range);
+
+CREATE TABLE locations (
+  geoname_id integer PRIMARY KEY,
+  name text,
+  city text );
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('geomap','10.GEO','Busiest client locations','Busiest Client Locations') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${GEO_DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('geochart','10.GEO','Busiest client locations1','Busiest Client Locations1') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${GEO_DATASET} FROM rows;
+-- END GEO
+
+-- START NODE GROUPING
+ALTER TABLE node  ADD column subgroup character varying(255);
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('by_instance','1.Node Statistics','By instance','Queries grouped by node instance') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='qtype') FROM rows;
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('by_city','1.Node Statistics','By city','Queries grouped by city') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='qtype') FROM rows;
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('by_country','1.Node Statistics','By country','Queries grouped by country') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='qtype') FROM rows;
+-- END NODE GROUPING
+
+-- START RSSAC
+INSERT INTO dataset (name) VALUES ('load_time');
+INSERT INTO dataset (name) VALUES ('zone_size');
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('load_time','9.RSSAC','Zone propagation time','Latency in the distribution system by serial number') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='load_time') FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('zone_size','9.RSSAC','Zone size','Size of the zone by serial number') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='zone_size') FROM rows;
+
+ALTER table node add ip ipaddress;
+-- END RSSAC
+
+-- STRART IP2ANS
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('asn','7.Client Subnet Statistics','Busiest client ASNs','Client ASNs for the busiest /24(IPv4) or /96(IPv6)') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${IP2ASN_DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('bgpprefix','7.Client Subnet Statistics','Busiest client BGP prefix','Clients by BGP prefix for the busiest /24(IPv4) or /96(IPv6)') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${IP2ASN_DATASET} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('client_addr_vs_rcode_accum_asn','7.Client Subnet Statistics', 'RCODE by client ASNs', 'RCODE by client ASNs for the busiest /24(IPv4) or /96(IPv6)') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${IP2ASN_DATASET2} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('client_addr_vs_rcode_accum_bgpprefix','7.Client Subnet Statistics', 'RCODE by clients by BGP prefix', 'RCODE by client BGP prefix for the busiest /24(IPv4) or /96(IPv6)')
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${IP2ASN_DATASET2} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('client_subnet2_accum_asn','8.Classification', 'Query classification by client ASNs', 'Query classification by client ASNs for the busiest /24(IPv4) or /96(IPv6)') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${IP2ASN_DATASET3} FROM rows;
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('client_subnet2_accum_bgpprefix','8.Classification', 'Query classification by clients by BGP prefix', 'Query classification by client BGP prefix for the busiest /24(IPv4) or /96(IPv6)')
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, ${IP2ASN_DATASET3} FROM rows;
+
+UPDATE visible_plot SET title='Busiest client subnets (fixed IPv4/8 or IPv6/32)', display_name='Busiest client subnets (fixed size)' where name='client_subnet_accum';
+-- END IP2ASN
+
+-- START DEST ADDR
+INSERT INTO dataset (name) VALUES ('server_addr');
+
+WITH rows AS (
+  INSERT INTO visible_plot (name, display_category, display_name, title) 
+    VALUES ('server_addr','1.Node Statistics','By server IP address','Server IP address') 
+    RETURNING id
+) 
+INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='server_addr') FROM rows;
+-- END DEST ADDR
+
+UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
+INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new graphs and datasets for 2.1', now() );
+COMMIT;
+EOF
+
+echo "`date`: $0 COMPLETED"

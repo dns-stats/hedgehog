@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   000015_ddl_ip2asn
+# File:   000010_ddl_python
 #
 
 eval $(@LIBEXEC@/conf_read)
@@ -29,9 +29,9 @@ DB_NAME=$hhconfig_database_name
 DATA_DIR=$hhconfig_directories_data
 SQ="'"
 
-NEW_DDL_SERIAL=15
+NEW_DDL_SERIAL=10
 REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
-NEW_API_VERSION=11
+NEW_API_VERSION=8
 REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 1 ))
 
 DSC_SCHEMA="dsc"
@@ -79,7 +79,7 @@ echo "$(date): $0 COMMENCED"
 psql $CONN_STRING -qtc '\dL' | grep plpythonu
 if [ $? -eq 1 ] ; then
   echo "No plpythonu language installed. Ensure that the plpythonu package is installed."
-  echo "Then connect to the $DB_NAME database as a superuser and run the command \"CREATE LANGUAGE plpythonu;\""
+  echo "Then connect to the $DB_NAME database as a superuser and run the command \"CREATE EXTENSION plpythonu SCHEMA pg_catalog;\""
   exit 1
 fi
 

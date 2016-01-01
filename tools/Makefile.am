@@ -22,7 +22,9 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000008_ddl_traffic_difference \
                          hedgehog/DDL_updates/000009_ddl_node_index \
                          hedgehog/DDL_updates/000010_ddl_tlds \
+                         hedgehog/DDL_updates/000010_ddl_python \
                          hedgehog/DDL_updates/000011_ddl_geoip \
+                         hedgehog/DDL_updates/000011_ddl_new_graphs \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
                          hedgehog/DDL_updates/000013_ddl_node_subgroup \
                          hedgehog/DDL_updates/000014_ddl_loadtime \
@@ -128,9 +130,17 @@ hedgehog/DDL_updates/000010_ddl_tlds: $(srcdir)/hedgehog/DDL_updates/000010_ddl_
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000010_ddl_tlds.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000010_ddl_tlds
 
+hedgehog/DDL_updates/000010_ddl_python: $(srcdir)/hedgehog/DDL_updates/000010_ddl_python.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000010_ddl_python.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000010_ddl_python
+
 hedgehog/DDL_updates/000011_ddl_geoip: $(srcdir)/hedgehog/DDL_updates/000011_ddl_geoip.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000011_ddl_geoip.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000011_ddl_geoip
+
+hedgehog/DDL_updates/000011_ddl_new_graphs: $(srcdir)/hedgehog/DDL_updates/000011_ddl_new_graphs.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000011_ddl_new_graphs.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000011_ddl_new_graphs
 
 hedgehog/DDL_updates/000012_ddl_lower_key_index: $(srcdir)/hedgehog/DDL_updates/000012_ddl_lower_key_index.in Makefile
 	mkdir -p hedgehog/DDL_updates
