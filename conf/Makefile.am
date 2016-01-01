@@ -23,5 +23,7 @@ install-data-hook:
 		${INSTALL_DATA} -m 644 $(srcdir)/tlds.d/idn_cctlds.csv ${DESTDIR}${sysconfdir}/tlds.d/idn_cctlds.csv
 	test -f ${DESTDIR}${sysconfdir}/tlds.d/legacy_glds.csv || \
 		${INSTALL_DATA} -m 644 $(srcdir)/tlds.d/legacy_gtlds.csv ${DESTDIR}${sysconfdir}/tlds.d/legacy_gtlds.csv
-	test -f ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds.csv || \
-		${INSTALL_DATA} -m 644 $(srcdir)/tlds.d/new_gtlds.csv ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds.csv
+	test -f ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds-20131023-20150611.csv || \
+		${INSTALL_DATA} -m 644 $(srcdir)/tlds.d/new_gtlds-20131023-20150611.csv ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds-20131023-20150611.csv
+	test -f ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds-20150614-20151223.csv || \
+		${INSTALL_DATA} -m 644 $(srcdir)/tlds.d/new_gtlds-20150614-20151223.csv ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds-20150614-20151223.csv
