@@ -25,3 +25,5 @@ install-data-hook:
 		${INSTALL_DATA} -m 644 $(srcdir)/tlds.d/legacy_gtlds.csv ${DESTDIR}${sysconfdir}/tlds.d/legacy_gtlds.csv
 	test -f ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds.csv || \
 		${INSTALL_DATA} -m 644 $(srcdir)/tlds.d/new_gtlds.csv ${DESTDIR}${sysconfdir}/tlds.d/new_gtlds.csv
+	test -f ${DESTDIR}${sysconfdir}/tlds.d/more_gtlds.csv || \
+		${INSTALL_DATA} -m 644 $(srcdir)/tlds.d/more_gtlds.csv ${DESTDIR}${sysconfdir}/tlds.d/more_gtlds.csv
