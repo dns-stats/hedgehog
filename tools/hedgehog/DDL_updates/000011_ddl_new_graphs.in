@@ -158,14 +158,14 @@ CREATE TABLE locations (
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('geomap','10.GEO','Busiest client locations','Busiest Client Locations') 
+    VALUES ('geomap','10.GEO','Busiest client locations by city','Busiest client locations by city') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${GEO_DATASET} FROM rows;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('geochart','10.GEO','Busiest client locations1','Busiest Client Locations1') 
+    VALUES ('geochart','10.GEO','Busiest client locations by country','Busiest client locations by country, node locations by city') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, ${GEO_DATASET} FROM rows;

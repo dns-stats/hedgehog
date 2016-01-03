@@ -172,6 +172,21 @@ BEGIN
   END CASE;
 END
 \$\$ LANGUAGE plpgsql;
+
+CREATE or REPLACE FUNCTION dsc.alabel2ulabel (alabel text)
+  RETURNS text
+as \$\$
+  
+  import getdns
+  
+  ''' Sanity Check '''
+  if alabel is None:
+    plpy.error('Function alabel2ulabel: a-label passed in was null')
+    return None
+  
+  ulabel = getdns.alabel_to_ulabel(alabel)
+  return ulabel
+\$\$ LANGUAGE plpythonu;
 EOF
 
 echo
