@@ -39,3 +39,6 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
 * If a user touches any controls while a query is waiting to return
   then the 'generate graph' button becomes enabled again and a second
   plot can be generated that will then over write the first.
+
+* The geochart is ignoring the instruction in the html not to show the color
+  code in the tooltips.
