@@ -28,15 +28,6 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
   This affects, for example, the 'Traffic volume' plot. However, we prefer SVG
   to flash given all the flash vulnerabilities of late. 
 
-* The plot is not sorted according to size correctly in the interactive plots
-  for horizontal bar charts. The static plots should be used instead. This
-  includes:
-  - QTYPE for most popular TLD
-  - Busient client subnet
-  - RCODE by client subnet
-  - Root abusers
-  - Query classification by subnet
-
 * Support for RSSAC reports is added for XML imports only, however extended 
   RCODES cannot be collected by the existing DSC collector so only base RCODES
   are collected and displayed. If the DSC collector is extended then further
@@ -49,5 +40,5 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
   then the 'generate graph' button becomes enabled again and a second
   plot can be generated that will then over write the first.
 
-* The geochart is ignoring the instruction not to show the color code in the
-  tooltips.
+* The geochart is ignoring the instruction in the html not to show the color
+  code in the tooltips.

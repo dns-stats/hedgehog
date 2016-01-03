@@ -70,7 +70,6 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
   # Process the tld file
   echo "Processing file: " $TLD_FILE
   while read line || [[ -n "$line" ]]; do
-
   	trimmed_line=$(echo $line | sed -e 's/^ *//' -e 's/ *$//')
 
   	if [[ -z ${trimmed_line} ]] || [[ "${trimmed_line}" =~ ^# ]] ; then
@@ -101,12 +100,12 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     fi
     
     # Check if this tld already exists
-    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tlds where alabel = lower('${ALABEL}')")
-    [ ! $CHECK -eq 0 ] && continue
-    CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name = '${TLDTYPE}'")
-    [ ! $CHECK -eq 1 ] && continue
+    # CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tlds where alabel = lower('${ALABEL}')")
+    # [ ! $CHECK -eq 0 ] && continue
+    # CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name = '${TLDTYPE}'")
+    # [ ! $CHECK -eq 1 ] && continue
     
-    echo $(psql -h $hhconfig_database_host $DB_NAME -qtc "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'")
+    echo $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'")
 
   done < ${TLD_FILE}
 done

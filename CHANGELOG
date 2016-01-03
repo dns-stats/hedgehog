@@ -17,19 +17,38 @@
 Hedgehog 2.1.0b1 
 ------------------------------
 
-* Added some support for displaying IDN in their unicode glyphs
-* Added separate graphs for different types of TLD (Qtype for most popular TLD)
+Features:
+* Added new graphs for different types of TLD (QTYPE and RCODE for most
+  popular TLD). Some support for displaying IDN in their unicode glyphs.
+* Added new graph for Client subnet vs TLD
+* Added new graph to display Geo-locations of querying subnets and nodes
+* Added new graphs to display query sources as BGP prefixes or ASN
+* Added new graphs to group nodes by Country/City/Instance
+* Added new graph to display Destination Address vs Query rate
+* Added option to group nodes in selection tab by Country/City/Instance and 
+  config option for default choice (specified in nodes.csv).
+* Added rssacd demon to collect rssac load time and zone size data. Requires
+  management IP Address of node to be specified in nodes.csv
 * Added GeoLite2 data created by MaxMind, available from
   http://www.maxmind.com
-* Added serevr to collect rssac load time and zone size data
-* Added ip address to nodes table
-* rewrote database_update_nodes to make it easier to maintain
-* wrote check_user_db_api to do all user checks, check db access and data dir.
+* Added static link URI to provide access to raw plot files
+* Updated database_update_nodes script to support new fields. NOTE: New format
+  is not backwards compatible!
+* Multiple remote Web front ends now supported
+* New config option to customise 'Support' link on Web page
+
+Maintenance/Bug fixes:
+* Improve DB performance by adding further indexes
+* Change to rssac scripts. Processing of unique_sources data now done by
+  'database_process_rssac_data' script which must be explicitly called.
+* Wrote check_user_db_api to do all user checks, check db access and data dir.
   access. Used in new database_update_nodes will gradually be used by all tools.
-* Improved font sizes in some graphs
-* Fixed DSC-251 to ensure lowwer case comparison
-* Added static link box 
+* Improved chart sizes, font sizes and data ordering in some graphs
+* Significant enhancements to installation and management scripts and 
+  configuration files.
 * Fixed appearance of gvis column chart vAxis
+* Fixed error in rssac reports where ".root-servers.org" was used instead of 
+ ".root-servers.net"
 
 
 Hedgehog 2.0.0rc2 - 2015-07-09

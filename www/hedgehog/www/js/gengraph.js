@@ -45,7 +45,8 @@ $(document).ready(function() {
     // populate plot and server dropdowns and nodetabs then generate default plot    
     // , brew("initnodeslist"),
     $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), 
-           brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), brew("getSupportURL")).done(function(db,rp, pt, ss, nd, dg, dp, su){
+           brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), 
+           brew("getSupportURL")).done(function(db,rp, pt, ss, nd, dg, dp, su){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -140,9 +141,7 @@ function brew(divId) {
 function genDSCGraph() {
     // call hedgehog.brew to generate a plot
     var gvis = 0;
-    var subgroup = 0;
     if ($('#googleviz').prop('checked') === true) gvis = 1;
-    //if ($('#groupNodes').prop('checked') === true) subgroup = 1;
 
     var pltid = $("#plotType option:selected").val();
     var svrnm = $("#servers option:selected").text();
@@ -180,8 +179,6 @@ function genDSCGraph() {
                 'start': window.start.toISOString().slice(0,16),
                 'stop': window.stop.toISOString().slice(0,16),
                 'gvis': gvis,
-                // FIXME[node grouping]: this parm is no longer needed
-                'subgroup': subgroup,
                 'pltid': pltid,
                 'svrnm' : svrnm,
                 'svrid': svrid,

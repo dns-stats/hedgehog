@@ -196,13 +196,13 @@ getDefaultGrouping <- function() {
 	}
 	
 	grouping = gui_config$www$default_node_grouping
-    if      (grouping == "instance") {%>instance<%} 
-    else if (grouping == "city")     {%>city<%}
-    else if (grouping == "country")  {%>country<%} 
-    else if (grouping == "none")     {%>none<%}
+	if      (grouping == "instance") {%>instance<%} 
+	else if (grouping == "city")     {%>city<%}
+	else if (grouping == "country")  {%>country<%} 
+	else if (grouping == "none")     {%>none<%}
 	else {
-    	system('logger -p user.warning Unsupported Node Grouping present in config file. Using None.')
-    	%>none<%
+		system('logger -p user.warning Unsupported Node Grouping present in config file. Using None.')
+		%>none<%
 	}
 	return(TRUE)
 }
@@ -247,7 +247,6 @@ generatePlot <- function(){
 		
 	svrid				<- GET$svrid
 	gvis				<- GET$gvis
-	subgroup 			<- GET$subgroup
 	ndarr				<- GET$ndarr
 	svrnm				<- GET$svrnm
 	start				<- GET$start

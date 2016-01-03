@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   000015_ddl_ip2asn
+# File:   000010_ddl_python
 #
 
 eval $(@LIBEXEC@/conf_read)
@@ -29,9 +29,9 @@ DB_NAME=$hhconfig_database_name
 DATA_DIR=$hhconfig_directories_data
 SQ="'"
 
-NEW_DDL_SERIAL=15
+NEW_DDL_SERIAL=10
 REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
-NEW_API_VERSION=11
+NEW_API_VERSION=8
 REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 1 ))
 
 DSC_SCHEMA="dsc"
