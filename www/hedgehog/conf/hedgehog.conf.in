@@ -31,7 +31,7 @@
 	    order allow,deny
 	    allow from all
 	    DefaultType text/html
-      Require all granted
+	    Require all granted
 	    DirectoryIndex hedgehog.html
 	</Directory>
 
@@ -41,7 +41,7 @@
 	    order allow,deny
 	    allow from all
 	    SetHandler r-script
-      Require all granted
+	    Require all granted
 	    RHandler brew::brew
 	</Directory>
 
@@ -50,7 +50,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
-      Require all granted
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 
@@ -59,7 +59,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
-      Require all granted
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 
@@ -68,7 +68,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
-      Require all granted
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 
@@ -77,7 +77,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
-      Require all granted
+	    Require all granted
 	    SetHandler r-script
 	</Directory>
 
@@ -86,7 +86,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
-      Require all granted
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 	
@@ -96,7 +96,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
-      Require all granted
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 
@@ -105,7 +105,7 @@
 	    Options Indexes
 	    AllowOverride None
 	    order allow,deny
-      Require all granted
+	    Require all granted
 	    allow from all
 	</Directory>	
 
