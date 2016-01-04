@@ -153,6 +153,8 @@ Developed by Sinodun IT (www.sinodun.com)
       <hr style='margin-top:5px;' />
       This product includes GeoLite2 data created by MaxMind, available from
       <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
+	  <br/>Powered by: <a href="http://www.postgresql.org">PostgreSQL</a>, <a href="http://rapache.net/index.html">RApache</a>, <a href="https://httpd.apache.org">Apache</a>, 
+	  <a href="https://developers.google.com/chart/?hl=en">Google Charts</a>, <a href="https://www.r-project.org">R</a>, <a href="https://jquery.com">jQuery</a>, <a href="https://getdnsapi.net">getdns</a>
     </div>  
   </div><!-- container -->
 
