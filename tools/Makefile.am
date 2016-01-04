@@ -110,7 +110,7 @@ hedgehog/database_rm_old_rssac_data: $(srcdir)/hedgehog/database_rm_old_rssac_da
 
 hedgehog/DDL_updates/000010_ddl_python: $(srcdir)/hedgehog/DDL_updates/000010_ddl_python.in Makefile
 	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000010_ddl_python.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000010_ddl_python
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000010_ddl_python.in | $(subst_DB_VERSION) | $(subst_sql) > hedgehog/DDL_updates/000010_ddl_python
 
 hedgehog/DDL_updates/000011_ddl_new_graphs: $(srcdir)/hedgehog/DDL_updates/000011_ddl_new_graphs.in Makefile
 	mkdir -p hedgehog/DDL_updates
