@@ -22,7 +22,7 @@
 
 	#ServerName www.example.com
 	ServerAdmin webmaster@localhost
-	
+  
 	Alias /hedgehog @HH_WEB_SOURCE@
 	<Directory @HH_WEB_SOURCE@>
 	    RSourceOnStartup @HH_WEB_SOURCE@/R/startup.R
@@ -31,6 +31,7 @@
 	    order allow,deny
 	    allow from all
 	    DefaultType text/html
+	    Require all granted
 	    DirectoryIndex hedgehog.html
 	</Directory>
 
@@ -40,6 +41,7 @@
 	    order allow,deny
 	    allow from all
 	    SetHandler r-script
+	    Require all granted
 	    RHandler brew::brew
 	</Directory>
 
@@ -48,6 +50,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 
@@ -56,6 +59,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 
@@ -64,6 +68,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 
@@ -72,6 +77,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
+	    Require all granted
 	    SetHandler r-script
 	</Directory>
 
@@ -80,6 +86,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 	
@@ -89,6 +96,7 @@
 	    AllowOverride None
 	    order allow,deny
 	    allow from all
+	    Require all granted
 	    SetHandler default-handler
 	</Directory>
 
@@ -97,6 +105,7 @@
 	    Options Indexes
 	    AllowOverride None
 	    order allow,deny
+	    Require all granted
 	    allow from all
 	</Directory>	
 
