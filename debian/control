@@ -89,6 +89,7 @@ Depends: hedgehog-common (>= ${source:Version}~),
          libcairo2-dev,
          libxt-dev,
          libpq-dev,
+         unifont
          ${misc:Depends}
 Suggests: dsc-statistics-collector,
           pgbouncer,
