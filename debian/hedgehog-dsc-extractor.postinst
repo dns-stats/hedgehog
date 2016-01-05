@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
 
-adduser --system --no-create-home --home /nonexistent hedgehog
+
 
 #DEBHELPER#
