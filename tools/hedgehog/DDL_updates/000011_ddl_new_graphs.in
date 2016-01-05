@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2015 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ INSERT INTO tld_types (type_name) VALUES
   ('Legacy-gTLD'),
   ('ccTLD');
 CREATE TABLE tlds (id serial PRIMARY KEY,
-                   alabel text,
+                   alabel text UNIQUE,
                    type int REFERENCES tld_types (id));
 
 INSERT INTO dataset (name) VALUES ('client_subnet_vs_tld');

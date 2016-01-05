@@ -1,5 +1,5 @@
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -167,143 +167,155 @@ prepStmnt <- function(statementNm, dsccon){
 
                format3_bgpprefix  = {
                  sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
-                 "SELECT xx / ip2bgpprefix(xx) AS x, y FROM
+                 "SELECT xx / ip2bgpprefix(xx) AS x, sum(y) as y FROM
                   (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y 
                   FROM dsc.data 
                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
                   select_nodes_sql,
                   "AND key2", skipped_sql,
-                  "GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;", sep=" ")
+                  "GROUP BY xx ORDER BY y DESC LIMIT 40) as sq
+                group by x order by y desc;", sep=" ")
                 sql=gsub("\n"," ",sql_joined)
                 rs <- try(dbSendQuery(dsccon, sql))},
                
                format3_bgpprefix_all_nodes= {
                  sql_joined <- paste("PREPARE", statementNm, all_nodes_prep, 
-                 "SELECT xx / ip2bgpprefix(xx) AS x, y FROM 
+                 "SELECT xx / ip2bgpprefix(xx) AS x, sum(y) as y FROM 
                   (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y
                    FROM dsc.data
                    WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5
                    AND key2", skipped_sql,
-                  "GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;", sep=" ")
+                  "GROUP BY xx ORDER BY y DESC LIMIT 40) as sq
+                group by x order by y desc;", sep=" ")
                 sql=gsub("\n"," ",sql_joined)
                 rs <- try(dbSendQuery(dsccon, sql))},
 
                format3_asn = {
                  sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
-                 "SELECT ip2asn(xx) AS x, y FROM
+                 "SELECT ip2asn(xx) AS x, sum(y) as y FROM
                   (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y 
                    FROM dsc.data 
                    WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
                    select_nodes_sql,
                    "AND key2", skipped_sql,
-                  "GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;", sep=" ")
+                  "GROUP BY xx ORDER BY y DESC LIMIT 40) as sq
+                group by x order by y desc;", sep=" ")
                 sql=gsub("\n"," ",sql_joined)
                 rs <- try(dbSendQuery(dsccon, sql))},
                
                format3_asn_all_nodes = {
                  sql_joined <- paste("PREPARE", statementNm, all_nodes_prep, 
-                 "SELECT ip2asn(xx) AS x, y FROM 
+                 "SELECT ip2asn(xx) AS x, sum(y) as y FROM 
                   (SELECT key2::ipaddress AS xx, sum(value)/$1 AS y 
                    FROM dsc.data 
                    WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5
                    AND key2", skipped_sql,
-                  "GROUP BY xx ORDER BY y DESC LIMIT 40) as sq;", sep=" ")
+                  "GROUP BY xx ORDER BY y DESC LIMIT 40) as sq
+                group by x order by y desc;", sep=" ")
                  sql=gsub("\n"," ",sql_joined)
                  rs <- try(dbSendQuery(dsccon, sql))},
                
                client_addr_vs_rcode_accum_asn = {
                sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
-                 "SELECT dsc.ip2asn(xx) AS x, key, y FROM 
+                 "SELECT dsc.ip2asn(xx) AS x, key, sum(y) as y FROM 
                   (SELECT key1::ipaddress AS xx, il.name AS key, sum(d.value)/$1 As y 
                    FROM dsc.data d, iana_lookup il 
                    WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5
                    AND d.key1", skipped_sql,
                    "AND il.registry = 'rcode' AND d.key2::text = il.value::text",
                    select_nodes_sql,
-                   "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                   "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
               sql=gsub("\n"," ",sql_joined)
               rs <- try(dbSendQuery(dsccon, sql))},
               
               client_addr_vs_rcode_accum_asn_all_nodes = {
               sql_joined <- paste("PREPARE", statementNm, all_nodes_prep,
-                "SELECT dsc.ip2asn(xx) AS x, key, y FROM 
+                "SELECT dsc.ip2asn(xx) AS x, key, sum(y) as y FROM 
                  (SELECT key1::ipaddress AS xx, il.name AS key, sum(d.value)/$1 As y 
                   FROM dsc.data d, iana_lookup il 
                   WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5
                   AND d.key1 ", skipped_sql,
                   "AND il.registry = 'rcode' AND d.key2::text = il.value::text
-                  GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                  GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
              sql=gsub("\n"," ",sql_joined)
              rs <- try(dbSendQuery(dsccon, sql))},
  
              client_addr_vs_rcode_accum_bgpprefix = {
              sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
-               "SELECT xx / dsc.ip2bgpprefix(xx) AS x, key, y FROM 
+               "SELECT xx / dsc.ip2bgpprefix(xx) AS x, key, sum(y) as y FROM 
                 (SELECT key1::ipaddress AS xx, il.name AS key, sum(d.value)/$1 As y 
                  FROM dsc.data d, iana_lookup il 
                  WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5
                  AND d.key1", skipped_sql,
                  "AND il.registry = 'rcode' AND d.key2::text = il.value::text",
                  select_nodes_sql,
-                 "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                 "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
             sql=gsub("\n"," ",sql_joined)
             rs <- try(dbSendQuery(dsccon, sql))},
             
             client_addr_vs_rcode_accum_bgpprefix_all_nodes = {
             sql_joined <- paste("PREPARE", statementNm, all_nodes_prep,
-              "SELECT xx / dsc.ip2bgpprefix(xx) AS x, key, y FROM 
+              "SELECT xx / dsc.ip2bgpprefix(xx) AS x, key, sum(y) as y FROM 
                (SELECT key1::ipaddress AS xx, il.name AS key, sum(d.value)/$1 As y 
                 FROM dsc.data d, iana_lookup il 
                 WHERE server_id=$2 AND d.plot_id=$3 AND starttime>=$4 AND starttime<=$5
                 AND d.key1", skipped_sql,
                   "AND il.registry = 'rcode' AND d.key2::text = il.value::text
-                GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},
 
            client_subnet2_accum_asn = {
              sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
-               "SELECT ip2asn(xx) AS x, key, y FROM
+               "SELECT ip2asn(xx) AS x, key, sum(y) as y FROM
                  (SELECT key1::ipaddress AS xx, key2 AS key, sum(value)/$1 AS y
                   FROM dsc.data 
                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
                   select_nodes_sql,
                   "AND key1", skipped_sql,
-                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},
            
            client_subnet2_accum_asn_all_nodes = {
              sql_joined <- paste("PREPARE", statementNm, all_nodes_prep,
-               "SELECT ip2asn(xx) AS x, key, y FROM
+               "SELECT ip2asn(xx) AS x, key, sum(y) as y FROM
                  (SELECT key1::ipaddress AS xx, key2 AS key, sum(value)/$1 AS y
                   FROM dsc.data 
                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
                   "AND key1", skipped_sql,
-                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},
 
            client_subnet2_accum_bgpprefix = {
              sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
-               "SELECT xx / dsc.ip2bgpprefix(xx) AS x, key, y FROM
+               "SELECT xx / dsc.ip2bgpprefix(xx) AS x, key, sum(y) as y FROM
                  (SELECT key1::ipaddress AS xx, key2 AS key, sum(value)/$1 AS y
                   FROM dsc.data 
                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
                   select_nodes_sql,
                   "AND key1", skipped_sql,
-                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},
            
            client_subnet2_accum_bgpprefix_all_nodes = {
              sql_joined <- paste("PREPARE", statementNm, all_nodes_prep,
-               "SELECT xx / dsc.ip2bgpprefix(xx) AS x, key, y FROM
+               "SELECT xx / dsc.ip2bgpprefix(xx) AS x, key, sum(y) as y FROM
                  (SELECT key1::ipaddress AS xx, key2 AS key, sum(value)/$1 AS y
                   FROM dsc.data 
                   WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
                   "AND key1", skipped_sql,
-                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq;", sep=" ")
+                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},               
 
