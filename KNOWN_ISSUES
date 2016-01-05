@@ -1,5 +1,5 @@
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
   Flash plots for the interactive plots (google charts). There is a known 
   issue with the SVG plots where long legends are not wrapped properly:
   https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536
-  This affects, for example, the 'Traffic volume' plot. However, we prefer SVG
+  This affects, for example, the 'by_node' plot. However, we prefer SVG
   to flash given all the flash vulnerabilities of late. 
 
 * Support for RSSAC reports is added for XML imports only, however extended 

@@ -1,5 +1,5 @@
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -813,7 +813,15 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
     msg <- paste('logger -p user.notice In generatePlotFile. Plot name =', pltnm, sep=" ")
     system(msg)
   }
-
+  if (pltnm == 'geomap' && gvis == 0) {
+    plot_file <- "plots/no_graph.png"
+    return(plot_file)
+  }
+  if (pltnm == 'geochart' && gvis == 0) {
+    plot_file <- "plots/no_graph.png"
+    return(plot_file)
+  }    
+    
   mytitle <- paste(plttitle, "\nfrom ", simple_start, " UTC to ", simple_stop," UTC ", sep="")
   posix_start <- as.POSIXct(simple_start, format='%Y-%m-%d %H:%M')
   posix_stop <- as.POSIXct(simple_stop, format='%Y-%m-%d %H:%M')
