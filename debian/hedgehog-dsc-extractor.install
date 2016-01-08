@@ -1,4 +1,5 @@
 etc/hedgehog/nodes.csv
+etc/hedgehog/nodes.csv.sample /usr/share/doc/hedgehog/examples/
 etc/hedgehog/tlds.d/*
 usr/bin/dsc-extractor
 usr/bin/refile_and_grok
