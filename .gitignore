@@ -1,5 +1,6 @@
 #Vagrant
 .vagrant
+._*
 
 # Generated automatically
 /build
