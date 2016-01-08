@@ -29,6 +29,7 @@ Depends: ${misc:Depends},
          postgresql-9.3-ip4r,
          postgresql-plpython-9.3,
          python-ipy
+Suggests: hedgehog-doc
 Description: visualisation tool for DNS [Database setup file]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -39,15 +40,8 @@ Package: hedgehog-common
 Architecture: all
 Depends: libyaml-tiny-perl,
          ${misc:Depends},
-         ${python:Depends},
-         python-yaml,
-         python-dnspython,
-         python-psycopg2,
          postgresql-client-common,
-         postgresql-client,
-         unzip
-Recommends: hedgehog-gui
-Suggests: dsc-statistics-collector
+         postgresql-client
 Description: visualisation tool for DNS [common files]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -58,8 +52,6 @@ Package: hedgehog-doc
 Architecture: all
 Section: doc
 Depends: ${misc:Depends}
-Recommends: hedgehog-gui
-Suggests: dsc-statistics-collector
 Description: visualisation tool for DNS [documentation]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -69,13 +61,10 @@ Description: visualisation tool for DNS [documentation]
 Package: hedgehog-gui
 Architecture: all
 Section: web
-Depends: hedgehog-common (>= ${source:Version}~),
+Depends: ${misc:Depends},
+         hedgehog-common (>= ${source:Version}~),
          apache2 (>= 2.4),
          libapache2-mod-r-base,
-         libyaml-tiny-perl,
-         postgresql,
-         postgresql-client,
-         postgresql-contrib,
          r-base,
          r-base-core,
          r-cran-cairodevice,
@@ -88,12 +77,8 @@ Depends: hedgehog-common (>= ${source:Version}~),
          unifont,
          libcairo2-dev,
          libxt-dev,
-         libpq-dev,
-         libapache2-mod-r-base,
-         ${misc:Depends}
-Suggests: dsc-statistics-collector,
-          pgbouncer,
-          hedgehog-doc
+         libpq-dev
+Suggests: hedgehog-doc
 Description: visualisation tool for DNS [web]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -106,7 +91,13 @@ Multi-Arch: foreign
 Depends: hedgehog-common (>= ${source:Version}~),
          ${misc:Depends},
          ${shlibs:Depends},
-         adduser
+         ${python:Depends},
+         adduser,
+         python-yaml,
+         python-dnspython,
+         python-psycopg2,
+         unzip
+Suggests: hedgehog-doc
 Description: visualisation tool for DNS [DSC Extractor]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
