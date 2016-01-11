@@ -41,8 +41,7 @@ Architecture: all
 Depends: libyaml-tiny-perl,
          ${misc:Depends},
          postgresql-client-common,
-         postgresql-client,
-         adduser
+         postgresql-client
 Description: visualisation tool for DNS [common files]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -96,7 +95,8 @@ Depends: hedgehog-common (>= ${source:Version}~),
          python-yaml,
          python-dnspython,
          python-psycopg2,
-         unzip
+         unzip,
+         adduser
 Suggests: hedgehog-doc
 Description: visualisation tool for DNS [DSC Extractor]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
