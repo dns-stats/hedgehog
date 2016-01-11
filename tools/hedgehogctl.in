@@ -33,11 +33,26 @@ usage () {
 	echo
 	echo "Usage: $(basename $0) [help|list] [COMMAND] [command_options]"
 	echo
-	echo "The list of COMMANDs is:"
-	printf '  %s\n\n' "${TOOLS[@]}"
+  if [ -z "$1" ] ; then
+	  echo "The list of COMMANDs is:"
+  	printf '  %s\n' "${TOOLS[@]}"
+  else
+    echo "The list of available COMMANDs can be found by using the list option."
+  fi
 	echo
   exit 1
 }
+
+if [[  " ${1} " == " help2man " ]] ; then
+  usage help2man
+fi
+
+# Remove commands that are not installed
+for cmd in ${TOOLS[@]} ; do
+  if [ ! -x ${SCRIPT_DIR}/${cmd} ] ; then
+    TOOLS=(${TOOLS[@]/$cmd})
+  fi
+done
 
 if [[  " ${1} " == " list " ]] ; then
   echo "Valid commands are:"
