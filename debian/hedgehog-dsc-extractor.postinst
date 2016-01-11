@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-adduser --system --group --no-create-home --home /nonexistent hedgehog
+adduser --system --group hedgehog
 chown hedgehog:hedgehog /var/lib/hedgehog/data
 
 #DEBHELPER#
