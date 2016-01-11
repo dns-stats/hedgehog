@@ -92,7 +92,7 @@ Multi-Arch: foreign
 Depends: hedgehog-common (>= ${source:Version}~),
          ${misc:Depends},
          ${shlibs:Depends},
-         ${python:Depends}
+         ${python:Depends},
          python-yaml,
          python-dnspython,
          python-psycopg2,
