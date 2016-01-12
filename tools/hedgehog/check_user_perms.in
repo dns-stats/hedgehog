@@ -169,6 +169,7 @@ if [ $CHECK_DATA_DIR -eq 1 ] ; then
   DATA_OWNER+$(stat -c %U $hhconfig_directories_data)
   if [ "$DATA_OWNER" != "$USER" ] ; then
     echo "The user $USER  does not have write access to the data dirctory $hhconfig_directories_data"
+    exit 1
   fi
 fi
 
@@ -178,6 +179,7 @@ if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
   WWW_OWNER=$(stat -c %U $mydir)
   if [ "$WWW_OWNER" != "$USER" ] ; then
     echo "The user $USER  does not have write access to the www dirctory $mydir"
+    exit 1
   fi
 fi
 
