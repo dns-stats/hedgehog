@@ -32,7 +32,7 @@ if [ ! -e $NODES_FILE ] ; then
 fi
 
 # We need a write user with access to the data dir. 
-a=$(@LIBEXEC@/check_user_db_api -wfc)
+a=$(@LIBEXEC@/check_user_perms -wfc)
 if [ $? -ne 0 ] ; then
 	echo $a
 	exit 1
@@ -59,7 +59,7 @@ while getopts ":hd" opt; do
     case $opt in
         h  ) usage
              exit 1 ;;
-		d  ) set -x ;;
+        d  ) set -x ;;
         \? ) usage
              exit 1 ;;
     esac

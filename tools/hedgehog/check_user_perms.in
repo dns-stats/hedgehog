@@ -20,11 +20,11 @@
 #
 
 # 
-# File:   check_user
+# File:   check_user_perms
 #
 
 # This script should be called like this:
-# a=$(@LIBEXEC@/check_user_db_api -wfc)
+# a=$(@LIBEXEC@/check_user_perms -wfc)
 # if [ $? -ne 0 ] ; then
 #   echo $a
 #   exit 1
@@ -48,7 +48,7 @@ usage () {
   echo "  -s <SERIAL_NUMBER> check DB serial number"
   echo "  -c check databse API version against the build time API version"
   echo "  -f check user has write permission to $hhconfig_directories_data"
-  echo "  -g check user has write permission to $hhconfig_directories_rssac"
+  echo "  -g check user has write permission to web directory ${hhconfig_directories_rssac%rssac}"
   echo "  -w check we are a write user of the DB"
   echo "  -U specify a DB user"
   echo "  -P specify a DB password"
@@ -166,26 +166,19 @@ if [ $CHECK_SERIAL -eq 1 ] ; then
 fi
 
 if [ $CHECK_DATA_DIR -eq 1 ] ; then
-  set +e
-  touch $hhconfig_directories_data/test
-  if [ $? -ne 0 ] ; then
-    echo "The user $USER_NAME does not have write access to the data dirctory $hhconfig_directories_data"
-    exit 1
+  DATA_OWNER+$(stat -c %U $hhconfig_directories_data)
+  if [ "$DATA_OWNER" != "$USER" ] ; then
+    echo "The user $USER  does not have write access to the data dirctory $hhconfig_directories_data"
   fi
-  rm $hhconfig_directories_data/test
-  set -e
 fi
 
 if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
-  set +e
+  # The %rssac removes rssac from the end of the path, thus checking the www directory instead.
   mydir=${hhconfig_directories_rssac/%rssac/}
-  touch $mydir/test
-  if [ $? -ne 0 ] ; then
-    echo "The user $USER_NAME does not have write access to the dirctory $mydir"
-    exit 1
+  WWW_OWNER=$(stat -c %U $mydir)
+  if [ "$WWW_OWNER" != "$USER" ] ; then
+    echo "The user $USER  does not have write access to the www dirctory $mydir"
   fi
-  rm $mydir/test
-  set -e
 fi
 
 # print env variables for eval to process in calling script

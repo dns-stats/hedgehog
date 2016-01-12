@@ -56,7 +56,7 @@ done
 
 # Need a write user to update DB
 echo "`date`: $0 COMMENCED"
-a=$(@LIBEXEC@/check_user_db_api -w -C $REQUIRED_API_VERSION -s $REQUIRED_DDL_SERIAL)
+a=$(@LIBEXEC@/check_user_perms -w -C $REQUIRED_API_VERSION -s $REQUIRED_DDL_SERIAL)
 if [ $? -ne 0 ] ; then
   echo $a
   exit 1
