@@ -27,7 +27,7 @@
 
 eval $(@LIBEXEC@/conf_read)
 
-a=$(@LIBEXEC@/check_user_db_api -gc)
+a=$(@LIBEXEC@/check_user_perms -gc)
 if [ $? -ne 0 ] ; then
 	echo $a
 	exit 1
