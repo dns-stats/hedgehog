@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+# We need user with access to the data directory
+a=$(@LIBEXEC@/check_user_perms -fnc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+
 usage () {
   echo
   echo "Pack old xml files already processed into a .tar package to store and archive."
@@ -36,14 +45,11 @@ done
 
 echo "`date`: $0 COMMENCED"
 
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
-
 eval $(@LIBEXEC@/conf_read)
 
-for i in $(find $hhconfig_directories_data -maxdepth 3 -name done -type d) ; do
+for i in $(find $DATADIR -maxdepth 3 -name done -type d) ; do
     for j in $(find $i -mindepth 1 -maxdepth 1 -type d) ; do
-    short=$(echo $j | sed "s|$hhconfig_directories_data||")
+    short=$(echo $j | sed "s|$DATADIR||")
     DIR_FOUND=$(echo $short | awk -F\/ ' { print $5 } ')
     TODAY=$(date +%Y-%m-%d)
     if [ $DIR_FOUND == $TODAY ] ; then

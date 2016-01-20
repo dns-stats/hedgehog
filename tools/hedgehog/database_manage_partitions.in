@@ -90,8 +90,8 @@ else
     fi
 fi
 
-SERVERS=`psql $CONN_STRING -tc "SELECT name FROM dsc.server;"`
-PLOTS=`psql $CONN_STRING -tc "SELECT name FROM dsc.dataset;"`
+SERVERS=$(psql $CONN_STRING -tc "SELECT name FROM dsc.server;")
+PLOTS=$(psql $CONN_STRING -tc "SELECT name FROM dsc.dataset;")
 
 for server in $SERVERS
 do

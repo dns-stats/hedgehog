@@ -23,7 +23,15 @@
 # File:   datafiles_rm_empty_xml_dirs.bash
 #
 
-eval $(@LIBEXEC@/conf_read)
+# We need user with access to the data directory
+a=$(@LIBEXEC@/check_user_perms -fnc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+
+
 DATE=`date --date="- 7 day" +%Y-%m-%d`
 INCOMING="incoming"
 
@@ -49,8 +57,6 @@ while getopts ":d:h" opt; do
 done
 
 echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
 [ -z $DATE ] && usage && exit 1
 
@@ -69,18 +75,18 @@ fi
 # Date converted in seconds to be compared with processed directories date
 DATE_SECONDS=`date --utc --date "$DATE" +%s`
 
-cd $hhconfig_directories_data
+cd $DATADIR
 
 for SERVER in * ; do
 	test -L $SERVER && continue;
 	test -d $SERVER || continue;
-	cd $hhconfig_directories_data/$SERVER
+	cd $DATADIR/$SERVER
 	for NODE in * ; do
 		test -L $NODE && continue;
 		test -d $NODE || continue;
 		test -L $NODE/$DONE && continue;
         test -d $NODE/$DONE || continue;
-        cd $hhconfig_directories_data/$SERVER/$NODE/$INCOMING
+        cd $DATADIR/$SERVER/$NODE/$INCOMING
 		for MYDATE in * ; do
 			test -L $MYDATE && continue;
 			test -d $MYDATE || continue;
@@ -96,9 +102,9 @@ for SERVER in * ; do
 			my_count=`ls -1 $MYDATE | wc -l`
 			[ $my_count -eq 0 ] && rm -rf $MYDATE
 		done
-		cd $hhconfig_directories_data/$SERVER
+		cd $DATADIR/$SERVER
 	done
-	cd $hhconfig_directories_data
+	cd $DATADIR
 done
 
 echo "`date`: $0 COMPLETED"
