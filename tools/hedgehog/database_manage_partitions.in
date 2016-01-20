@@ -61,11 +61,6 @@ while getopts ":m:h" opt; do
 done
 
 echo "`date`: $0 COMMENCED"
-# USER=$(whoami)
-# [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
-#
-# DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME  -tc  "select version from dsc.version;"`
-# [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 if [ -z $PDATE ] ; then
     NOW=`date --date="+1 month" +%Y_%m`

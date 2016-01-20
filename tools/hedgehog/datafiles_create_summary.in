@@ -23,7 +23,14 @@
 # File:   datafiles_create_summary
 #
 
-eval $(@LIBEXEC@/conf_read)
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -c)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
 
 DATADIR=$hhconfig_directories_data
 LOG_FILE="dsc-extractor-xml-db.out"
@@ -58,8 +65,6 @@ while getopts ":s:n:ch" opt; do
              exit 1 ;;
     esac
 done
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
 SQ="'"
 TOTAL_FILES_REMAINING=0
