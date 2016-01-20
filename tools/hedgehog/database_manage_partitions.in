@@ -23,11 +23,20 @@
 # File:   database_manage_partitions
 #
 
-eval $(@LIBEXEC@/conf_read)
+# eval $(@LIBEXEC@/conf_read)
+#
+# REQUIRED_API_VERSION=@DB_VERSION@
+# DB_NAME=$hhconfig_database_name
+# export PGPASSWORD=$hhconfig_database_owner_pass
 
-REQUIRED_API_VERSION=@DB_VERSION@
-DB_NAME=$hhconfig_database_name
-export PGPASSWORD=$hhconfig_database_owner_pass
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -wc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
 
 usage () {
 	echo
@@ -52,11 +61,11 @@ while getopts ":m:h" opt; do
 done
 
 echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
-
-DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME  -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+# USER=$(whoami)
+# [ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+#
+# DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME  -tc  "select version from dsc.version;"`
+# [ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
 
 if [ -z $PDATE ] ; then
     NOW=`date --date="+1 month" +%Y_%m`
@@ -86,17 +95,17 @@ else
     fi
 fi
 
-SERVERS=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT name FROM dsc.server;"`
-PLOTS=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT name FROM dsc.dataset;"`
+SERVERS=`psql $CONN_STRING -tc "SELECT name FROM dsc.server;"`
+PLOTS=`psql $CONN_STRING -tc "SELECT name FROM dsc.dataset;"`
 
 for server in $SERVERS
 do
-    s_id=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT id FROM dsc.server WHERE name = '$server';"`
+    s_id=`psql $CONN_STRING -tc "SELECT id FROM dsc.server WHERE name = '$server';"`
     for plot in $PLOTS
     do
-      p_id=`psql -h $hhconfig_database_host -td $DB_NAME -c "SELECT id FROM dsc.dataset WHERE name = '$plot';"`
+      p_id=`psql $CONN_STRING -tc "SELECT id FROM dsc.dataset WHERE name = '$plot';"`
       
-      psql -h $hhconfig_database_host $DB_NAME <<EOF
+      psql $CONN_STRING <<EOF
 BEGIN;
 
 CREATE TABLE dsc.data_${server}_${plot}_${NOW} (
