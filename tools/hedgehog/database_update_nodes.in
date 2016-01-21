@@ -65,7 +65,7 @@ while getopts ":hd" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
 # Read CSV file with the following fields in order:
 fields=(server_name node_name node_region node_country node_city node_subgroup node_ip)
@@ -162,7 +162,7 @@ while read line || [[ -n "$line" ]]; do
 	echo "Processing: ${aNODES["server_name"]} ${aNODES["node_name"]} ${aNODES["node_region"]} ${aNODES["node_country"]} ${aNODES["node_city"]} ${aNODES["node_subgroup"]} ${aNODES["node_ip"]}"
 	
 	SERVER_ID=$(psql $CONN_STRING -tc "select id from server where display_name='${aNODES["server_name"]}'")
-	if [ -z $SERVER_ID ]; then
+	if [ -z "$SERVER_ID" ]; then
 		# lower case
 		SERVER_DB_NAME=${aNODES["server_name"]}
 		SERVER_DB_NAME=${SERVER_DB_NAME,,}
@@ -177,7 +177,7 @@ while read line || [[ -n "$line" ]]; do
 	if [ ${aNODES["node_ip"]} != "null" ] ; then
 		aNODES["node_ip"]="'${aNODES["node_ip"]}'"
 	fi
-	if [ -z $NODE_ID ] ; then
+	if [ -z "$NODE_ID" ] ; then
 		NODE_ID=$(psql $CONN_STRING -tqc "INSERT INTO dsc.node (server_id, name, region, country, city, subgroup, ip) VALUES ($SERVER_ID, '${aNODES["node_name"]}', '${aNODES["node_region"]}', '${aNODES["node_country"]}', '${aNODES["node_city"]}', '${aNODES["node_subgroup"]}', ${aNODES["node_ip"]});")
 		echo "Added node ${aNODES["node_name"]}"
 	else
@@ -199,4 +199,4 @@ if [ ${NEW_SERVER} -eq 1 ] ; then
 	echo
 fi
 
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"

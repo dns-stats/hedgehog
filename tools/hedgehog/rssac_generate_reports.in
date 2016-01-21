@@ -25,9 +25,9 @@
 
 #TODO(asap): Add a flag to allow the user to specify a single server to run the report for
 
-eval $(@LIBEXEC@/conf_read)
+# eval $(@LIBEXEC@/conf_read)
 
-a=$(@LIBEXEC@/check_user_perms -gc)
+a=$(@LIBEXEC@/check_user_perms -pgc)
 if [ $? -ne 0 ] ; then
 	echo $a
 	exit 1
@@ -61,10 +61,10 @@ while getopts ":d:h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
 # Validate the input date
-if [ ! -z ${INPUT_START} ] ; then
+if [ ! -z "${INPUT_START}" ] ; then
 	if [[ ! $INPUT_START =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$ ]] ; then
 			echo "Error: The start date is not in the required format of YYYY-MM-DD" 
 			exit 1
@@ -85,7 +85,7 @@ SQ="'"
 CURL_ARGS="--max-time 300 --retry 1 --get"
 # TODO: do not hardcode this path
 URL="localhost/hedgehog/brew/hedgehog.brew"
-TOP_OUTPUTDIR="$hhconfig_directories_rssac/$(date --date=${START} +%Y)/$(date --date=${START} +%m)"
+TOP_OUTPUTDIR="$RSSAC_DIR/$(date --date=${START} +%Y)/$(date --date=${START} +%m)"
 TYPES="generateYaml generatePlot"
 GVIS=0
 # Specify some strings for special handling
@@ -115,7 +115,7 @@ for SVRNM in $SERVERNMS ; do
         for PLTID in $PLOTIDS ; do
 			PLTNM=$(psql $CONN_STRING -tc "SELECT name FROM dsc.plot where id=${PLTID};" | sed 's/[[:space:]]//g')
 			# Clear out the file in the plot cache to make sure we get the most up to date plots in the reports
-			rm -rf $hhconfig_directories_plotcache/${SVRNM}/${PLTNM}/${START}-${STOP}-all*.png >/dev/null 2>&1
+			rm -rf $RSSAC_DIR/${SVRNM}/${PLTNM}/${START}-${STOP}-all*.png >/dev/null 2>&1
 			# Generate the file. Yaml gets written to the rssac directory, plots go into the plotcache
 			echo "*** Generating '${EXT}' for: " ${PLTNM}
 			CURL_URL="${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}"
@@ -126,7 +126,7 @@ for SVRNM in $SERVERNMS ; do
 			
             if [ "${TYPE}" == "generatePlot" ] ; then
 				# Retrieve the plot from the plot cache
-                PLTFILE=$(echo ${RESULT} | sed 's/^.* src="\([^"?]*\).*/\1/' | sed "s:../plotcache:$hhconfig_directories_plotcache:" | sed 's/-log//' | sed 's/-stack//')
+                PLTFILE=$(echo ${RESULT} | sed 's/^.* src="\([^"?]*\).*/\1/' | sed "s:../plotcache:$PLOT_CACHE_DIR:" | sed 's/-log//' | sed 's/-stack//')
 
                 if [ "${PLTFILE}" != "plots/no_graph.png" ] && [ "${PLTFILE}" != "plots/no_results.png" ] && [ "${PLTFILE}" != "plots/no_connection.png" ] ; then                   
 					# Report names are the same as plot names but use dash instead of underscore
@@ -145,4 +145,4 @@ for SVRNM in $SERVERNMS ; do
         done
     done
 done
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"

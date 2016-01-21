@@ -32,7 +32,7 @@ fi
 eval $a
 
 
-DATE=`date --date="- 7 day" +%Y-%m-%d`
+DATE=$(date --date="- 7 day" +%Y-%m-%d)
 INCOMING="incoming"
 
 usage () {
@@ -56,9 +56,9 @@ while getopts ":d:h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
-[ -z $DATE ] && usage && exit 1
+[ -z "$DATE" ] && usage && exit 1
 
 # Validate the start date
 if [[ ! $DATE =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$ ]] ; then
@@ -73,7 +73,7 @@ if [ ${is_valid} -ne 0 ] ; then
 fi
 
 # Date converted in seconds to be compared with processed directories date
-DATE_SECONDS=`date --utc --date "$DATE" +%s`
+DATE_SECONDS=$(date --utc --date "$DATE" +%s)
 
 cd $DATADIR
 
@@ -96,10 +96,10 @@ for SERVER in * ; do
 				continue;
 			fi
 			# Check if directory is older than DATE
-			MYDATE_SECONDS=`date --utc --date "$MYDATE" +%s`
+			MYDATE_SECONDS=$(date --utc --date "$MYDATE" +%s)
 			[ $MYDATE_SECONDS -ge $DATE_SECONDS ] && continue;
 			# Remove empty directories
-			my_count=`ls -1 $MYDATE | wc -l`
+			my_count=$(ls -1 $MYDATE | wc -l)
 			[ $my_count -eq 0 ] && rm -rf $MYDATE
 		done
 		cd $DATADIR/$SERVER
@@ -107,4 +107,4 @@ for SERVER in * ; do
 	cd $DATADIR
 done
 
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"

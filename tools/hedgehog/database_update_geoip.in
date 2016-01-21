@@ -53,7 +53,7 @@ while getopts ":h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
 cd $TMP_DIR
 rm -f GeoLite2-City-CSV.zip.md5

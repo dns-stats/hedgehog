@@ -55,9 +55,9 @@ while getopts ":h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
-if [ ! -d $TLDS_DIR ] ; then
+if [ ! -d "$TLDS_DIR" ] ; then
 	echo "No tlds.d dir found. Expecting a dir $TLDS_DIR... done..."
 	exit 1
 fi
@@ -91,7 +91,7 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
   		continue
   	fi
     
-  	if [ -z $TLDTYPE ] ; then
+  	if [ -z "$TLDTYPE" ] ; then
     	echo "Missing TLD type field for alabel $ALABEL - alabel ignored"
     	continue
     fi

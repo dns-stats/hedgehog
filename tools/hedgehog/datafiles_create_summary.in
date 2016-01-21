@@ -66,11 +66,10 @@ while getopts ":s:n:cdh" opt; do
     esac
 done
 
-SQ="'"
 TOTAL_FILES_REMAINING=0
 
 if [ -z "${SERVER_NAME}" ] ; then
-	SERVER_NAMES=`ls -1 ${DATADIR}`
+	SERVER_NAMES=$(ls -1 ${DATADIR})
 else 
 	SERVER_NAMES=$SERVER_NAME
 fi
@@ -85,7 +84,7 @@ for SERVER in $SERVER_NAMES ; do
 	test -d $DATADIR/$SERVER || continue;
 
 	if [ -z "${NODE_NAME}" ] ; then
-		NODE_NAMES=`ls -1 $DATADIR/$SERVER`
+		NODE_NAMES=$(ls -1 $DATADIR/$SERVER)
 	else 
 		NODE_NAMES=$NODE_NAME
 	fi
@@ -93,13 +92,13 @@ for SERVER in $SERVER_NAMES ; do
 	for NAME in $NODE_NAMES  ; do
 
 		FILE_NAME=$DATADIR/$SERVER/$NAME/$LOG_FILE
-		if [ ! -f ${FILE_NAME} ] ; then
+		if [ ! -f "${FILE_NAME}" ] ; then
 			continue
 		fi
 		
 		# Get the last date that import started:
-		IMPORT_START_TIME=`tac ${FILE_NAME} | grep -e '--' -m1 | awk '{print $2, $3}' | sed -e 's/^ *//' -e 's/ *$//'`
-		IMPORT_LATEST_TIME=`tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $1, $2}' | sed -e 's/^ *//' -e 's/ *$//'`
+		IMPORT_START_TIME=$(tac ${FILE_NAME} | grep -e '--' -m1 | awk '{print $2, $3}' | sed -e 's/^ *//' -e 's/ *$//')
+		IMPORT_LATEST_TIME=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $1, $2}' | sed -e 's/^ *//' -e 's/ *$//')
 		if [[ "${IMPORT_LATEST_TIME}" =~ ^[a-zA-Z] ]] ; then
 			IMPORT_LATEST_TIME="Old format"
 			FOUND_FILES=""
@@ -107,17 +106,17 @@ for SERVER in $SERVER_NAMES ; do
 			FILES_FAILED=""
 			LAST_FILE=""
 		else
-			FOUND_FILES=`tac ${FILE_NAME} | grep -e 'Found' -m 1 | awk '{print $3}'`
+			FOUND_FILES=$(tac ${FILE_NAME} | grep -e 'Found' -m 1 | awk '{print $3}')
 			if [[ "${FOUND_FILES}" =~ ^\. ]] ; then
 				FOUND_FILES="Old format"
 				FILES_REMAINING_NUMBER=""
 				FILES_FAILED=""
 				LAST_FILE=""
 			fi	
-			FILES_REMAINING=`tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $6, $8, $9}' | sed -e 's/^ *//' -e 's/ *$//' `
-			FILES_REMAINING_NUMBER=`echo $FILES_REMAINING | awk '{print $1}' | sed -e 's/^ *//' -e 's/ *$//' `
-			FILES_FAILED=`echo $FILES_REMAINING | sed 's/(//'  | awk '{print $2}' | sed -e 's/^ *//' -e 's/ *$//' `
-			LAST_FILE=`tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $5}' | sed -e 's/^ *//' -e 's/ *$//' `
+			FILES_REMAINING=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $6, $8, $9}' | sed -e 's/^ *//' -e 's/ *$//')
+			FILES_REMAINING_NUMBER=$(echo $FILES_REMAINING | awk '{print $1}' | sed -e 's/^ *//' -e 's/ *$//')
+			FILES_FAILED=$(echo $FILES_REMAINING | sed 's/(//'  | awk '{print $2}' | sed -e 's/^ *//' -e 's/ *$//')
+			LAST_FILE=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $5}' | sed -e 's/^ *//' -e 's/ *$//')
 			(( TOTAL_FILES_REMAINING = TOTAL_FILES_REMAINING + FILES_REMAINING_NUMBER ))		
 		fi
 		

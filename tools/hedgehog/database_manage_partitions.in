@@ -21,21 +21,14 @@
 
 # 
 # File:   database_manage_partitions
-#
-
-# eval $(@LIBEXEC@/conf_read)
-#
-# REQUIRED_API_VERSION=@DB_VERSION@
-# DB_NAME=$hhconfig_database_name
-# export PGPASSWORD=$hhconfig_database_owner_pass
 
 # We need a write user
 a=$(@LIBEXEC@/check_user_perms -wc)
 if [ $? -ne 0 ] ; then
-	echo $a
+	echo "$a"
 	exit 1
 fi
-eval $a
+eval "$a"
 export PGPASSWORD=$PGPASSWORD
 
 usage () {
@@ -43,7 +36,7 @@ usage () {
 	echo "Create a new set of partitioned data tables in the database to hold imported data."
 	echo "The partitions are created per month of data."
 	echo
-	echo "Usage: $(basename $0) options"
+	echo "Usage: $(basename "$0") options"
 	echo
 	echo "Supported options:"
 	echo " -m Month to create partitions for (default is next month, format YYYY-MM)."
@@ -60,11 +53,11 @@ while getopts ":m:h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
-if [ -z $PDATE ] ; then
-    NOW=`date --date="+1 month" +%Y_%m`
-    NEXT=`date --date="+2 month" +%Y_%m`
+if [ -z "$PDATE" ] ; then
+    NOW=$(date --date="+1 month" +%Y_%m)
+    NEXT=$(date --date="+2 month" +%Y_%m)
 else
 	if [[ ! $PDATE =~ ^[0-9]{4}-[0-1][0-9]$ ]] ; then
 			echo "Error: The start date is not in the required format of YYYY-MM" 
@@ -78,15 +71,15 @@ else
 		exit 1
 	fi
 	
-    NOW=`date --date="$PDATE-01" +%Y_%m`
+    NOW=$(date --date="$PDATE-01" +%Y_%m)
     
     IFS='_' read -a YM <<< "$NOW"
     YEAR=${YM[0]}
     MONTH=${YM[1]}
-    NEXT="${YEAR}_`expr $MONTH + 1`"
+    NEXT="${YEAR}_$(( MONTH + 1))"
 
-    if [ $MONTH -eq 12 ] ; then
-        NEXT=`expr ${YEAR} + 1`"_01"
+    if [ "$MONTH" -eq 12 ] ; then
+        NEXT=$((YEAR + 1))"_01"
     fi
 fi
 
@@ -95,10 +88,10 @@ PLOTS=$(psql $CONN_STRING -tc "SELECT name FROM dsc.dataset;")
 
 for server in $SERVERS
 do
-    s_id=`psql $CONN_STRING -tc "SELECT id FROM dsc.server WHERE name = '$server';"`
+    s_id=$(psql $CONN_STRING -tc "SELECT id FROM dsc.server WHERE name = '$server';")
     for plot in $PLOTS
     do
-      p_id=`psql $CONN_STRING -tc "SELECT id FROM dsc.dataset WHERE name = '$plot';"`
+      p_id=$(psql $CONN_STRING -tc "SELECT id FROM dsc.dataset WHERE name = '$plot';")
       
       psql $CONN_STRING <<EOF
 BEGIN;
@@ -119,4 +112,4 @@ EOF
     done
 done
 
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"

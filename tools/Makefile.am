@@ -43,7 +43,7 @@ hedgehog/utility_prepare_GeoLite2-City-Locations-en: $(srcdir)/hedgehog/utility_
 	$(do_subst_python) < $(srcdir)/hedgehog/utility_prepare_GeoLite2-City-Locations-en.in > hedgehog/utility_prepare_GeoLite2-City-Locations-en
 	
 refile_and_grok: refile_and_grok.in Makefile
-	$(subst_LIBEXECDATA) < $(srcdir)/refile_and_grok.in | $(subst_DB_VERSION) | $(subst_BIN) > refile_and_grok
+	$(subst_LIBEXECDATA) < $(srcdir)/refile_and_grok.in | $(subst_BIN) > refile_and_grok
 
 hedgehogctl: hedgehogctl.in Makefile
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehogctl.in > hedgehogctl
@@ -62,19 +62,19 @@ hedgehog/database_init: $(srcdir)/hedgehog/database_init.in Makefile
 
 hedgehog/database_manage_partitions: $(srcdir)/hedgehog/database_manage_partitions.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_manage_partitions.in | $(subst_DB_VERSION) > hedgehog/database_manage_partitions
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_manage_partitions.in > hedgehog/database_manage_partitions
 
 hedgehog/database_update_geoip: $(srcdir)/hedgehog/database_update_geoip.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_geoip.in | $(subst_DB_VERSION) > hedgehog/database_update_geoip
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_geoip.in > hedgehog/database_update_geoip
 
 hedgehog/database_update_nodes: $(srcdir)/hedgehog/database_update_nodes.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_nodes.in | $(subst_DB_VERSION) > hedgehog/database_update_nodes
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_nodes.in > hedgehog/database_update_nodes
 
 hedgehog/database_update_tlds: $(srcdir)/hedgehog/database_update_tlds.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_tlds.in | $(subst_DB_VERSION) > hedgehog/database_update_tlds
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_tlds.in > hedgehog/database_update_tlds
 
 hedgehog/datafiles_create_summary: $(srcdir)/hedgehog/datafiles_create_summary.in Makefile
 	mkdir -p hedgehog
@@ -90,23 +90,23 @@ hedgehog/datafiles_tar_old_xml_files: $(srcdir)/hedgehog/datafiles_tar_old_xml_f
 
 hedgehog/plotcache_generate_cached_plots: $(srcdir)/hedgehog/plotcache_generate_cached_plots.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/plotcache_generate_cached_plots.in | $(subst_DB_VERSION) > hedgehog/plotcache_generate_cached_plots
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/plotcache_generate_cached_plots.in > hedgehog/plotcache_generate_cached_plots
 
 hedgehog/plotcache_rm_cached_plots: $(srcdir)/hedgehog/plotcache_rm_cached_plots.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/plotcache_rm_cached_plots.in | $(subst_DB_VERSION) > hedgehog/plotcache_rm_cached_plots
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/plotcache_rm_cached_plots.in > hedgehog/plotcache_rm_cached_plots
 
 hedgehog/rssac_generate_reports: $(srcdir)/hedgehog/rssac_generate_reports.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/rssac_generate_reports.in | $(subst_DB_VERSION) > hedgehog/rssac_generate_reports
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/rssac_generate_reports.in > hedgehog/rssac_generate_reports
 
 hedgehog/database_process_rssac_data: $(srcdir)/hedgehog/database_process_rssac_data.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_process_rssac_data.in | $(subst_DB_VERSION) > hedgehog/database_process_rssac_data
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_process_rssac_data.in > hedgehog/database_process_rssac_data
 
 hedgehog/database_rm_old_rssac_data: $(srcdir)/hedgehog/database_rm_old_rssac_data.in Makefile
 	mkdir -p hedgehog
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_rm_old_rssac_data.in | $(subst_DB_VERSION) > hedgehog/database_rm_old_rssac_data
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_rm_old_rssac_data.in > hedgehog/database_rm_old_rssac_data
 
 hedgehog/DDL_updates/000010_ddl_python: $(srcdir)/hedgehog/DDL_updates/000010_ddl_python.in Makefile
 	mkdir -p hedgehog/DDL_updates

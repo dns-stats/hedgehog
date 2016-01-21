@@ -43,11 +43,9 @@ while getopts ":h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
-eval $(@LIBEXEC@/conf_read)
-
-for i in $(find $DATADIR -maxdepth 3 -name done -type d) ; do
+for i in $(find $DATADIR -maxdepth 3 -name "done" -type d) ; do
     for j in $(find $i -mindepth 1 -maxdepth 1 -type d) ; do
     short=$(echo $j | sed "s|$DATADIR||")
     DIR_FOUND=$(echo $short | awk -F\/ ' { print $5 } ')
@@ -61,4 +59,4 @@ for i in $(find $DATADIR -maxdepth 3 -name done -type d) ; do
   done
 done
 
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"

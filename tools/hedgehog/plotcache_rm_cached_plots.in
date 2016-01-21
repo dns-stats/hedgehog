@@ -56,7 +56,7 @@ while getopts ":ah" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
 if [ $REMOVE_ALL -eq 1 ] ; then
 	echo "Removing all cached plots from $PLOT_CACHE_DIR"
@@ -104,4 +104,4 @@ while true ; do
 	echo "Do you want to remove another plot?"
 done
 
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"

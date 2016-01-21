@@ -26,13 +26,13 @@
 # We need a write user
 a=$(@LIBEXEC@/check_user_perms -wc)
 if [ $? -ne 0 ] ; then
-	echo $a
+	echo "$a"
 	exit 1
 fi
-eval $a
+eval "$a"
 export PGPASSWORD=$PGPASSWORD
 
-DEFAULT_DAY=`date --date="- 7 day" +%Y-%m-%d`
+DEFAULT_DAY=$(date --date="- 7 day" +%Y-%m-%d)
 START=${DEFAULT_DAY}
 FORCE_SUM_DEL=0
 DELETE_RAW=0
@@ -63,7 +63,7 @@ while getopts ":d:fDh" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
+echo "$(date): $0 COMMENCED"
 
 
 # Validate the start date
@@ -115,8 +115,8 @@ for SERVER_ID in $SERVER_IDS ;do
     SERVER_NAME=$(psql $CONN_STRING -tc "SELECT name FROM dsc.server WHERE id=${SERVER_ID};" | tr -d [[:space:]])
     NODE_COUNT=$(psql $CONN_STRING -tc "SELECT count(*) FROM dsc.node where server_id=${SERVER_ID};")
     NODE_IDS=$(psql $CONN_STRING -tc "SELECT id FROM dsc.node where server_id=${SERVER_ID} order by id;")
-    MONTH=`date --date="${START}" +%m`
-    YEAR=`date --date="${START}" +%Y`
+    MONTH=$(date --date="${START}" +%m)
+    YEAR=$(date --date="${START}" +%Y)
     # Could do this work directly on dsc.data instead
     UNIQUE_SOURCE_RAW_TABLE_NAME="dsc.data_${SERVER_NAME}_${UNIQUE_SOURCE_RAW_PLOT_NAME}_${YEAR}_${MONTH}"
     UNIQUE_SOURCE_SUM_TABLE_NAME="dsc.data_${SERVER_NAME}_${UNIQUE_SOURCE_SUM_PLOT_NAME}_${YEAR}_${MONTH}"
@@ -129,7 +129,7 @@ for SERVER_ID in $SERVER_IDS ;do
 		# First up, check that there isn't an entry in the summary table for this node. 
 		# Note that if there is actually data when the transaction occurs then the insert will fail and the transaction will rollback.
 		SUMMARY_TABLE_ENTRY=$(psql $CONN_STRING -tc "SELECT count(*) FROM ${UNIQUE_SOURCE_SUM_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;")
-		if [ ${SUMMARY_TABLE_ENTRY} != "0" ] ; then
+		if [ "${SUMMARY_TABLE_ENTRY}" != "0" ] ; then
 			if [ ${FORCE_SUM_DEL} -eq 1 ] ; then
 				echo "Summary data already exists for node id = ${NODE_ID}... Force flag was used overwriting summary data!"
 				DELETE_SUMMARY_SQL="DELETE FROM ${UNIQUE_SOURCE_SUM_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;"
@@ -146,9 +146,9 @@ for SERVER_ID in $SERVER_IDS ;do
 		IPv4_SUMMARY_RESULT=$(psql $CONN_STRING -tc "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV4_key}';")
 		IPv6_SUMMARY_RESULT=$(psql $CONN_STRING -tc "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV6_key}';")
 		IPv6_ag_SUMMARY_RESULT=$(psql $CONN_STRING -tc "SELECT y from unique_source_summary_function(${SERVER_ID}, ${UNIQUE_SOURCE_RAW_PLOT_ID}, TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC', TIMESTAMP '${START} 23:59:00' AT TIME ZONE 'UTC', '${NODE_ID}') WHERE x='${IPV6_ag_key}';")
-		if [ ! -z ${IPv4_SUMMARY_RESULT} ] ; then IPV4_value=${IPv4_SUMMARY_RESULT} ; fi
-		if [ ! -z ${IPv6_SUMMARY_RESULT} ] ; then IPV6_value=${IPv6_SUMMARY_RESULT} ; fi
-		if [ ! -z ${IPv6_ag_SUMMARY_RESULT} ] ; then IPV6_ag_value=${IPv6_ag_SUMMARY_RESULT} ; fi
+		if [ ! -z "${IPv4_SUMMARY_RESULT}" ] ; then IPV4_value=${IPv4_SUMMARY_RESULT} ; fi
+		if [ ! -z "${IPv6_SUMMARY_RESULT}" ] ; then IPV6_value=${IPv6_SUMMARY_RESULT} ; fi
+		if [ ! -z "${IPv6_ag_SUMMARY_RESULT}" ] ; then IPV6_ag_value=${IPv6_ag_SUMMARY_RESULT} ; fi
 								
 		# Time to delete the raw data if that is what we were told to do						
 		if [ ${DELETE_RAW} -eq 1 ] ; then
@@ -168,5 +168,5 @@ COMMIT;
 EOF
 	done
 done
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"
 exit 0
