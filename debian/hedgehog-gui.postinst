@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
-chown -R www-data:www-data /var/lib/hedgehog/www/
+# Make /var/lib/hedgehog/data writeable by www-data:www-data user
+if ! dpkg-statoverride --list /var/lib/hedgehog/www/ >/dev/null; then
+  dpkg-statoverride --update --add www-data www-data 0755 /var/lib/hedgehog/www/ >/dev/null 2>/dev/null || true
+fi
 
 #DEBHELPER#

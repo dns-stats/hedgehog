@@ -1,7 +1,13 @@
 #!/bin/sh
 set -e
 
-adduser --system --group --no-create-home --home /nonexistent hedgehog
-chown hedgehog:hedgehog /var/lib/hedgehog/data
+if ! getent passwd hedgehog > /dev/null; then
+  adduser --system --group --no-create-home --home /nonexistent hedgehog
+fi
+
+# Make /var/lib/hedgehog/data writeable by hedgehog:hedgehog user
+if ! dpkg-statoverride --list /var/lib/hedgehog/data >/dev/null; then
+  dpkg-statoverride --update --add hedgehog hedgehog 0755 /var/lib/hedgehog/data >/dev/null 2>/dev/null || true
+fi
 
 #DEBHELPER#

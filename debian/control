@@ -73,6 +73,7 @@ Depends: ${misc:Depends},
          r-cran-ggplot2,
          r-cran-reshape,
          r-cran-rjson,
+         r-cran-rpostgresql,
          r-hedgehog-rpostgresqlhelper,
          unifont,
          libcairo2-dev,
@@ -114,3 +115,18 @@ Description: GNU R package for Hedgehog R PostgreSQL Helper
  acquired with the DSC collector.
  .
  This package contains GNU R PostgreSQL Helper used by Hedgehog.
+
+Package: hedgehog
+Architecture: all
+Section: web
+Depends: r-hedgehog-rpostgresqlhelper,
+         hedgehog-dsc-extractor,
+         hedgehog-gui,
+         hedgehog-doc,
+         hedgehog-common,
+         hedgehog-database
+Description: visualisation tool for DNS [common files]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package installs all components.

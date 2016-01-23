@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+if test "$1" = "purge"; then
+    # this could be wrapped inside debconf question whether to remove the data or not
+    rm -f /var/lib/hedgehog/www/
+    dpkg-statoverride --remove /var/lib/hedgehog/www/ >/dev/null 2>/dev/null || true
+fi
+
+#DEBHELPER#
