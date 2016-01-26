@@ -28,8 +28,9 @@ Depends: ${misc:Depends},
          ${python:Depends},
          postgresql-9.3-ip4r,
          postgresql-plpython-9.3,
-         python-ipy
-Suggests: hedgehog-doc
+         python-ipy,
+Suggests: hedgehog-doc,
+          unbound
 Description: visualisation tool for DNS [Database setup file]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -117,7 +118,6 @@ Description: GNU R package for Hedgehog R PostgreSQL Helper
 
 Package: hedgehog
 Architecture: all
-Section: web
 Depends: r-hedgehog-rpostgresqlhelper,
          hedgehog-dsc-extractor,
          hedgehog-gui,
