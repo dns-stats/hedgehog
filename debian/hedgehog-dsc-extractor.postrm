@@ -1,15 +1,15 @@
 #!/bin/sh
 set -e
 
-if getent passwd hedgehog > /dev/null; then
-  deluser --system hedgehog
-  deluser --system --group --only-if-empty hedgehog
-fi
-
 if test "$1" = "purge"; then
     # this could be wrapped inside debconf question whether to remove the data or not
     rm -f /var/lib/hedgehog/data
     dpkg-statoverride --remove /var/lib/hedgehog/data >/dev/null 2>/dev/null || true
+fi
+
+if getent passwd hedgehog > /dev/null; then
+  deluser --system hedgehog
+  deluser --system --group --only-if-empty hedgehog
 fi
 
 #DEBHELPER#
