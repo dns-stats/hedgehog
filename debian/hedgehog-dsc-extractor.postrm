@@ -8,7 +8,7 @@ if test "$1" = "purge"; then
 
     if getent passwd hedgehog > /dev/null; then
       deluser --system hedgehog
-      deluser --system --group --only-if-empty hedgehog
+#      deluser --system --group --only-if-empty hedgehog
     fi
 fi
 
