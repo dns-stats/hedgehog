@@ -23,12 +23,16 @@
 # File:   database_update_geoip
 #
 
-eval $(@LIBEXEC@/conf_read)
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -wc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
 
-REQUIRED_API_VERSION=@DB_VERSION@
-DB_NAME=$hhconfig_database_name
 TMP_DIR=/tmp
-export PGPASSWORD=$hhconfig_database_owner_pass
 
 usage () {
 	echo
@@ -49,12 +53,7 @@ while getopts ":h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
-
-DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+echo "$(date): $0 COMMENCED"
 
 cd $TMP_DIR
 rm -f GeoLite2-City-CSV.zip.md5
@@ -82,7 +81,7 @@ echo "Preparing City Blocks data..."
 echo "Preparing Location data..."
 @LIBEXEC@/utility_prepare_GeoLite2-City-Locations-en
 			
-psql -h $hhconfig_database_host $DB_NAME << EOF                                                                                                                                          
+psql $CONN_STRING << EOF                                                                                                                                          
 BEGIN;
 delete from geoip;
 \copy geoip (ip_range, geoname, latitude, longitude) from '/tmp/blocks_ready_to_import.csv' (HEADER false, DELIMITER ',', FORMAT 'csv')

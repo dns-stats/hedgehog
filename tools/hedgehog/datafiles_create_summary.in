@@ -23,13 +23,18 @@
 # File:   datafiles_create_summary
 #
 
-eval $(@LIBEXEC@/conf_read)
+# We need user with access to the data directory
+a=$(@LIBEXEC@/check_user_perms -fnc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
 
-DATADIR=$hhconfig_directories_data
+
 LOG_FILE="dsc-extractor-xml-db.out"
 NODE_NAME=""
 SERVER_NAME=""
-DB_NAME=$hhconfig_database_name
 FORMAT_STRING="-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
 FORMAT_SEP="|"
 
@@ -43,13 +48,15 @@ usage () {
 	echo "	-s Only report on the server with this name (default is all servers)"
 	echo "	-n Only report on the node with this name (default is all nodes)"
 	echo "	-c Output in csv format for import into spreadsheet application"
+  echo "  -d Run in debug mode (set -x)"
 	echo "	-h Show this help."
 }
 
-while getopts ":s:n:ch" opt; do
+while getopts ":s:n:cdh" opt; do
     case $opt in
 		n  ) NODE_NAME=$OPTARG ;;
-		s  ) SERVER_NAME=$OPTARG ;;		
+		s  ) SERVER_NAME=$OPTARG ;;
+    d  ) set -x ;;
 		c  ) FORMAT_STRING=""
 		     FORMAT_SEP=',';;
         h  ) usage
@@ -58,14 +65,11 @@ while getopts ":s:n:ch" opt; do
              exit 1 ;;
     esac
 done
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
 
-SQ="'"
 TOTAL_FILES_REMAINING=0
 
 if [ -z "${SERVER_NAME}" ] ; then
-	SERVER_NAMES=`ls -1 ${DATADIR}`
+	SERVER_NAMES=$(ls -1 ${DATADIR})
 else 
 	SERVER_NAMES=$SERVER_NAME
 fi
@@ -80,7 +84,7 @@ for SERVER in $SERVER_NAMES ; do
 	test -d $DATADIR/$SERVER || continue;
 
 	if [ -z "${NODE_NAME}" ] ; then
-		NODE_NAMES=`ls -1 $DATADIR/$SERVER`
+		NODE_NAMES=$(ls -1 $DATADIR/$SERVER)
 	else 
 		NODE_NAMES=$NODE_NAME
 	fi
@@ -88,13 +92,13 @@ for SERVER in $SERVER_NAMES ; do
 	for NAME in $NODE_NAMES  ; do
 
 		FILE_NAME=$DATADIR/$SERVER/$NAME/$LOG_FILE
-		if [ ! -f ${FILE_NAME} ] ; then
+		if [ ! -f "${FILE_NAME}" ] ; then
 			continue
 		fi
 		
 		# Get the last date that import started:
-		IMPORT_START_TIME=`tac ${FILE_NAME} | grep -e '--' -m1 | awk '{print $2, $3}' | sed -e 's/^ *//' -e 's/ *$//'`
-		IMPORT_LATEST_TIME=`tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $1, $2}' | sed -e 's/^ *//' -e 's/ *$//'`
+		IMPORT_START_TIME=$(tac ${FILE_NAME} | grep -e '--' -m1 | awk '{print $2, $3}' | sed -e 's/^ *//' -e 's/ *$//')
+		IMPORT_LATEST_TIME=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $1, $2}' | sed -e 's/^ *//' -e 's/ *$//')
 		if [[ "${IMPORT_LATEST_TIME}" =~ ^[a-zA-Z] ]] ; then
 			IMPORT_LATEST_TIME="Old format"
 			FOUND_FILES=""
@@ -102,17 +106,17 @@ for SERVER in $SERVER_NAMES ; do
 			FILES_FAILED=""
 			LAST_FILE=""
 		else
-			FOUND_FILES=`tac ${FILE_NAME} | grep -e 'Found' -m 1 | awk '{print $3}'`
+			FOUND_FILES=$(tac ${FILE_NAME} | grep -e 'Found' -m 1 | awk '{print $3}')
 			if [[ "${FOUND_FILES}" =~ ^\. ]] ; then
 				FOUND_FILES="Old format"
 				FILES_REMAINING_NUMBER=""
 				FILES_FAILED=""
 				LAST_FILE=""
 			fi	
-			FILES_REMAINING=`tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $6, $8, $9}' | sed -e 's/^ *//' -e 's/ *$//' `
-			FILES_REMAINING_NUMBER=`echo $FILES_REMAINING | awk '{print $1}' | sed -e 's/^ *//' -e 's/ *$//' `
-			FILES_FAILED=`echo $FILES_REMAINING | sed 's/(//'  | awk '{print $2}' | sed -e 's/^ *//' -e 's/ *$//' `
-			LAST_FILE=`tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $5}' | sed -e 's/^ *//' -e 's/ *$//' `
+			FILES_REMAINING=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $6, $8, $9}' | sed -e 's/^ *//' -e 's/ *$//')
+			FILES_REMAINING_NUMBER=$(echo $FILES_REMAINING | awk '{print $1}' | sed -e 's/^ *//' -e 's/ *$//')
+			FILES_FAILED=$(echo $FILES_REMAINING | sed 's/(//'  | awk '{print $2}' | sed -e 's/^ *//' -e 's/ *$//')
+			LAST_FILE=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $5}' | sed -e 's/^ *//' -e 's/ *$//')
 			(( TOTAL_FILES_REMAINING = TOTAL_FILES_REMAINING + FILES_REMAINING_NUMBER ))		
 		fi
 		

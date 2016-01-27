@@ -23,13 +23,16 @@
 # File:   database_update_tlds
 #
 
-eval $(@LIBEXEC@/conf_read)
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -wc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
 
-REQUIRED_API_VERSION=@DB_VERSION@
-DB_NAME=$hhconfig_database_name
-DATA_DIR=$hhconfig_directories_data
-TLDS_DIR=$hhconfig_directories_conf/tlds.d
-export PGPASSWORD=$hhconfig_database_owner_pass
+TLDS_DIR=$CONF_DIR/tlds.d
 
 usage () {
 	echo
@@ -52,15 +55,9 @@ while getopts ":h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
+echo "$(date): $0 COMMENCED"
 
-DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
-
-
-if [ ! -d $TLDS_DIR ] ; then
+if [ ! -d "$TLDS_DIR" ] ; then
 	echo "No tlds.d dir found. Expecting a dir $TLDS_DIR... done..."
 	exit 1
 fi
@@ -94,18 +91,12 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
   		continue
   	fi
     
-  	if [ -z $TLDTYPE ] ; then
+  	if [ -z "$TLDTYPE" ] ; then
     	echo "Missing TLD type field for alabel $ALABEL - alabel ignored"
     	continue
     fi
     
-    # Check if this tld already exists
-    # CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tlds where alabel = lower('${ALABEL}')")
-    # [ ! $CHECK -eq 0 ] && continue
-    # CHECK=$(psql -h $hhconfig_database_host $DB_NAME -tc "select count(*) from tld_types where type_name = '${TLDTYPE}'")
-    # [ ! $CHECK -eq 1 ] && continue
-    
-    echo $(psql -h $hhconfig_database_host $DB_NAME -tc "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'")
+    psql $CONN_STRING -tc "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'"
 
   done < ${TLD_FILE}
 done

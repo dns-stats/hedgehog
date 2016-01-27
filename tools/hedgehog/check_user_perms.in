@@ -41,14 +41,17 @@ usage () {
   echo "Optionally specify DB version checking, directory permission checking"
   echo "or check for write access to the DB."
   echo
-  echo "Usage: $(basename $0) options"
+  echo "Usage: $(basename "$0") options"
   echo
   echo "Supported options:"
   echo "  -C <API_VERSION> specify DB API version to check for (implies -c)"
+  echo "  -n Indicate that the user doesn't need to access the database"
   echo "  -s <SERIAL_NUMBER> check DB serial number"
   echo "  -c check databse API version against the build time API version"
   echo "  -f check user has write permission to $hhconfig_directories_data"
   echo "  -g check user has write permission to web directory ${hhconfig_directories_rssac%rssac}"
+  echo "  -p check user has write permission to plotcache directory $hhconfig_directories_plotcache"
+  echo "  -r check user has write permission to rssac directory ${hhconfig_directories_rssac}"
   echo "  -w check we are a write user of the DB"
   echo "  -U specify a DB user"
   echo "  -P specify a DB password"
@@ -61,21 +64,28 @@ WRITER=0
 CHECK_API=0
 CHECK_SERIAL=0
 CHECK_DATA_DIR=0
+CHECK_WEB_DIR=0
 CHECK_RSSAC_DIR=0
+CHECK_PLOT_CACHE_DIR=0
 SPECIFIED_PASS=""
 SPECIFIED_USER=""
+# By default check for a database connection
+CHECK_DB_CONN=1
 
 REQUIRED_API_VERSION=@DB_VERSION@
 
-while getopts ":C:cdfgP:s:U:whv" opt; do
+while getopts ":C:ncdfgprP:s:U:whv" opt; do
     case $opt in
     C  ) REQUIRED_API_VERSION=$OPTARG
          CHECK_API=1 ;;
+    n  ) CHECK_DB_CONN=0 ;;
     c  ) CHECK_API=1 ;;
     d  ) set -x ;;
     f  ) CHECK_DATA_DIR=1 ;;
-    g  ) CHECK_RSSAC_DIR=1 ;;
+    g  ) CHECK_WEB_DIR=1 ;;
+    p  ) CHECK_PLOT_CACHE_DIR=1 ;;
     P  ) SPECIFIED_PASS=$OPTARG ;;
+    p  ) CHECK_RSSAC_DIR=1 ;;
     s  ) CHECK_SERIAL=1
          REQUIRED_DDL_SERIAL=$OPTARG ;;
     U  ) SPECIFIED_USER=$OPTARG ;;
@@ -88,92 +98,94 @@ while getopts ":C:cdfgP:s:U:whv" opt; do
          exit 1 ;;
     esac
 done
+if [ $CHECK_DB_CONN -eq 1 ] ; then
 
-USER_NAME=$hhconfig_database_read_user
-if [ -z $USER_NAME ]; then
-  echo "Database user name not set"
-  exit 1
-fi
-export PGPASSWORD="$hhconfig_database_read_pass"
-if [ $WRITER -eq 1 ] ; then
-  USER_NAME=$hhconfig_database_owner
-  export PGPASSWORD="$hhconfig_database_owner_pass"
-fi
-if [ -n "$SPECIFIED_USER" ] ; then
-  USER_NAME=$SPECIFIED_USER
-  export PGPASSWORD="$SPECIFIED_PASS"
-fi
+  USER_NAME=$hhconfig_database_read_user
+  if [ -z "$USER_NAME" ]; then
+    echo "Database user name not set"
+    exit 1
+  fi
+  export PGPASSWORD="$hhconfig_database_read_pass"
+  if [ $WRITER -eq 1 ] ; then
+    USER_NAME=$hhconfig_database_owner
+    export PGPASSWORD="$hhconfig_database_owner_pass"
+  fi
+  if [ -n "$SPECIFIED_USER" ] ; then
+    USER_NAME=$SPECIFIED_USER
+    export PGPASSWORD="$SPECIFIED_PASS"
+  fi
 
-# If the password is set then assume md5 authentication otherwise you must be
-# a user with the same name as the hedgehog database owner and are using peer
-# authentication
-if [ -z "$PGPASSWORD" ] ; then
-  USER=$(whoami)
-  if [ "$USER" != "$USER_NAME" ] ; then
-    echo "Must be user: $USER_NAME and using peer authentication to run this script"
+  # If the password is set then assume md5 authentication otherwise you must be
+  # a user with the same name as the hedgehog database owner and are using peer
+  # authentication
+  if [ -z "$PGPASSWORD" ] ; then
+    USER=$(whoami)
+    if [ "$USER" != "$USER_NAME" ] ; then
+      echo "Must be user: $USER_NAME and using peer authentication to run this script"
+      exit 1
+    fi
+  fi
+
+  PORT=$hhconfig_database_port
+  if [ -z "$PORT" ] ; then
+    PORT=5432
+  fi
+  DB_NAME=$hhconfig_database_name
+  if [ -z "$DB_NAME" ] ; then
+    echo "Database name not set"
+    exit 1
+  fi
+  DB_HOST=$hhconfig_database_host
+  if [ -z "$DB_HOST" ]; then
+    echo "Database host not set"
+    exit 1
+  fi
+
+  CONN_STRING="-h $DB_HOST -U $USER_NAME -p $PORT -d $DB_NAME"
+  # Test connection to the database
+  psql $CONN_STRING -tc "\conninfo" > /dev/null
+  if [ $? -ne 0 ] ; then
+    echo "Error connecting to database using connection string $CONN_STRING"
+    exit 1
+  fi
+
+  # Now test the optional parameters...
+  TEST=$(psql $CONN_STRING -tc "SELECT has_table_privilege('dsc.version', 'SELECT')" | tr -d '[:space:]')
+  if [ $WRITER -eq 1 ] ; then
+    TEST=$(psql $CONN_STRING -tc "SELECT has_table_privilege('dsc.version', 'INSERT')" | tr -d '[:space:]')
+  fi
+
+  if [ "x$TEST" == "xt" ] ; then
+    if [ $CHECK_API -eq 1 ] ; then
+      DB_API_VERSION=$(psql $CONN_STRING -tc  "select version from dsc.version;")
+      if [ "$DB_API_VERSION" -ne "$REQUIRED_API_VERSION" ] ; then
+        echo "Error: Database API version incorrect: Found $DB_API_VERSION expected $REQUIRED_API_VERSION"
+        exit 1
+      fi
+    fi
+  else
+    echo "The user $USER_NAME does not have the expected database access."
     exit 1
   fi
 fi
 
-PORT=$hhconfig_database_port
-if [ -z $PORT ] ; then
-  PORT=5432
-fi
-DB_NAME=$hhconfig_database_name
-if [ -z $DB_NAME ] ; then
-  echo "Database name not set"
-  exit 1
-fi
-DB_HOST=$hhconfig_database_host
-if [ -z $DB_HOST ]; then
-  echo "Database host not set"
-  exit 1
-fi
-
-CONN_STRING="-h $DB_HOST -U $USER_NAME -p $PORT -d $DB_NAME"
-# Test connection to the database
-psql $CONN_STRING -tc "\conninfo" > /dev/null
-if [ $? -ne 0 ] ; then
-  echo "Error connecting to database using connection string $CONN_STRING"
-  exit 1
-fi
-
-# Now test the optional parameters...
-TEST=$(psql $CONN_STRING -tc "SELECT has_table_privilege('dsc.version', 'SELECT')" | tr -d '[:space:]')
-if [ $WRITER -eq 1 ] ; then
-  TEST=$(psql $CONN_STRING -tc "SELECT has_table_privilege('dsc.version', 'INSERT')" | tr -d '[:space:]')
-fi
-
-if [ "x$TEST" == "xt" ] ; then
-  if [ $CHECK_API -eq 1 ] ; then
-    DB_API_VERSION=$(psql $CONN_STRING -tc  "select version from dsc.version;")
-    if [ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] ; then
-      echo "Error: Database API version incorrect: Found $DB_API_VERSION expected $REQUIRED_API_VERSION"
-      exit 1
-    fi
-  fi
-else
-  echo "The user $USER_NAME does not have the expected database access."
-  exit 1
-fi
-
 if [ $CHECK_SERIAL -eq 1 ] ; then
   LAST_SERIAL=$(psql $CONN_STRING -tc "select max(serial) from dsc.internal_version;")
-  if [ $LAST_SERIAL != $REQUIRED_DDL_SERIAL ] ; then
+  if [ "$LAST_SERIAL" != "$REQUIRED_DDL_SERIAL" ] ; then
     echo "Error: DDL scripts have not been run in correct order. Running $REQUIRED_DDL_SERIAL, last run was $LAST_SERIAL"
     exit 1
   fi
 fi
 
 if [ $CHECK_DATA_DIR -eq 1 ] ; then
-  DATA_OWNER=$(stat -c %U $hhconfig_directories_data)
-  if [ "$DATA_OWNER" != "$USER" ] ; then
+  OWNER=$(stat -c %U $hhconfig_directories_data)
+  if [ "$OWNER" != "$USER" ] ; then
     echo "The user $USER  does not have write access to the data dirctory $hhconfig_directories_data"
     exit 1
   fi
 fi
 
-if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
+if [ $CHECK_WEB_DIR -eq 1 ] ; then
   # The %rssac removes rssac from the end of the path, thus checking the www directory instead.
   mydir=${hhconfig_directories_rssac/%rssac/}
   WWW_OWNER=$(stat -c %U $mydir)
@@ -183,7 +195,28 @@ if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
   fi
 fi
 
+if [ $CHECK_PLOT_CACHE_DIR -eq 1 ] ; then
+  OWNER=$(stat -c %U $hhconfig_directories_plotcache)
+  if [ "$OWNER" != "$USER" ] ; then
+    echo "The user $USER  does not have write access to the plotcache dirctory $hhconfig_directories_plotcache"
+    exit 1
+  fi
+fi
+
+CHECK_RSSAC_DIR
+if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
+  OWNER=$(stat -c %U $hhconfig_directories_rssac)
+  if [ "$OWNER" != "$USER" ] ; then
+    echo "The user $USER  does not have write access to the rssac dirctory $hhconfig_directories_rssac"
+    exit 1
+  fi
+fi
+
 # print env variables for eval to process in calling script
+echo "RSSAC_DIR=\"$hhconfig_directories_rssac\""
+echo "CONF_DIR=\"$hhconfig_directories_conf\""
+echo "PLOT_CACHE_DIR=\"$hhconfig_directories_plotcache\""
+echo "DATADIR=\"$hhconfig_directories_data\""
 echo "PGPASSWORD=\"$PGPASSWORD\""
 echo "CONN_STRING=\"$CONN_STRING\""
 exit 0

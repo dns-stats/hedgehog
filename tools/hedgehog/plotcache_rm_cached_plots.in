@@ -23,12 +23,16 @@
 # File:   plotcache_rm_cached_plots
 #
 
-eval $(@LIBEXEC@/conf_read)
+# We need user with access to the plotcache directory
+a=$(@LIBEXEC@/check_user_perms -pc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
 
-REQUIRED_API_VERSION=@DB_VERSION@
-DB_NAME=$hhconfig_database_name
 REMOVE_ALL=0
-export PGPASSWORD=$hhconfig_database_reader_pass
 
 usage () {
     echo
@@ -52,24 +56,19 @@ while getopts ":ah" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ "$USER" != "$hhconfig_database_read_user" ] && echo "Must be $hhconfig_database_read_user to run this script" && exit 1
+echo "$(date): $0 COMMENCED"
 
 if [ $REMOVE_ALL -eq 1 ] ; then
-	echo "Removing all cached plots from $hhconfig_directories_plotcache"
-	rm -rf $hhconfig_directories_plotcache/*/*/*.png
-	rm -rf $hhconfig_directories_plotcache/*/*/*.html
+	echo "Removing all cached plots from $PLOT_CACHE_DIR"
+	rm -rf $PLOT_CACHE_DIR/*/*/*.png
+	rm -rf $PLOT_CACHE_DIR/*/*/*.html
 	echo "Done."
 	exit
 fi
 
-DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
-
 # Get list of servers and plots from database
-SERVERS=`echo "SELECT display_name FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME`
-PLOTS=`echo "SELECT name FROM dsc.visible_plot;" | psql -h $hhconfig_database_host -td $DB_NAME`
+SERVERS=$(psql $CONN_STRING -tc "SELECT display_name FROM dsc.server;")
+PLOTS=$(psql $CONN_STRING -tc "SELECT name FROM dsc.visible_plot;")
 PLOTS=(${PLOTS// / }) # convert string to an array
 
 while true ; do
@@ -93,10 +92,10 @@ while true ; do
         selection=${PLOTS[${c}]}
         PLOTS=(${PLOTS[@]:0:$c} ${PLOTS[@]:$(($c + 1))}) # remove selected plot from PLOTS
         for server in $SERVERS ; do
-            echo "rm -rf $hhconfig_directories_plotcache/${server}/${selection}/*.png"
-            rm -rf $hhconfig_directories_plotcache/${server}/${selection}/*.png
-            echo "rm -rf $hhconfig_directories_plotcache/${server}/${selection}/*.html"
-            rm -rf $hhconfig_directories_plotcache/${server}/${selection}/*.html
+            echo "rm -rf $PLOT_CACHE_DIR/${server}/${selection}/*.png"
+            rm -rf $PLOT_CACHE_DIR/${server}/${selection}/*.png
+            echo "rm -rf $PLOT_CACHE_DIR/${server}/${selection}/*.html"
+            rm -rf $PLOT_CACHE_DIR/${server}/${selection}/*.html
             echo "Removed plots for ${selection}."
         done
     else
@@ -105,4 +104,4 @@ while true ; do
 	echo "Do you want to remove another plot?"
 done
 
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"
