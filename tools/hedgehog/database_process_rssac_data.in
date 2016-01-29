@@ -129,7 +129,7 @@ for SERVER_ID in $SERVER_IDS ;do
 		# First up, check that there isn't an entry in the summary table for this node. 
 		# Note that if there is actually data when the transaction occurs then the insert will fail and the transaction will rollback.
 		SUMMARY_TABLE_ENTRY=$(psql $CONN_STRING -tc "SELECT count(*) FROM ${UNIQUE_SOURCE_SUM_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;")
-		if [ "${SUMMARY_TABLE_ENTRY}" != "0" ] ; then
+		if [ ${SUMMARY_TABLE_ENTRY} -ne 0 ] ; then
 			if [ ${FORCE_SUM_DEL} -eq 1 ] ; then
 				echo "Summary data already exists for node id = ${NODE_ID}... Force flag was used overwriting summary data!"
 				DELETE_SUMMARY_SQL="DELETE FROM ${UNIQUE_SOURCE_SUM_TABLE_NAME} WHERE node_id=${NODE_ID} and starttime = TIMESTAMP '${START} 00:00:00' AT TIME ZONE 'UTC' ;"

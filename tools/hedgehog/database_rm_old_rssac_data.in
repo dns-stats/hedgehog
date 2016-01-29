@@ -37,7 +37,7 @@ export PGPASSWORD=$PGPASSWORD
 DEFAULT_DAY=$(date --date="$(date +%Y-%m-15)" +%Y%m%d)
 NOW=$(date --date="now" +%Y%m%d)
 
-if [ "$DEFAULT_DAY" -ge "$NOW" ] ; then
+if [ $DEFAULT_DAY -ge $NOW ] ; then
 	START=$(date --date="$NOW - 2 month" +%Y-%m)
 else
 	START=$(date --date="$NOW - 1 month" +%Y-%m)
@@ -105,7 +105,7 @@ do
 	(( SIZE=${#TABLENAME}-7 ))
 	TMP_DATE=$(echo ${TABLENAME:$SIZE} | sed -e 's/_/-/')
 	TABLE_DATE=$(date --date="$TMP_DATE-01" +%Y%m%d)
-	if [ "$START_TRUNC" -ge "$TABLE_DATE" ] ; then
+	if [ $START_TRUNC -ge $TABLE_DATE ] ; then
 		echo "Truncating table $TABLENAME"
 		psql $CONN_STRING -c "truncate $TABLENAME;"
 	fi

@@ -78,7 +78,7 @@ else
     MONTH=${YM[1]}
     NEXT="${YEAR}_$(( MONTH + 1))"
 
-    if [ "$MONTH" -eq 12 ] ; then
+    if [ $MONTH -eq 12 ] ; then
         NEXT=$((YEAR + 1))"_01"
     fi
 fi
