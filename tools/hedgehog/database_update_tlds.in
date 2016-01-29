@@ -98,12 +98,12 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     	echo "Missing TLD type field for alabel $ALABEL - alabel ignored"
     	continue
     fi
-    (( COUNT+=1 ))
+    
     if [ $COUNT -gt 0 ]; then
       echo "UNION" >> $TLD_TMP
     fi
     echo "select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'" >> $TLD_TMP
-
+    (( COUNT+=1 ))
   done < ${TLD_FILE}
 done
 echo ";" >> $TLD_TMP
