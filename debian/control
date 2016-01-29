@@ -97,7 +97,8 @@ Depends: hedgehog-common (>= ${source:Version}~),
          python-dnspython,
          python-psycopg2,
          unzip,
-         adduser
+         adduser,
+         curl
 Suggests: hedgehog-doc
 Description: visualisation tool for DNS [DSC Extractor]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
