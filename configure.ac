@@ -18,7 +18,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(Hedgehog, 2.1.0a2,  dns-stats-users@dns-stats.org)
+AC_INIT(Hedgehog, 2.1.0b1,  dns-stats-users@dns-stats.org)
 AC_CONFIG_SRCDIR([tools/hedgehogctl.in])
 AC_CONFIG_HEADER([config.h])
 
