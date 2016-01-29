@@ -98,7 +98,7 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     	continue
     fi
     
-    echo "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'" >> $TLD_TMP
+    echo "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}';" >> $TLD_TMP
 
   done < ${TLD_FILE}
 done
