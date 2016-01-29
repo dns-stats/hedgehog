@@ -158,7 +158,7 @@ if [ $CHECK_DB_CONN -eq 1 ] ; then
   if [ "x$TEST" == "xt" ] ; then
     if [ $CHECK_API -eq 1 ] ; then
       DB_API_VERSION=$(psql $CONN_STRING -tc  "select version from dsc.version;")
-      if [ "$DB_API_VERSION" -ne "$REQUIRED_API_VERSION" ] ; then
+      if [ $DB_API_VERSION -ne $REQUIRED_API_VERSION ] ; then
         echo "Error: Database API version incorrect: Found $DB_API_VERSION expected $REQUIRED_API_VERSION"
         exit 1
       fi
@@ -171,8 +171,8 @@ fi
 
 if [ $CHECK_SERIAL -eq 1 ] ; then
   LAST_SERIAL=$(psql $CONN_STRING -tc "select max(serial) from dsc.internal_version;")
-  if [ "$LAST_SERIAL" != "$REQUIRED_DDL_SERIAL" ] ; then
-    echo "Error: DDL scripts have not been run in correct order. Running $REQUIRED_DDL_SERIAL, last run was $LAST_SERIAL"
+  if [ $LAST_SERIAL -ne $REQUIRED_DDL_SERIAL ] ; then
+    echo "Error: DDL scripts have not been run in correct order. Required $REQUIRED_DDL_SERIAL, actual version is $LAST_SERIAL"
     exit 1
   fi
 fi
