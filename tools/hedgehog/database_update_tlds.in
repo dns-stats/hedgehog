@@ -34,6 +34,7 @@ export PGPASSWORD=$PGPASSWORD
 
 TLDS_DIR=$CONF_DIR/tlds.d
 TLD_TMP="/tmp/hedgehog_tld_inserts.sql"
+COUNT=0
 
 usage () {
 	echo
@@ -63,7 +64,7 @@ if [ ! -d "$TLDS_DIR" ] ; then
 	exit 1
 fi
 
-rm -f $TLD_TMP
+echo "insert into tlds (alabel, type)" > $TLD_TMP
 
 for TLD_FILE in ${TLDS_DIR}/* ; do
   # Process the tld file
@@ -97,11 +98,15 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     	echo "Missing TLD type field for alabel $ALABEL - alabel ignored"
     	continue
     fi
-    
-    echo "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}';" >> $TLD_TMP
+    (( COUNT+=1 ))
+    if [ $COUNT -gt 0 ]; then
+      echo "UNION" >> $TLD_TMP
+    fi
+    echo "select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'" >> $TLD_TMP
 
   done < ${TLD_FILE}
 done
+echo ";" >> $TLD_TMP
 psql $CONN_STRING -tf $TLD_TMP
 
 echo "$(date): $0 COMPLETED"
