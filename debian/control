@@ -30,7 +30,8 @@ Depends: ${misc:Depends},
          postgresql-plpython-9.3,
          python-ipy,
 Suggests: hedgehog-doc,
-          unbound
+          unbound,
+          pgtune
 Description: visualisation tool for DNS [Database setup file]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
