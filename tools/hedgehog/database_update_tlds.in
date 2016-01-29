@@ -96,9 +96,10 @@ for TLD_FILE in ${TLDS_DIR}/* ; do
     	continue
     fi
     
-    psql $CONN_STRING -tc "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'"
+    echo "insert into tlds (alabel, type) select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'" > /tmp/hedgehog_tld_inserts.sql
 
   done < ${TLD_FILE}
 done
+psql $CONN_STRING -tf /tmp/hedgehog_tld_inserts.sql
 
 echo "$(date): $0 COMPLETED"
