@@ -203,7 +203,6 @@ if [ $CHECK_PLOT_CACHE_DIR -eq 1 ] ; then
   fi
 fi
 
-CHECK_RSSAC_DIR
 if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
   OWNER=$(stat -c %U $hhconfig_directories_rssac)
   if [ "$OWNER" != "$USER" ] ; then
