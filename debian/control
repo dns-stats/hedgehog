@@ -87,7 +87,7 @@ Description: visualisation tool for DNS [web]
  .
  This package contains web pages and Apache configuration.
 
-Package: hedgehog-dsc-extractor
+Package: hedgehog-data-manager
 Architecture: any
 Multi-Arch: foreign
 Depends: hedgehog-common (>= ${source:Version}~),
@@ -121,7 +121,7 @@ Description: GNU R package for Hedgehog R PostgreSQL Helper
 Package: hedgehog
 Architecture: all
 Depends: r-hedgehog-rpostgresqlhelper,
-         hedgehog-dsc-extractor,
+         hedgehog-data-manager,
          hedgehog-gui,
          hedgehog-doc,
          hedgehog-common,
