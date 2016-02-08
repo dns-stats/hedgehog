@@ -7,9 +7,9 @@ if ! getent group hedgehog > /dev/null; then
 fi
 
 # Make /var/log/hedgehog/ writeable by hedgehog group
-# if ! dpkg-statoverride --list /var/log/hedgehog >/dev/null; then
-#   dpkg-statoverride --update --add root hedgehog 0775 /var/log/hedgehog >/dev/null 2>/dev/null || true
-# fi
+if ! dpkg-statoverride --list /var/log/hedgehog >/dev/null; then
+  dpkg-statoverride --update --add root hedgehog 0775 /var/log/hedgehog >/dev/null 2>/dev/null || true
+fi
 
 
 #DEBHELPER#

@@ -9,9 +9,17 @@ if test "$1" = "purge"; then
     rm -rf /var/lib/hedgehog
     dpkg-statoverride --remove /var/log/hedgehog >/dev/null 2>/dev/null || true
     
+    # Ensure the web user is not part of the hedghog group
+    if id -Gn www-data | grep -qw hedgehog ; then
+      deluser www-data hedgehog
+    fi
+    
+    # Remove the hedgehog group
     if getent group hedgehog > /dev/null; then
       delgroup --system --only-if-empty hedgehog
     fi
 fi
 
 #DEBHELPER#
+
+exit 0
