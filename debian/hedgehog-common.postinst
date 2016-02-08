@@ -2,7 +2,7 @@
 
 # Add a group for hedgehog so that www-data and hedgehog can be part of it 
 # even on a split install
-if ! getent group hedgehog > /dev/null; then
+if getent group hedgehog > /dev/null; then
   addgroup --system hedgehog
 fi
 
