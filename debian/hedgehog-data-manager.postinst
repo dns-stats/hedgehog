@@ -5,7 +5,7 @@ if ! getent passwd hedgehog > /dev/null; then
   adduser --system --ingroup hedgehog --no-create-home --home /nonexistent hedgehog
 fi
 
-if ! getent passwd www-data > /dev/null; then
+if getent passwd www-data > /dev/null; then
   # adding www-data to group hedgehog so that if uploads are being done via
   # Apache then Apache will be able to write to /var/lib/hedgehog/data
   adduser www-data hedgehog
