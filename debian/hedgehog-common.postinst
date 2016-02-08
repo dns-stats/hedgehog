@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 # Add a group for hedgehog so that www-data and hedgehog can be part of it 
 # even on a split install

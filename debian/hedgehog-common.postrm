@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 if test "$1" = "purge"; then
     # this could be wrapped inside debconf question whether to remove the data or not

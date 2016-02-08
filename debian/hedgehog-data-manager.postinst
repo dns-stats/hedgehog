@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 if ! getent passwd hedgehog > /dev/null; then
   adduser --system --ingroup hedgehog --no-create-home --home /nonexistent hedgehog
