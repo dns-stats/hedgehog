@@ -162,8 +162,10 @@ Developed by Sinodun IT (www.sinodun.com)
 
     <!-- Javascript
   ================================================== -->
-    <script src="/usr/share/javascript/jquery/jquery.min.js"></script>
-    <script src="/usr/share/javascript/jquery-ui/jquery-ui.min.js"></script>
+    <script language="javascript" type="text/javascript"
+            src="/javascript/jquery/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript"
+            src="/javascript/jquery-ui/jquery-ui.min.js"></script>
     <script src="js/gengraph.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
     <script src="js/datetimes.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
     <script src="js/nodetabs.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
