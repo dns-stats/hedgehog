@@ -6,6 +6,7 @@ CLEANFILES = $(data_DATA) $(nobase_data_DATA)
 sysconfdir = @sysconfdir@/hedgehog
 
 nobase_data_DATA =  hedgehog/conf/hedgehog.conf \
+					hedgehog/conf/hedgehog_webdav.conf \
 					hedgehog/www/R/startup.R \
 					hedgehog/www/hedgehog.html \
 					hedgehog/www/about.html \
