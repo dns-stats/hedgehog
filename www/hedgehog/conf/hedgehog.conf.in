@@ -114,14 +114,4 @@
 	#<Location /RApacheInfo>
 	#    SetHandler r-info
 	#</Location>
-
-	# Uncomment to allow data to be uploaded by clients with valid certificates
-	# Alias /data @HH_DATA_DIR@
-	# <Directory @HH_DATA_DIR@>
-	#    DAV On
-	#    SSLRequireSSL
-	#    SSLVerifyClient require
-	#    SSLVerifyDepth 1
-	#    Options +Indexes
-	# </Directory>
 </VirtualHost>
