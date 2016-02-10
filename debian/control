@@ -89,6 +89,21 @@ Description: visualisation tool for DNS [web]
  .
  This package contains web pages and Apache configuration.
 
+Package: hedgehog-webdav-upload
+Architecture: all
+Section: web
+Depends: ${misc:Depends},
+         hedgehog-common (>= ${source:Version}~),
+         apache2 (>= 2.4),
+         hedgehog-data-manager
+Suggests: hedgehog-doc
+Description: visualisation tool for DNS [web]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains Apache configuration to allow secure upload via webdav.
+
+
 Package: hedgehog-data-manager
 Architecture: any
 Multi-Arch: foreign
