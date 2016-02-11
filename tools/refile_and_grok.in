@@ -35,7 +35,7 @@ eval $a
 export PGPASSWORD=$PGPASSWORD
 
 set -e # exit if any command yields a non 0 exit status
-WD="$hhconfig_directories_data"
+WD="$DATADIR"
 INPUT="XML"
 OUTPUT="DB"
 START_DATE=""
