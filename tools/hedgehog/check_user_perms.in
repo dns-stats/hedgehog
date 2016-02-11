@@ -142,6 +142,7 @@ if [ $CHECK_DB_CONN -eq 1 ] ; then
   fi
 
   CONN_STRING="-h $DB_HOST -U $USER_NAME -p $PORT -d $DB_NAME"
+  CONN_STRING_XX="host=$DB_HOST port=$PORT dbname=$DB_NAME password=$PGPASSWORD"
   # Test connection to the database
   psql $CONN_STRING -tc "\conninfo" > /dev/null
   if [ $? -ne 0 ] ; then
@@ -218,4 +219,5 @@ echo "PLOT_CACHE_DIR=\"$hhconfig_directories_plotcache\""
 echo "DATADIR=\"$hhconfig_directories_data\""
 echo "PGPASSWORD=\"$PGPASSWORD\""
 echo "CONN_STRING=\"$CONN_STRING\""
+echo "CONN_STRING_XX=\"$CONN_STRING_XX\""
 exit 0

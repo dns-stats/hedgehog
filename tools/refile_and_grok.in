@@ -103,7 +103,7 @@ echo "Using $CPUS CPUS ($REAL_CPUS available, $RESERVED_CPUS reserved)."
 
 if [[ "$INPUT" = "XML" || "$INPUT" = "DAT" ]] && [ "$OUTPUT" = "DB" ]
 then
-    ARGS="-i ${INPUT} -o PG_DB -c \"${CONN_STRING}\" ${START_DATE} ${RSSAC_FLAG}"
+    ARGS="-i ${INPUT} -o PG_DB -c \"${CONN_STRING_XX}\" ${START_DATE} ${RSSAC_FLAG}"
     LOG=${LOG/.out/-xml-db.out}
     [ "$INPUT" == "DAT" ] && LOG=${LOG/xml/dat}
 fi
@@ -132,7 +132,7 @@ fi
 echo "$(date) SCRIPT COMMENCED"
 BINDIR=@BIN@
 export BINDIR SERVER
-for SERVER in $(psql $CONN_STRING -tc "select display_name from server;") ; do
+for SERVER in $(psql $CONN_STRING_XX -tc "select display_name from server;") ; do
     [ -L "$SERVER" ] && continue
     [ -d "$SERVER" ] || continue
     ls "${SERVER}" | xargs -i --max-procs=$CPUS bash -c "[ -L \"${SERVER}/{}\" ] || ([ -d \"${SERVER}/{}\" ] && cd \"${SERVER}/{}\"; echo \"\$(date) START: ${SERVER}/{}\"; $BINDIR/dsc-extractor ${ARGS} >> \"${LOG}\" 2>&1; echo \"\$(date) DONE: ${SERVER}/{}\")"
