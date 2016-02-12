@@ -51,22 +51,26 @@ function initNodeHtml(nodes_raw) {
     //*** SERVERS ***//
     // For each server, construct the groups.
     for (var i = 0; i < nodes.length; i++) {
-        $('#groupcontent'                ).append(  "<div class='hidden' id='" + nodes[i].server + "'>");
-        $('#' + nodes[i].server          ).append(  "<div class='Tabs'   id='" + nodes[i].server + "_tabs'>");
-        $('#' + nodes[i].server + '_tabs').append(  "<ul                 id='" + nodes[i].server +"_tabs_ul'>");
+        var server_tmp = nodes[i].server;
+        // need this to cater for '.' in server and group names
+        var server     = server_tmp.replace(/\./g, "£");
+        $('#groupcontent'       ).append(  "<div class='hidden' id='" + server + "'>");
+        $('#' + server          ).append(  "<div class='Tabs'   id='" + server + "_tabs'>");
+        $('#' + server + '_tabs').append(  "<ul                 id='" + server +"_tabs_ul'>");
         //***  GROUPS (REGIONS) ***//
         // For each group, add a tab and fill in the nodes
         for (var j = 0; j < nodes[i].groups.length; j++) {
-            var group =  nodes[i].groups[j].group_name;
-            var group_server       = group + "_" + nodes[i].server;
+            var group_tmp =  nodes[i].groups[j].group_name;
+            var group     = group_tmp.replace(/\./g, "£");
+            var group_server       = group + "_" + server;
             var group_server_basic = group_server;
             // Create the top tab with a list entry
-            $('#' + nodes[i].server + '_tabs_ul').append("<li id='li_" + group_server + "' onclick='gpTab(\"" + group_server + "\")'>  <a>" + group + "<img id='cb_" + group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></a></li>");
+            $('#' + server + '_tabs_ul').append("<li id='li_" + group_server + "' onclick='gpTab(\"" + group_server + "\")'>  <a>" + group_tmp + "<img id='cb_" + group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'></a></li>");
             //Now the node content divs
             for (var node_grouping_options = 0; node_grouping_options <=3; node_grouping_options++) {
-                if (node_grouping_options == 1)      {group_server = group + "_" + nodes[i].server + "_subgroup";}
-                else if (node_grouping_options == 2) {group_server = group + "_" + nodes[i].server + "_city";}
-                else if (node_grouping_options == 3) {group_server = group + "_" + nodes[i].server + "_country";}
+                if (node_grouping_options == 1)      {group_server = group + "_" + server + "_subgroup";}
+                else if (node_grouping_options == 2) {group_server = group + "_" + server + "_city";}
+                else if (node_grouping_options == 3) {group_server = group + "_" + server + "_country";}
                 $('#nodecontent'                 ).append("<div class='group_showing'   id='" + group_server + "'>");
                 $('#' + group_server             ).append("<div class='allnone'         id='" + group_server + "_allnone'>");
                 $('#' + group_server             ).append("<div class='node_cbs'        id='" + group_server + "_node_cbs_id'>");
@@ -101,7 +105,7 @@ function initNodeHtml(nodes_raw) {
                             var node_groupby_class   = 'countryselection';
                         }
                         // use tilde not underscores as delimiter so other code doesn't trigger off this
-                        var node_groupby_group_server = node_groupby_label + "~" + group + "~" + nodes[i].server;
+                        var node_groupby_group_server = node_groupby_label + "~" + group + "~" + server;
                         if($("input[type='checkbox'][id='" + node_groupby_group_server + "']").length == 0) {
                             $('#' + group_server + '_node_cbs_id').append("<label for='" + node_groupby_group_server + "' title='Toggle node selection for:\n" + node.node_name + "'>" + node_groupby_label + " <img id='cb_" + node_groupby_group_server +"_img' src='images/all.png' alt='all selected' height='10' width='10'>");
                             $('#' + group_server + '_node_cbs_id').append("<input type='checkbox' class='" + node_groupby_class + "' id='" + node_groupby_group_server + "' name='cb-" + node_groupby_group_server + "' value='" + node_id_group_server + "' onclick='selectGrouping(this)'></label>");
@@ -343,7 +347,8 @@ function gpTab(gpnm) {
 function serverTab() {
     // display associated group tabs for selected
     // server and hide old group tabs from view
-    gptabsid = $("#servers option:selected").text();
+    gptabsid_tmp = $("#servers option:selected").text();
+    gptabsid = gptabsid_tmp.replace(/\./g, "£");
     old_content = $("div.server_showing");
     old_content.removeClass('server_showing');
     old_content.addClass('hidden');
