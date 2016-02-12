@@ -186,7 +186,8 @@ while read line || [[ -n "$line" ]]; do
 		echo "Updated node ${aNODES["node_name"]} for server ${aNODES["server_name"]}"
 	fi
 	mkdir -p $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}/incoming
-	
+	chmod 775 $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}/incoming
+   
 	junk=""
 done < ${NODES_FILE}
 
