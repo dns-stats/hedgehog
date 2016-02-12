@@ -29,6 +29,8 @@ Depends: ${misc:Depends},
          postgresql-9.3-ip4r,
          postgresql-plpython-9.3,
          python-ipy,
+         libgetdns1,
+         python-getdns
 Suggests: hedgehog-doc,
           unbound,
           pgtune
