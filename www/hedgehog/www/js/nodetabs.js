@@ -20,6 +20,17 @@ var sortByText = function (a, b) {
      return $.trim($(a).text()) > $.trim($(b).text());
 }
 
+function parse_name( myid ) {
+    // Need to process the server name as it could contain full stops.
+    // Whilst these are allowed in identifiers if escaped their use complicates the code
+    // So instead replace the full stop with a different character.
+    // In CSS identifiers can contain only the characters [a-zA-Z0-9] and ISO 10646
+    // characters U+00A0 and higher, plus the hyphen (-) and the underscore (_). 
+    // We can't use with hyphen or underscore here, so use the Pound sign (U+00A3) which is valid.
+
+    return myid.replace( /\./g, "£" );
+}
+
 function initNodeHtml(nodes_raw) {
 
     // Example data format
@@ -52,16 +63,15 @@ function initNodeHtml(nodes_raw) {
     // For each server, construct the groups.
     for (var i = 0; i < nodes.length; i++) {
         var server_tmp = nodes[i].server;
-        // need this to cater for '.' in server and group names
-        var server     = server_tmp.replace(/\./g, "£");
+        var server     = parse_name(server_tmp);
         $('#groupcontent'       ).append(  "<div class='hidden' id='" + server + "'>");
         $('#' + server          ).append(  "<div class='Tabs'   id='" + server + "_tabs'>");
         $('#' + server + '_tabs').append(  "<ul                 id='" + server +"_tabs_ul'>");
         //***  GROUPS (REGIONS) ***//
         // For each group, add a tab and fill in the nodes
         for (var j = 0; j < nodes[i].groups.length; j++) {
-            var group_tmp =  nodes[i].groups[j].group_name;
-            var group     = group_tmp.replace(/\./g, "£");
+            var group_tmp = nodes[i].groups[j].group_name;
+            var group     = parse_name(group_tmp);
             var group_server       = group + "_" + server;
             var group_server_basic = group_server;
             // Create the top tab with a list entry
@@ -348,7 +358,7 @@ function serverTab() {
     // display associated group tabs for selected
     // server and hide old group tabs from view
     gptabsid_tmp = $("#servers option:selected").text();
-    gptabsid = gptabsid_tmp.replace(/\./g, "£");
+    gptabsid = parse_name(gptabsid_tmp);
     old_content = $("div.server_showing");
     old_content.removeClass('server_showing');
     old_content.addClass('hidden');

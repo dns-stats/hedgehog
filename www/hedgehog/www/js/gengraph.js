@@ -144,7 +144,8 @@ function genDSCGraph() {
     if ($('#googleviz').prop('checked') === true) gvis = 1;
 
     var pltid = $("#plotType option:selected").val();
-    var svrnm = $("#servers option:selected").text();
+    var svrnm_tmp = $("#servers option:selected").text();
+    var svrnm = parse_name(svrnm_tmp);
     var svrid = $("#servers option:selected").val();
         
     var ndset = {};

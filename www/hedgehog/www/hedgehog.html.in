@@ -161,11 +161,11 @@ Developed by Sinodun IT (www.sinodun.com)
 </body>
 
     <!-- Javascript
-  ================================================== -->
-    # <script language="javascript" type="text/javascript"
-    #         src="/javascript/jquery/jquery.min.js"></script>
-    # <script language="javascript" type="text/javascript"
-    #         src="/javascript/jquery-ui/jquery-ui.min.js"></script>
+  ================================================== 
+    <script language="javascript" type="text/javascript"
+             src="/javascript/jquery/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript"
+             src="/javascript/jquery-ui/jquery-ui.min.js"></script> -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="js/gengraph.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
