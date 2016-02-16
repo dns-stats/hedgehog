@@ -1,5 +1,17 @@
 #!/bin/bash
 
+### BEGIN INIT INFO
+# Provides:          rssacd
+# Required-Start:    $local_fs $remote_fs $network $time $postgresql
+# Required-Stop:     $local_fs $remote_fs $network $time $postgresql
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: rssac data collection daemon
+# Description:       rssac data collection daemon.
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
 TSIG_NAME=""
 TSIG_KEY=""
 # One of hmac-sha1,hmac-sha224,hmac-sha256,hmac-sha384,hmac-sha512
@@ -30,7 +42,7 @@ case "$1" in
         stop)
                 su - -c "killall rssacd"
                 ;;
-        restart)
+        restart | force-reload )
                 su - -c "killall rssacd"
                 sleep 10
                 su - -c "rssacd $TSIG_NAME $TSIG_KEY --log $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS"
