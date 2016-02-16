@@ -65,3 +65,9 @@ rssacd.8: rssacd rssac_server.py rssac_server/rssac.py rssac_server/threadpool.p
 
 dsc-extractor.1: dsc-extractor Makefile
 	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 --no-discard-stderr -n "Application to extract DSC data from XML or DAT files and insert it in to a Postgresql database. Users are recommended to use the refile_and_grok wrapper script in preference to using this exectutable directly." ./dsc-extractor -o dsc-extractor.1
+	
+install-data-hook:
+	mkdir ${prefix}/etc/init.d
+	cp ${srcdir}/rssac_server/rssacd.init ${prefix}/etc/init.d/rssacd
+	chmod 755 ${prefix}/etc/init.d/rssacd
+		

@@ -73,9 +73,12 @@ class DnsReaderServer(SocketServer.UDPServer):
         ''' Clear group privileges '''
         os.setgroups([])
         ''' set new uid/gid '''
-        os.setgid(running_gid)
-        os.setuid(running_uid)
-        
+        try:
+            os.setgid(running_gid)
+            os.setuid(running_uid)
+        except os.error:
+            self.server.logger.error('Unable to drop privs to user:group {}:{}'.running_uid,running_uid)
+            
         ''' Start logger '''
         self.logger = logging.getLogger('rssac_propagation.server.DnsReaderServer')
         

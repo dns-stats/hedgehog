@@ -1,0 +1,42 @@
+#!/bin/bash
+
+TSIG_NAME=""
+TSIG_KEY=""
+# One of hmac-sha1,hmac-sha224,hmac-sha256,hmac-sha384,hmac-sha512
+TSIG_ALGO=""
+LOG="/var/log/hedgehog/rssacd.log"
+LISTEN="0.0.0.0:53"
+# Server name (as in the database, lower case with - replaced by _)
+SERVER="server_a"
+#OTHER_ARGS="-v"
+
+if [ -n "$TSIG_NAME" ] ; then
+    TSIG_NAME="--tsig-name $TSIG_NAME"
+fi
+if [ -n "$TSIG_KEY" ] ; then
+    TSIG_KEY="--tsig-key $TSIG_KEY"
+fi
+if [ -n "$TSIG_ALGO" ] ; then
+    TSIG_ALGO="--tsig-algo $TSIG_ALGO"
+fi 
+if [ -n "$LOG" ] ; then
+    LOG="--log $LOG"
+fi
+
+case "$1" in 
+        start)
+                su - -c "rssacd $TSIG_NAME $TSIG_KEY $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS"
+                ;;
+        stop)
+                su - -c "killall rssacd"
+                ;;
+        restart)
+                su - -c "killall rssacd"
+                sleep 10
+                su - -c "rssacd $TSIG_NAME $TSIG_KEY --log $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS"
+                ;;
+        *)
+                echo "Usage: $0 {start|stop|restart}"
+esac 
+ 
+exit 0
