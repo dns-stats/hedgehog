@@ -13,4 +13,6 @@ if test "$1" = "purge"; then
     fi
 fi
 
+update-rc.d -f rssacd remove
+
 #DEBHELPER#

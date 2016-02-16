@@ -13,3 +13,4 @@ usr/lib/hedgehog/database_*
 usr/lib/hedgehog/datafiles_*
 usr/lib/hedgehog/DDL_updates/*
 usr/lib/hedgehog/utility_*
+etc/hedgehog/init.d/rssacd /etc/init.d/
