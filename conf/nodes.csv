@@ -1,8 +1,8 @@
 ######################### NODES CONFIGURATION FILE ###################
 # Format is:     server-name, node-name, [node-group],[node-country],
 #                [node-city],[node-instance],[node-ip]
-# Name, group and instance fields can contain alphanumeric characters, full
-# stops (.) and hyphens (-) only.
+# Server, name, group and instance fields can contain alphanumeric characters,
+# full stops (.) and hyphens (-) only.
 # Country and city fields can contain alphanumeric characters, spaces and
 # hyphens (-) only.
 # All the commas are required, even if all optional fields are blank

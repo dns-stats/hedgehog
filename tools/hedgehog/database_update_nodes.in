@@ -168,6 +168,8 @@ while read line || [[ -n "$line" ]]; do
 		SERVER_DB_NAME=${SERVER_DB_NAME,,}
 		# subsitute _ for -
 		SERVER_DB_NAME=${SERVER_DB_NAME//-/_}
+		# subsitute __ for .
+		SERVER_DB_NAME=${SERVER_DB_NAME//./__}
 		SERVER_ID=$(psql $CONN_STRING -tqc "INSERT INTO dsc.server (name, display_name) VALUES ('$SERVER_DB_NAME', '${aNODES["server_name"]}') RETURNING id;")
 		echo "Added server ${aNODES["server_name"]}"
 		NEW_SERVER=1
