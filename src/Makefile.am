@@ -68,6 +68,6 @@ dsc-extractor.1: dsc-extractor Makefile
 	
 install-data-hook:
 	mkdir -p ${prefix}/etc/init.d
-	cp ${srcdir}/rssac_server/rssacd.init ${prefix}/etc/init.d/rssacd
-	chmod 755 ${prefix}/etc/init.d/rssacd
+	cp ${srcdir}/rssac_server/rssacd.init ${DESTDIR}${sysconfdir}/init.d/rssacd
+	chmod 755 ${DESTDIR}${sysconfdir}/etc/init.d/rssacd
 		
