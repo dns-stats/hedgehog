@@ -67,7 +67,7 @@ dsc-extractor.1: dsc-extractor Makefile
 	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 --no-discard-stderr -n "Application to extract DSC data from XML or DAT files and insert it in to a Postgresql database. Users are recommended to use the refile_and_grok wrapper script in preference to using this exectutable directly." ./dsc-extractor -o dsc-extractor.1
 	
 install-data-hook:
-	mkdir -p ${prefix}/etc/init.d
+	mkdir -p ${DESTDIR}${sysconfdir}/init.d
 	cp ${srcdir}/rssac_server/rssacd.init ${DESTDIR}${sysconfdir}/init.d/rssacd
 	chmod 755 ${DESTDIR}${sysconfdir}/etc/init.d/rssacd
 		
