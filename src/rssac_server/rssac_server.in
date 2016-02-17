@@ -220,7 +220,8 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         except dns.exception.FormError:
             self.server.logger.error('Error attempting AXFR from {}'.format(self.client_address[0]))
         else:
-            zone_size = sys.getsizeof(zone.getvalue())
+            ''' Need to subtract 2 bytes for the TCP length field '''
+            zone_size = sys.getsizeof(zone.getvalue()) - 2
         zone.close()
         return zone_size
 
