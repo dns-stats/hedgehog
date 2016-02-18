@@ -12,7 +12,7 @@
 
 . /lib/lsb/init-functions
 
-. /opt/hedgehog/etc/hedgehog/rssacd.conf
+. @HEDGEHOGYAML@/rssacd.conf
 
 if [ -n "$TSIG_NAME" ] ; then
     TSIG_NAME="--tsig-name $TSIG_NAME"
@@ -29,7 +29,7 @@ fi
 
 case "$1" in 
         start)
-                su - -c "/opt/hedgehog/sbin/rssacd $TSIG_NAME $TSIG_KEY $TSIG_ALGO $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS &"
+                su - -c "@SBIN@/rssacd $TSIG_NAME $TSIG_KEY $TSIG_ALGO $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS &"
                 ;;
         stop)
                 su - -c "killall rssacd"
@@ -37,7 +37,7 @@ case "$1" in
         restart | force-reload )
                 su - -c "killall rssacd"
                 sleep 10
-                su - -c "/opt/hedgehog/sbin/rssacd $TSIG_NAME $TSIG_KEY $TSIG_ALGO $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS &"
+                su - -c "@SBIN@/rssacd $TSIG_NAME $TSIG_KEY $TSIG_ALGO $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS &"
                 ;;
         *)
                 echo "Usage: $0 {start|stop|restart}"

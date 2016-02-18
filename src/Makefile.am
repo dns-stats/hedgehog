@@ -68,6 +68,7 @@ dsc-extractor.1: dsc-extractor Makefile
 	
 install-data-hook:
 	mkdir -p ${DESTDIR}${sysconfdir}/init.d
+	sed -e 's|@HEDGEHOGYAML@|$(sysconfdir)|' -e 's|@SBIN@|$(sbindir)|' < $(srcdir)/rssac_server/rssacd.init.in > ${srcdir}/rssac_server/rssacd.init
 	cp ${srcdir}/rssac_server/rssacd.init ${DESTDIR}${sysconfdir}/init.d/rssacd
 	chmod 755 ${DESTDIR}${sysconfdir}/init.d/rssacd
-		
+	cp ${srcdir}/rssac_server/rssacd.conf ${DESTDIR}$(sysconfdir)/rssacd.conf
