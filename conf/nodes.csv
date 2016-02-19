@@ -9,7 +9,7 @@
 # '#' is the comment character
 # 
 # server-name   - This must be unique and it must match the name used in the
-#                 data directory path for uploaded files.
+#                 data directory path for uploaded files. Max length=11 chars.
 # node-name     - This must be unique for a given server and it must 
 #                 match the name used in the data directory path for 
 #                 uploaded files.
