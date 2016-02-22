@@ -70,7 +70,6 @@ echo "$(date): $0 COMMENCED"
 # Read CSV file with the following fields in order:
 fields=(server_name node_name node_region node_country node_city node_subgroup node_ip)
 
-SERVER_NAME_MAX_LENGTH=11
 NAME_REGEX="^[a-zA-Z0-9\\.-]+$"
 NAME_SPACE_REGEX="^[[:space:]a-zA-Z0-9\\-]+$"
 NAME_ERROR="It may contain alphanumeric characters, hyphens (-) and full stops (.) only."
@@ -125,11 +124,6 @@ while read line || [[ -n "$line" ]]; do
 	
 	if [[ -n $junk ]] ; then
 		echo "Error: Too many fields in $NODES_FILE line $i"
-		exit 1
-	fi
-
-	if [ ${#aNODES["server_name"]} -gt $SERVER_NAME_MAX_LENGTH ] ; then
-		echo "Error: Server name ${aNODES["server_name"]} too long in $NODES_FILE line $i"
 		exit 1
 	fi
 
