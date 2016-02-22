@@ -5,7 +5,6 @@
 # characters, full stops (.) and hyphens (-) only.
 # Country and city fields can contain alphanumeric characters, spaces and
 # hyphens (-) only.
-# All the commas are required, even if all optional fields are blank
 # '#' is the comment character
 # 
 # server-name   - This must be unique and it must match the name used in the
@@ -40,5 +39,5 @@
 #Server-A,Node-7,Region-3,Country-3,City-4,Instance-5,10.0.0.3
 #Server-B,Node-1,Region-1,Country-4,,,
 #Server-B,Node-2,Region-2,,,Instance-6,
-#Server-C,Node-5,,,,,
+#Server-C,Node-5
 ######################################################################
