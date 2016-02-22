@@ -40,5 +40,9 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
   then the 'generate graph' button becomes enabled again and a second
   plot can be generated that will then over write the first.
 
-* The geochart is ignoring the instruction in the html not to show the color
-  code in the tooltips.
+* No static plots are produced for the GEO type plots.The geochart is ignoring 
+  the instruction in the html not to show the color code in the tooltips.
+
+* Server, node and group and instance names may only contain alphanumeric 
+  characters, full stops (.) and hyphens (-). Country and city names can
+  only contain alphanumeric characters, spaces and hyphens (-)

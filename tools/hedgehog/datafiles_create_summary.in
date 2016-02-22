@@ -48,7 +48,7 @@ usage () {
 	echo "	-s Only report on the server with this name (default is all servers)"
 	echo "	-n Only report on the node with this name (default is all nodes)"
 	echo "	-c Output in csv format for import into spreadsheet application"
-  echo "  -d Run in debug mode (set -x)"
+	echo "	-d Run in debug mode (set -x)"
 	echo "	-h Show this help."
 }
 
