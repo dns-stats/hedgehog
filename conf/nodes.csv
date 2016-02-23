@@ -5,6 +5,7 @@
 # characters, full stops (.) and hyphens (-) only.
 # Country and city fields can contain alphanumeric characters, spaces and
 # hyphens (-) only.
+# Nodes may be grouped and plotted by Country,City or Instance in 2.1.
 # '#' is the comment character
 # 
 # server-name   - This must be unique and it must match the name used in the
@@ -20,13 +21,14 @@
 #                 It is optional and if not specified 'No Country' is used.
 # node-city     - This is the city that the node is located in
 #                 It is optional and if not specified 'No City' is used.
+#                 This is used to plot node locations in GEO plots
 # node-instance - This is used to collect nodes into subgroups called 'Instances' 
 #                 (e.g. nodes within the same city) for convenient selection
 #                 and plotting. It should be unique for a given group. It is 
 #                 optional and if not specified 'No Instance' is used.
 # node-ip       - The management IP address of the node (IPv4 or IPv6)
 #                 It is optional and if not specified is left blank. This is 
-#                 required if rssac loadtime/serial data is to be collected.
+#                 required if RSSAC load-time/zone-size data is to be collected.
 #
 # Example input: (uncomment the following)
 #

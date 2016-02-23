@@ -1,18 +1,18 @@
 
-<p>The Hedgehog tools are a set of scripts that are used to perform various tasks in terms of creating and maintaining the database and hedgehog files on disk. They can be run directly from <span>&lt;PREFIX&gt;/libexec/hedgehog or</span>&nbsp;for convenience a wrapper script (<span>&lt;PREFIX&gt;/bin/hedgehogctl</span>) is provided:</p><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[>hedgehogctl help
- 
+<p>The Hedgehog tools are a set of scripts that are used to perform various tasks in terms of creating and maintaining the database and hedgehog files on disk. They can be run directly from <span>/libexec/hedgehog or</span>&nbsp;for convenience a wrapper script (<span>/bin/hedgehogctl</span>) is provided:</p><ac:structured-macro ac:macro-id="b3c2535a-74e2-4382-956a-66431f19a058" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[>hedgehogctl help
+ 
 Run a Hedgehog command
 
 Usage: hedgehogctl [help|list] [COMMAND] [command_options]]]></ac:plain-text-body></ac:structured-macro>
 <p>The available hedgehogctl commands are described below</p>
-<p><ac:structured-macro ac:name="toc" /></p>
+<p><ac:structured-macro ac:macro-id="8fff6759-8a52-4a19-929b-bc3886a8c215" ac:name="toc" ac:schema-version="1" /></p>
 <h2>Data Manager</h2>
 <p>These scripts should be run as the DB_OWNER user (<em>hedgehog</em> by default).</p>
 <h3>Database</h3>
 <h4>database_init</h4>
 <ul>
 <li>The script should be run after the database has been created (see the &lt;prefix&gt;/libexec/database_create helper script)</li>
-<li>This script populates the database with the plot and server/node data</li></ul><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[Create and populate the database tables with plot options and nodes.
+<li>This script populates the database with the plot and server/node data</li></ul><ac:structured-macro ac:macro-id="35c6307d-3935-4e00-bffb-e37aa1ac19b6" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Create and populate the database tables with plot options and nodes.
 
 This calls the hedeghog_database_update_nodes.sh script which will populate the DB
 with the specified nodes and create a directory structure for them in the working
@@ -22,33 +22,33 @@ Usage: database_init options
 
 Supported options:
 
-  -m Start month of oldest data to be imported 
+  -m Start month of oldest data to be imported 
      (default is current month, format YYYY-MM)
   -h Show this help]]></ac:plain-text-body></ac:structured-macro>
 <h4>database_manage_partitions</h4>
 <ul>
 <li>
-<p>This script creates new tables in the database to hold the imported data.&nbsp;</p><ac:structured-macro ac:name="warning"><ac:rich-text-body>
+<p>This script creates new tables in the database to hold the imported data.&nbsp;</p><ac:structured-macro ac:macro-id="02fd2867-ebc4-40f4-ac80-9a3515fc90a6" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
 <p><strong>It must be run at least once a month to create the tables for next month or the import will fail. It is recommended to configure a cron job as described in the&nbsp;Cron jobs section of the Installation guide.&nbsp;</strong></p></ac:rich-text-body></ac:structured-macro></li></ul>
 <ul>
-<li>Otherwise, the user will only have to run this script when new servers are added to an existing system.</li></ul><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Create a new set of partitioned data tables in the database to hold imported data.
+<li>Otherwise, the user will only have to run this script when new servers are added to an existing system.</li></ul><ac:structured-macro ac:macro-id="d5d85645-ac8c-4f52-a28d-93142894bb06" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Create a new set of partitioned data tables in the database to hold imported data.
 The partitions are created per month of data.
  
 Usage: database_manage_partitions options
 
 Supported options:
-    -m Month to create partitions for 
+    -m Month to create partitions for 
        (default is next month, format YYYY-MM)
     -h Show this help]]></ac:plain-text-body></ac:structured-macro>
 <h4>database_process_rssac_data</h4>
 <ul>
 <li>This script should be run to process the data ready for the <em>rssac_process_data </em>script.&nbsp;</li>
-<li>The importer inserts data from the XML files into the 'unique_source_raw' table. For each node, this script creates entries in the 'unique_source_summary' table based on the raw data and then (optionally) deletes the original raw data from the&nbsp;'unique_source_raw' table.</li></ul><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[Process RSSAC data for a specified 24 hour period
+<li>The importer inserts data from the XML files into the 'unique_source_raw' table. For each node, this script creates entries in the 'unique_source_summary' table based on the raw data and then (optionally) deletes the original raw data from the&nbsp;'unique_source_raw' table.</li></ul><ac:structured-macro ac:macro-id="1c107461-c555-46a2-aed9-0eb3d0823078" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Process RSSAC data for a specified 24 hour period
  
 Usage: database_process_rssac_data options
 
 Supported options:
-  -d Date on which to process RSSAC data 
+  -d Date on which to process RSSAC data 
     (default is 7 days ago, format: YYYY-MM-DD)
   -f Force overwrite of existing summary data
   -D Also delete the raw unique_source data from the database to save space 
@@ -56,37 +56,53 @@ Supported options:
   -h Show this help]]></ac:plain-text-body></ac:structured-macro>
 <h4>database_rm_old_rssac_data</h4>
 <ul>
-<li>For some systems, the unique source raw data can be unmanageably large. This script can be used to truncate the database tables to recover the disk space, for example it can be run once a month to remove all the raw data for the previous month</li></ul><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Delete all the raw unique_source data in the database for a given month. 
+<li>For some systems, the unique source raw data can be unmanageably large. This script can be used to truncate the database tables to recover the disk space, for example it can be run once a month to remove all the raw data for the previous month</li></ul><ac:structured-macro ac:macro-id="af1ff305-093e-450e-88c7-fd6c5cbc7f1b" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Delete all the raw unique_source data in the database for a given month. 
 All data older than this is also deleted.
-This script is intended to be run monthly to free disk space on systems 
+This script is intended to be run monthly to free disk space on systems 
 where the raw unique sources data becomes unmanagably large.
 
 Usage: database_rm_old_rssac_data options
 
 Supported options:
-  -m Month from which to delete all raw unique source data 
+  -m Month from which to delete all raw unique source data 
        (default 2014-07: format YYYY-MM)
        (default is 2 months ago when in the first half of the current month and
         1 month ago when in the second half of the current month)
   -h Show this help]]></ac:plain-text-body></ac:structured-macro>
+<h4>database_update_geoip</h4>
+<ul>
+<li>This script downloads a reference database of locations for use by the GEO maps. It should be periodically run to update with new location information.</li></ul><ac:structured-macro ac:macro-id="660d7d6b-270c-41fa-8cba-cd4f95aeb632" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Update the GeopIP list in the database. This reads input from /tmp
+Usage: database_update_geoip options
+Supported options:
+  -h Show this help.]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
 <h4>database_update_nodes</h4>
 <ul>
-<li>Run this script if new nodes or servers are added to the system</li></ul><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Add/update the servers and nodes in the database. This reads input from file
+<li>Run this script if new nodes or servers are added to the system</li></ul><ac:structured-macro ac:macro-id="4d9265e8-3cd1-4f78-b752-2861b5671147" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Add/update the servers and nodes in the database. This reads input from file
 called nodes.csv in the /usr/local/etc/hedgehog directory.
  - An example nodes.csv file is installed if one does not exist.
  - See the comments in that file for details of the format.
- - No action is taken on servers/nodes that are in the database but are not in the 
+ - No action is taken on servers/nodes that are in the database but are not in the 
    input files.
 
 Usage: /usr/local/bin/hedgehog_database_update_nodes options
 
 Supported options:
-  -p Run in prediction mode. Output findings but don't act on the DB
+  -d debug mode (set -x).
   -h Show this help.]]></ac:plain-text-body></ac:structured-macro>
+<h4>database_update_tlds</h4>
+<ul>
+<li>Run this script to update the categorisation of TLDs in the database</li></ul><ac:structured-macro ac:macro-id="7ef95ada-9bd4-46b3-b66a-ba2cfbd01256" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Update the TLD list in the database. This reads input from files
+from the /opt/hedgehog/etc/hedgehog/tlds.d directory.
+No action is taken on TLDs that are in the database but are not in the input files.
+Usage: database_update_tlds options
+Supported options:
+  -h Show this help]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
 <h3>Datafiles</h3>
 <h4>datafiles_create_summary</h4>
 <ul>
-<li>This is a useful utility script that can be used to get a high level picture of the processing of the XML files for all the nodes in the system. It can help identify backlogs in the processing system.</li></ul><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Generate a processing report based on the information in the log files
+<li>This is a useful utility script that can be used to get a high level picture of the processing of the XML files for all the nodes in the system. It can help identify backlogs in the processing system.</li></ul><ac:structured-macro ac:macro-id="bdc7b96f-0f56-4d9d-a73b-ce13df2d9d2b" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Generate a processing report based on the information in the log files
 
 Usage: datafiles_create_summary options
 
@@ -94,17 +110,18 @@ Supported options:
 	-s Only report on the server with this name (default is all servers)
 	-n Only report on the node with this name (default is all nodes)
 	-c Output in csv format for import into spreadsheet application
+    -d Run in debug mode (set -x)
 	-h Show this help.]]></ac:plain-text-body></ac:structured-macro>
-<h4>datafiles_rm_empty_xml_dirs</h4><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Remove empty incoming xml directories after a certain period of time 
+<h4>datafiles_rm_empty_xml_dirs</h4><ac:structured-macro ac:macro-id="88bd5715-ba68-4a20-a7f1-be499d770540" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Remove empty incoming xml directories after a certain period of time 
 (default is all the processed directories older than 7 days ago)
 
 Usage: datafiles_rm_empty_xml_dirs options
 
 Supported options:
-	-d Date before which removing empty xml directories 
-      (default: 7 days ago, format YYYY-MM-DD)
+	-d Date before which removing empty xml directories 
+      (default: 7 days ago, format YYYY-MM-DD)
 	-h Show this help]]></ac:plain-text-body></ac:structured-macro>
-<h4>datafiles_tar_old_xml_files</h4><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[Pack old xml files already processed into a .tar package to store and archive.
+<h4>datafiles_tar_old_xml_files</h4><ac:structured-macro ac:macro-id="9283cb80-b944-415c-8f1b-065ade9f307f" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Pack old xml files already processed into a .tar package to store and archive.
 The xml files are packed according to their date and node and server.
 The filename has the following format done-PID-date.tar.bz2 (e.g. done-14143-2015-05-01.tar.bz2).
 
@@ -120,15 +137,15 @@ Supported options:
 <li>
 <p>You must add at least one option for which plot window to generate [-D|-W|-M].</p></li>
 <li>
-<p>By default, the cached plots are generated daily for the day before between 00:00 and 23:59. It can be helpful to configure a daily cron job to use this script to create cached plots to make loading of the homepage and common plots faster.&nbsp;</p><ac:structured-macro ac:name="note"><ac:rich-text-body>
-<p><span>If not relying on the default behaviour be careful to specify BOTH a start and end date for this script, otherwise the end date will default to today and this may result in many plots being generated.</span></p></ac:rich-text-body></ac:structured-macro></li></ul><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Create cached plots for each chosen period (day/week/month) between Start and End range of time.
+<p>By default, the cached plots are generated daily for the day before between 00:00 and 23:59. It can be helpful to configure a daily cron job to use this script to create cached plots to make loading of the homepage and common plots faster.&nbsp;</p><ac:structured-macro ac:macro-id="e3a20735-7555-41f6-8f0f-1b885b193085" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p><span>If not relying on the default behaviour be careful to specify BOTH a start and end date for this script, otherwise the end date will default to today and this may result in many plots being generated.</span></p></ac:rich-text-body></ac:structured-macro></li></ul><ac:structured-macro ac:macro-id="4a423b5a-ca47-4597-99b9-9e7da0d06d90" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Create cached plots for each chosen period (day/week/month) between Start and End range of time.
 
 Usage: generate_cached_plots options
 
 Supported options:
-    -s Start date of time range from which to create cached plots 
+    -s Start date of time range from which to create cached plots 
        (default is 1 day before at 00:00, format YYYY-MM-DDThh:mm)
-    -e End date of time range from which to create cached plots 
+    -e End date of time range from which to create cached plots 
        (default is 1 day before at 23:59, format YYYY-MM-DDThh:mm)
     -D Generate daily cached plots
     -W Generate weekly cached plots
@@ -139,8 +156,8 @@ Supported options:
 <li>
 <p>The user should not normally need to run this script, but is available in case problem are encountered with cached plots, or it is desirable to flush the cache for some reason (for example the default interactive plot type is changed after graphs have been cached).&nbsp;</p></li>
 <li>
-<p>This script is interactive if the -a option is not selected.&nbsp;You will be asked to select which cached plot types you'd like to remove.</p></li></ul><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Remove all or a set of cached plots from the directory structure.
- 
+<p>This script is interactive if the -a option is not selected.&nbsp;You will be asked to select which cached plot types you'd like to remove.</p></li></ul><ac:structured-macro ac:macro-id="839813d2-ab5b-4555-a419-880edcf01815" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Remove all or a set of cached plots from the directory structure.
+ 
 Usage: plotcache_rm_cached_plots options
 
 Supported options:
@@ -151,12 +168,12 @@ Supported options:
 <ul>
 <li>By default the script creates RSSAC reports for all configured servers for a date 7 days in the past</li>
 <li>It will require that the&nbsp;database_process_rssac_data script will have already been run for the date in question.<em>&nbsp;</em></li>
-<li>Note the unique_source data for the report is taken from the summary table, not the raw table.</li></ul><ac:structured-macro ac:name="code"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Create RSSAC reports for a specified 24 hour period
- 
+<li>Note the unique_source data for the report is taken from the summary table, not the raw table.</li></ul><ac:structured-macro ac:macro-id="31543074-e163-4040-8ccd-a8ec5c66780c" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Create RSSAC reports for a specified 24 hour period
+ 
 Usage: rssac_generate_reports options
 
 Supported options:
-  -d Date on which to create RSSAC reports 
+  -d Date on which to create RSSAC reports 
      (default is 7 days ago, format: YYYY-MM-DD)
   -h Show this help]]></ac:plain-text-body></ac:structured-macro>
 <h2>Other tools</h2>
