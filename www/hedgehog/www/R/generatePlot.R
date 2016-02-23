@@ -70,7 +70,7 @@ H <- 600
 linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
   if (hh_debug) {
-    system('logger -p user.notice In linePlot')
+    system('logger -p user.notice Hedgehog: In linePlot')
   }
   
     if(gvis == 1){
@@ -160,7 +160,7 @@ linePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
 
   if (hh_debug) {
-    system('logger -p user.notice In barPlot')
+    system('logger -p user.notice Hedgehog: In barPlot')
   }
 
     if(gvis == 1){
@@ -217,7 +217,7 @@ barPlot <- function(df, f, title, xlabel, ylabel, gvis, vertical=0, small=1) {
 stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="discrete", vertical=0, gbar_width=0) {
 
   if (hh_debug) {
-    system('logger -p user.notice In stackedBarPlot')
+    system('logger -p user.notice Hedgehog: In stackedBarPlot')
   }
   
     if(gvis == 1){
@@ -321,7 +321,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
 stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
   if (hh_debug) {
-    system('logger -p user.notice In stackedAreaPlot')
+    system('logger -p user.notice Hedgehog: In stackedAreaPlot')
   }
   
     if(gvis == 1){
@@ -362,7 +362,7 @@ stackedAreaPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 facetedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, bar_width) {
 
   if (hh_debug) {
-    system('logger -p user.notice In facetedBarPlot')
+    system('logger -p user.notice Hedgehog: In facetedBarPlot')
   }
   
     if(gvis == 1){
@@ -392,7 +392,7 @@ facetedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, bar_width) {
 facetedLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
   if (hh_debug) {
-    system('logger -p user.notice In facetedLinePlot')
+    system('logger -p user.notice Hedgehog: In facetedLinePlot')
   }
 
     if(gvis == 1){
@@ -438,7 +438,7 @@ facetedLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
     if (hh_debug) {
-      system('logger -p user.notice In facetedDiffLinePlot')
+      system('logger -p user.notice Hedgehog: In facetedDiffLinePlot')
     }
 
     nKeys <- length(unique(df$key))
@@ -476,7 +476,7 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 scatterPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
   if (hh_debug) {
-    system('logger -p user.notice In scatterPlot')
+    system('logger -p user.notice Hedgehog: In scatterPlot')
   }
 
     if(gvis == 1){
@@ -519,7 +519,7 @@ scatterPlot <- function(df, f, title, xlabel, ylabel, gvis) {
 geomap <- function(df, f, title, xlabel, ylabel, gvis) {
 
   if (hh_debug) {
-    system('logger -p user.notice In geomap')
+    system('logger -p user.notice Hedgehog: In geomap')
     msg <- paste('logger -p user.notice file =', f)
     system(msg)
   }
@@ -535,7 +535,7 @@ geomap <- function(df, f, title, xlabel, ylabel, gvis) {
 geochart <- function(df, f, title, xlabel, ylabel, gvis) {
 
   if (hh_debug) {
-    system('logger -p user.notice In geomap')
+    system('logger -p user.notice Hedgehog: In geomap')
     msg <- paste('logger -p user.notice file =', f)
     system(msg)
   }
@@ -583,7 +583,7 @@ getStmntParameters <- function(dsccon, dbdrv, dd_pltid, prepStmtNm, srvrid, star
 generateYaml <- function(dsccon) {
 
   if (hh_debug) {
-      system('logger -p user.notice In generateYaml')
+      system('logger -p user.notice Hedgehog: In generateYaml')
     }
 
   # Only allow yaml calls from local host in this implementation
@@ -758,7 +758,7 @@ generateYaml <- function(dsccon) {
 initPlotOptions <- function() {
   
   if (hh_debug) {
-    system('logger -p user.notice In initPlotOptions')
+    system('logger -p user.notice Hedgehog: In initPlotOptions')
   }
 
   # first, create the groups that link plots to the prepared statements
