@@ -18,7 +18,7 @@
 # Developed by Sinodun IT (www.sinodun.com)
 #
 
-#system('logger -p user.notice Call to Hedgehog startup.R')
+#system('logger -p user.notice Hedgehog: Call to Hedgehog startup.R')
 
 # Set the locale - For some reason this is set in R on the command line
 # but not in Rapache!

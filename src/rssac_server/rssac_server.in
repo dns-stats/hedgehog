@@ -108,7 +108,7 @@ class DnsReaderServer(SocketServer.UDPServer):
         self.zone_size_plot_id = self._get_plot_id('zone_size')
 
         ''' Get server id '''
-        sql = "SELECT id from server where name=%s;"
+        sql = "SELECT id from server where display_name=%s;"
         data = (server_name, )
         fsql = cur.mogrify(sql, data)
         self.logger.debug('SQL Query: {}'.format(fsql))
@@ -122,7 +122,7 @@ class DnsReaderServer(SocketServer.UDPServer):
         
         ''' Get the list of nodes to query '''
         self.nodes = {}
-        sql="SELECT id, ip FROM node WHERE server_id=%s"
+        sql="SELECT id, ip FROM node WHERE server_id=%s and ip is not null"
         data = (self.db_server_id, )
         fsql = cur.mogrify(sql, data)
         self.logger.debug('SQL: {}'.format(fsql))
@@ -131,8 +131,8 @@ class DnsReaderServer(SocketServer.UDPServer):
             self.nodes[node[0]] = node[1]
         if not self.nodes:
             cur.close()
-            raise ValueError('No nodes found for server id {}'.format(self.db_server_id))
-        self.logger.debug('SQL Result: Server id {} has node(s) id {}'.format(self.db_server_id, self.nodes))
+            raise ValueError('No nodes found for server id with IP addresses {}'.format(self.db_server_id))
+        self.logger.debug('SQL Result: Server id {} has IP Adresses for node(s) id {}'.format(self.db_server_id, self.nodes))
     
         ''' Get max serial number '''
         ''' This is read at startup and state is maintained while the server is running '''
@@ -292,15 +292,15 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
 def main():
     ''' parse cmd line args '''
     parser = argparse.ArgumentParser(description='nofify receiver')
-    parser.add_argument('--tsig-name')
-    parser.add_argument('--tsig-key')
-    parser.add_argument('--tsig-algo', 
+    parser.add_argument('-n','--tsig-name')
+    parser.add_argument('-k','--tsig-key')
+    parser.add_argument('-a','--tsig-algo', 
             choices=['hmac-sha1', 'hmac-sha224', 'hmac-sha256', 'hmac-sha384','hmac-sha512'])
-    parser.add_argument('-v', '--verbose', action='count', help='Increase verbosity')
-    parser.add_argument('--log', default='server.log')
+    parser.add_argument('-v', '--verbose', action='count', help='increase verbosity (up to -vvv)')
+    parser.add_argument('-o','--log', default='server.log')
     parser.add_argument('-l', '--listen', metavar="0.0.0.0:53", 
             default="0.0.0.0:53", help='listen on address:port ')
-    parser.add_argument('-s','--server', help='Server name (as in the database, lower case with - replaced by _)', required=True)
+    parser.add_argument('-s','--server', help='server name', required=True)
     args = parser.parse_args()
     host, port = args.listen.split(":")
     

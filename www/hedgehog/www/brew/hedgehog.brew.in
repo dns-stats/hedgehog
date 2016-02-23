@@ -29,7 +29,7 @@ hh_debug <<- 0
 initPltType <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In initPltType')
+	    system('logger -p user.notice Hedgehog: In initPltType')
     }
 
     %><%=gui_config$www$default_plot_type%><%
@@ -39,7 +39,7 @@ initPltType <- function() {
 initPlotDDHtml <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In initPlotDDHtml')
+	    system('logger -p user.notice Hedgehog: In initPlotDDHtml')
     }
 
 	# TODO: These queries should only return plots that are configured for display
@@ -84,7 +84,7 @@ initPlotDDHtml <- function() {
 initServerDDHtml <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In initServerDDHtml')
+	    system('logger -p user.notice Hedgehog: In initServerDDHtml')
     }
 
     if (!(prepStmnt("getsrvrid_display_name", dsccon))) {
@@ -112,7 +112,7 @@ initServerDDHtml <- function() {
 # Generate a nested JSON structure the js code can use to create the node tabs
 initNodeData <- function() {
     if (hh_debug) {
-        system('logger -p user.notice In initNodeTabsHtml')
+        system('logger -p user.notice Hedgehog: In initNodeTabsHtml')
     }
 
     if (!(prepStmnt("getsrvrid_display_name", dsccon)) || !(prepStmnt("getgroups", dsccon)) || !(prepStmnt("getnodes", dsccon)) || !(prepStmnt("getnodesbyregion", dsccon))) {
@@ -171,7 +171,7 @@ initNodeData <- function() {
 getDefaultPlotId <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In getDefaultPlotId')
+	    system('logger -p user.notice Hedgehog: In getDefaultPlotId')
 	}
 	
 	# Query the db to get the default plot id
@@ -192,16 +192,22 @@ getDefaultPlotId <- function() {
 getDefaultGrouping <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In getDefaultGrouping')
+	    system('logger -p user.notice Hedgehog: In getDefaultGrouping')
 	}
 	
 	grouping = gui_config$www$default_node_grouping
+	if (is.null(grouping)) {
+		system('logger -p user.warning Hedgehog: Missing Node Grouping in config file. Using None.')
+		%>none<%
+		return(TRUE)
+	}
+
 	if      (grouping == "instance") {%>instance<%} 
 	else if (grouping == "city")     {%>city<%}
 	else if (grouping == "country")  {%>country<%} 
 	else if (grouping == "none")     {%>none<%}
 	else {
-		system('logger -p user.warning Unsupported Node Grouping present in config file. Using None.')
+		system('logger -p user.warning Hedgehog: Unsupported Node Grouping present in config file. Using None.')
 		%>none<%
 	}
 	return(TRUE)
@@ -210,9 +216,10 @@ getDefaultGrouping <- function() {
 getSupportURL <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In getSupportURL')
+	    system('logger -p user.notice Hedgehog: In getSupportURL')
 	}
 
+    # Calling code checks for missing url
 	%><%=gui_config$www$support_url%><%
 
 	return(TRUE)
@@ -223,7 +230,7 @@ generatePlot <- function(){
     #TODO(refactor): Move more of this code out to the generatePlot.R file
 
 	if(hh_debug){
-		system('logger -p user.notice In generatePlot')
+		system('logger -p user.notice Hedgehog: In generatePlot')
 	}
 
 	source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep=""))
@@ -341,7 +348,7 @@ generatePlot <- function(){
 validateDbVersion <- function() {
 	
 	if (hh_debug) {
-		system('logger -p user.notice In validateDbVersion')
+		system('logger -p user.notice Hedgehog: In validateDbVersion')
 	}
 
 	if (!(prepStmnt("getdbversion", dsccon))) {
@@ -369,7 +376,7 @@ validateDbVersion <- function() {
 #########################################################
 
 if (hh_debug) {
-    system('logger -p user.notice Call to Hedgehog brew')
+    system('logger -p user.notice Hedgehog: Call to Hedgehog brew')
 }
 
 source(paste(hh_config$directories$web_source, "/R/utilities.R", sep = ""))

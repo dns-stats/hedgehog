@@ -76,6 +76,9 @@ NAME_ERROR="It may contain alphanumeric characters, hyphens (-) and full stops (
 NAME_SPACE_ERROR="It may contain alphanumeric characters, spaces and hyphens (-) only."
 IP_REGEXP="^[a-fA-F0-9:\\.]*$"
 IP_ERROR="It must be a valid IPv4 or IPv6 address."
+# This restriction comes from the maximum table name length.
+MAX_SERVERNAME_LEN=11
+
 
 declare -A aNODES
 declare -A aFIELD_OPTIONAL
@@ -106,11 +109,17 @@ aFIELD_ERROR["node_city"]=$NAME_SPACE_ERROR
 aFIELD_ERROR["node_subgroup"]=$NAME_ERROR
 aFIELD_ERROR["node_ip"]=$IP_ERROR
 
-i=1
+i=0
 NEW_SERVER=0
+NODES_UPDATED=0
+NODES_ADDED=0
+NODES_ERRORS=0
+
+echo
+echo "PROCESSING:   SERVER, NODE, GROUP, COUNTRY, CITY, INSTANCE, IP ADDRESS"
 # Read nodes.csv
 while read line || [[ -n "$line" ]]; do
-	
+	i=$(($i+1))
 	trimmed_line=$(echo $line | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
 	if [[ -z ${trimmed_line} ]] || [[ "${trimmed_line}" =~ ^# ]] ; then
@@ -120,11 +129,13 @@ while read line || [[ -n "$line" ]]; do
 	IFS=, read -r aNODES["server_name"] aNODES["node_name"] \
 	                aNODES["node_region"] aNODES["node_country"] \
 	                aNODES["node_city"] aNODES["node_subgroup"] \
-					aNODES["node_ip"] junk <<< "$trimmed_line"
+	                aNODES["node_ip"] junk <<< "$trimmed_line"
 	
+	echo
 	if [[ -n $junk ]] ; then
-		echo "Error: Too many fields in $NODES_FILE line $i"
-		exit 1
+		echo "***ERROR***:  Line $i, Too many fields. This line will be ignored."
+		((NODES_ERRORS++))
+		continue
 	fi
 
 	error="no"
@@ -139,7 +150,8 @@ while read line || [[ -n "$line" ]]; do
 				aNODES["$key"]="null"
 			fi
 			if [ "${aFIELD_OPTIONAL["$key"]}" == "no" ] ; then
-				echo "Line $i, Field $key is not optional."
+				echo "***ERROR***:  Line $i, Field $key is not optional."
+				((NODES_ERRORS++))
 				error="yes"
 				break
 			else
@@ -147,7 +159,8 @@ while read line || [[ -n "$line" ]]; do
 			fi
 		fi
 		if [[ ! ${aNODES["$key"]} =~ ${aFIELD_REGEX["$key"]} ]] ; then
-			echo "Line $i, Field $key value: \"${aNODES["$key"]}\" is not valid. ${aFIELD_ERROR["$key"]} This line will be ignored."
+			echo "***ERROR***:  Line $i, Field $key value: \"${aNODES["$key"]}\" is not valid. ${aFIELD_ERROR["$key"]} This line will be ignored."
+			((NODES_ERRORS++))
 			error="yes"
 			break
 		fi
@@ -156,10 +169,12 @@ while read line || [[ -n "$line" ]]; do
 		continue
 	fi
 	set +f
-	
-	i=$(($i+1))
-		
-	echo "Processing: ${aNODES["server_name"]} ${aNODES["node_name"]} ${aNODES["node_region"]} ${aNODES["node_country"]} ${aNODES["node_city"]} ${aNODES["node_subgroup"]} ${aNODES["node_ip"]}"
+
+	if [ ${aNODES["node_ip"]} == "null" ] ; then
+		echo "PROCESSING:   ${aNODES["server_name"]}, ${aNODES["node_name"]}, ${aNODES["node_region"]}, ${aNODES["node_country"]}, ${aNODES["node_city"]}, ${aNODES["node_subgroup"]},"
+	else
+		echo "PROCESSING:   ${aNODES["server_name"]}, ${aNODES["node_name"]}, ${aNODES["node_region"]}, ${aNODES["node_country"]}, ${aNODES["node_city"]}, ${aNODES["node_subgroup"]}, ${aNODES["node_ip"]}"
+	fi
 	
 	SERVER_ID=$(psql $CONN_STRING -tc "select id from server where display_name='${aNODES["server_name"]}'")
 	if [ -z "$SERVER_ID" ]; then
@@ -170,9 +185,16 @@ while read line || [[ -n "$line" ]]; do
 		SERVER_DB_NAME=${SERVER_DB_NAME//-/_}
 		# subsitute __ for .
 		SERVER_DB_NAME=${SERVER_DB_NAME//./__}
+		if [ ${#SERVER_DB_NAME} -gt $MAX_SERVERNAME_LEN ] ; then
+			echo "***ERROR***:  Line $i, The Server name ${aNODES["server_name"]} is too long to be stored internally in Hedgehog."
+			echo "              Names containing only alphanumeric characters and hyphens can be a maximum of $MAX_SERVERNAME_LEN characters long."
+			echo "              Names also containing full stops must be less than this. This line will be ignored."
+			((NODES_ERRORS++))
+			continue
+		fi
 		SERVER_ID=$(psql $CONN_STRING -tqc "INSERT INTO dsc.server (name, display_name) VALUES ('$SERVER_DB_NAME', '${aNODES["server_name"]}') RETURNING id;")
-		echo "Added server ${aNODES["server_name"]}"
-		NEW_SERVER=1
+		echo "ADDED SERVER: ${aNODES["server_name"]}"
+		((NEW_SERVER++))
 	fi
 	
 	NODE_ID=$(psql $CONN_STRING -tc "select id from dsc.node where server_id=$SERVER_ID and name='${aNODES["node_name"]}'")
@@ -181,11 +203,13 @@ while read line || [[ -n "$line" ]]; do
 	fi
 	if [ -z "$NODE_ID" ] ; then
 		NODE_ID=$(psql $CONN_STRING -tqc "INSERT INTO dsc.node (server_id, name, region, country, city, subgroup, ip) VALUES ($SERVER_ID, '${aNODES["node_name"]}', '${aNODES["node_region"]}', '${aNODES["node_country"]}', '${aNODES["node_city"]}', '${aNODES["node_subgroup"]}', ${aNODES["node_ip"]});")
-		echo "Added node ${aNODES["node_name"]}"
+		echo "ADDED NODE:   ${aNODES["server_name"]}, ${aNODES["node_name"]}"
+		((NODES_ADDED++))
 	else
 		# It would be nice here to only update when something has changed so the user can easily see what changed
 		psql $CONN_STRING -c "UPDATE dsc.node SET server_id=$SERVER_ID, name='${aNODES["node_name"]}', region='${aNODES["node_region"]}', country='${aNODES["node_country"]}', city='${aNODES["node_city"]}', subgroup='${aNODES["node_subgroup"]}', ip=${aNODES["node_ip"]} where id=$NODE_ID;"
-		echo "Updated node ${aNODES["node_name"]} for server ${aNODES["server_name"]}"
+		echo "UPDATED NODE: ${aNODES["server_name"]}, ${aNODES["node_name"]}"
+		((NODES_UPDATED++))
 	fi
 	mkdir -p $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}/incoming
 	chmod 775 $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}/incoming
@@ -193,8 +217,15 @@ while read line || [[ -n "$line" ]]; do
 	junk=""
 done < ${NODES_FILE}
 
-if [ ${NEW_SERVER} -eq 1 ] ; then
+	echo 
+	echo "SUMMARY:"
+	echo " - Servers added    : $NEW_SERVER"
+	echo " - Nodes added      : $NODES_ADDED"
+	echo " - Nodes updated    : $NODES_UPDATED"
+	echo " - Nodes with errors: $NODES_ERRORS"
 	echo
+
+if [ ${NEW_SERVER} -ge 1 ] ; then
 	echo "********************************************************************************"
 	echo "New servers have been added to Hedgehog! To enable the import of data for this"
 	echo "server the 'manage_partitions' script MUST be run manually now."

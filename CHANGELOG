@@ -27,7 +27,7 @@ Features:
 * Added new graph to display Destination Address vs Query rate
 * Added option to group nodes in selection tab by Country/City/Instance and 
   config option for default choice (specified in nodes.csv).
-* Added rssacd demon to collect rssac load time and zone size data. Requires
+* Added rssacd demon to collect rssac load-time and zone-size data. Requires
   management IP Address of node to be specified in nodes.csv
 * Added GeoLite2 data created by MaxMind, available from
   http://www.maxmind.com
@@ -48,7 +48,8 @@ Maintenance/Bug fixes:
   configuration files.
 * Fixed appearance of gvis column chart vAxis
 * Fixed error in rssac reports where ".root-servers.org" was used instead of 
- ".root-servers.net"
+ ".root-servers.net". Also TCP length field is no longer included in the size
+  of the zone. 
 
 
 Hedgehog 2.0.0rc2 - 2015-07-09

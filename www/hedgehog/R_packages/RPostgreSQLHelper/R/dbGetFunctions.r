@@ -77,10 +77,10 @@ dbGetResultSet <- function(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr){
         rs <- try(dbSendQuery(dbiConnection ,sqlQueryStr))
         if(class(rs) == "try-error"){
             if(attempt == 1){
-                system('logger -p user.notice database connection lost')
+                system('logger -p user.notice Hedgehog: database connection lost')
             }
             if(attempt == (maxAttempts+1)){
-                system('logger -p user.crit apache2 failed to reconnect to database: administrator action required')
+                system('logger -p user.notice Hedgehog:crit apache2 failed to reconnect to database: administrator action required')
                 rs <- NULL
             }else{
                 system(paste("logger -p user.notice re-connecting to the database: attempt ", attempt, " of ", maxAttempts, sep=""))
