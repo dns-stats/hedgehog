@@ -145,7 +145,7 @@ prepStmnt <- function(statementNm, dsccon){
                  select n.city as location, count(*), 2 as color, n.city || ' nodes' as type 
                  from node n 
                  where n.id = ANY (string_to_array($5, ',')::integer[])
-                 and server_id=$1
+                 and server_id=$1 and n.city!='' and n.city IS NOT NULL
                  group by n.city;", sep=" ")
                 sql=gsub("\n"," ",sql_joined)
                 rs <- try(dbSendQuery(dsccon, sql))},
@@ -162,7 +162,7 @@ prepStmnt <- function(statementNm, dsccon){
                  union 
                  select n.city as location, count(*), 2 as color, n.city || ' nodes' as type 
                  from node n
-                 where server_id=$1
+                 where server_id=$1 and n.city!='' and n.city IS NOT NULL
                  group by n.city;", sep=" ")
                 sql=gsub("\n"," ",sql_joined)
                 rs <- try(dbSendQuery(dsccon, sql))},
