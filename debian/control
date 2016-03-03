@@ -97,6 +97,7 @@ Section: web
 Depends: ${misc:Depends},
          hedgehog-common (>= ${source:Version}~),
          apache2 (>= 2.4),
+         adduser,
          hedgehog-data-manager
 Suggests: hedgehog-doc
 Description: visualisation tool for DNS [web]
@@ -139,7 +140,8 @@ Description: GNU R package for Hedgehog R PostgreSQL Helper
 
 Package: hedgehog
 Architecture: all
-Depends: r-hedgehog-rpostgresqlhelper,
+Depends: ${misc:Depends},
+         r-hedgehog-rpostgresqlhelper,
          hedgehog-data-manager,
          hedgehog-gui,
          hedgehog-doc,
