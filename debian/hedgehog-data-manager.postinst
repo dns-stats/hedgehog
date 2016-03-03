@@ -16,7 +16,4 @@ if ! dpkg-statoverride --list /var/lib/hedgehog/data >/dev/null; then
   dpkg-statoverride --update --add hedgehog hedgehog 0775 /var/lib/hedgehog/data >/dev/null 2>/dev/null || true
 fi
 
-# Install rssacd startup links
-  update-rc.d rssacd defaults
-
 #DEBHELPER#
