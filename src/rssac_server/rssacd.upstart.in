@@ -1,0 +1,11 @@
+description "RSSAC02 Monitor"
+start on filesystem or runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+respawn limit 10 5
+umask 022
+script 
+ . @HEDGEHOGYAML@/rssacd.conf
+ exec @SBIN@/rssacd -n $TSIG_NAME -k $TSIG_KEY -a $TSIG_ALGO -o $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS
+end script

@@ -8,7 +8,7 @@ P =
 S =
 endif
 
-sysconfdir = @sysconfdir@/hedgehog
+hhconfdir = @sysconfdir@/hedgehog
 
 bin_PROGRAMS = $(D)
 
@@ -47,7 +47,7 @@ python_PYTHON = $(P)
 sbin_SCRIPTS = $(S)
 EXTRA_DIST = rssac_server.in rssacd.in
 
-do_subst_hh = sed -e 's|@HEDGEHOGYAML@|$(sysconfdir)|' -e "s|@DB_VERSION@|@DB_SCHEMA_VERSION@|"
+do_subst_hh = sed -e 's|@HEDGEHOGYAML@|$(hhconfdir)|' -e "s|@DB_VERSION@|@DB_SCHEMA_VERSION@|"
 do_subst_python = sed -e 's|@PYTHON_EXE@|$(PYTHON)|' -e 's|@HHPYSITEDIR@|$(pythondir)|'
 
 rssac_server.py: $(srcdir)/rssac_server/rssac_server.in Makefile
@@ -65,10 +65,14 @@ rssacd.8: rssacd rssac_server.py rssac_server/rssac.py rssac_server/threadpool.p
 
 dsc-extractor.1: dsc-extractor Makefile
 	$(HELP2MAN) -h -h --version-string=@PACKAGE_VERSION@ -N -s 1 --no-discard-stderr -n "Application to extract DSC data from XML or DAT files and insert it in to a Postgresql database. Users are recommended to use the refile_and_grok wrapper script in preference to using this exectutable directly." ./dsc-extractor -o dsc-extractor.1
-	
+
+dist_sysconf_DATA = rssacd.upstart \
+                    rssac_server/rssacd.conf
+
+rssacd.upstart: $(srcdir)/rssac_server/rssacd.upstart.in Makefile
+	sed -e 's|@HEDGEHOGYAML@|$(hhconfdir)|' -e 's|@SBIN@|$(sbindir)|' < $(srcdir)/rssac_server/rssacd.upstart.in > rssacd.upstart
+
 install-data-hook:
-	mkdir -p ${DESTDIR}${sysconfdir}/init.d
-	sed -e 's|@HEDGEHOGYAML@|$(sysconfdir)|' -e 's|@SBIN@|$(sbindir)|' < $(srcdir)/rssac_server/rssacd.init.in > ${srcdir}/rssac_server/rssacd.init
-	cp ${srcdir}/rssac_server/rssacd.init ${DESTDIR}${sysconfdir}/init.d/rssacd
-	chmod 755 ${DESTDIR}${sysconfdir}/init.d/rssacd
-	cp ${srcdir}/rssac_server/rssacd.conf ${DESTDIR}$(sysconfdir)/rssacd.conf
+	mkdir -p ${DESTDIR}${sysconfdir}/init
+	mv ${DESTDIR}${sysconfdir}/rssacd.upstart ${DESTDIR}${sysconfdir}/init/rssacd.conf
+	mv ${DESTDIR}${sysconfdir}/rssacd.conf ${DESTDIR}${hhconfdir}/rssacd.conf
