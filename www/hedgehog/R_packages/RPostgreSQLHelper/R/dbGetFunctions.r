@@ -63,7 +63,7 @@ maxAttempts <- 3
         }
     }
 
-    dbiConnection <<- try(dbConnect(dbiDriver, dbConnStr))	
+    dbiConnection <- eval(parse(text = paste("dbConnect(dbdrv,",  dbConnStr,")")))
 
 }
 
