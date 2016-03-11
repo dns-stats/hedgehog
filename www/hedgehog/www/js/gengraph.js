@@ -70,7 +70,6 @@ $(document).ready(function() {
         // initialise server drop down id to 1 (or 'DB error' if applicable)
         //TODO(asap): Default server should be a config option
         $("#servers").html(ss[0]);
-        $("#servers").val(1);
 
         // check we have at least 1 server
         var servers_ok = server_list_has_content();
