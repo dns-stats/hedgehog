@@ -222,11 +222,11 @@ DSCStrategyFactory::createStrategy(const string &server, const string &name, boo
         return_v.push_back( strat );
         return return_v;       
         
-    } else if (name.compare("client_subnet_vs_tld") == 0) {
-        string keys[1] = {"dummy"};
-        Format4DSCStrategy* strat = new Format4DSCStrategy(server, name,keys,0);
-        return_v.push_back( strat );
-        return return_v;
+    // } else if (name.compare("client_subnet_vs_tld") == 0) {
+    //     string keys[1] = {"dummy"};
+    //     Format4DSCStrategy* strat = new Format4DSCStrategy(server, name,keys,0);
+    //     return_v.push_back( strat );
+    //     return return_v;
         
     //  End format 4
         

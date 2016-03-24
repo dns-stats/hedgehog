@@ -1,0 +1,71 @@
+#!/bin/bash
+# 
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   database_update_tlds_from_zone
+#
+
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -wc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+TLD_TMP="/tmp/hedgehog_tld_inserts.sql"
+
+usage () {
+	echo
+	echo "Update the TLD list in the database. This reads input from IANA ftp site"
+	echo "from the $TLDS_DIR directory."
+	echo "No action is taken on TLDs that are in the database but are not in the input data."
+	echo 
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "$(date): $0 COMMENCED"
+
+TTYPE=$(psql -tc "select id from tld_types where type_name='New-gTLD'")
+echo "insert into tlds (alabel, type) values " > $TLD_TMP
+
+for tld in $(curl ftp://rs.internic.net/domain/root.zone | awk -F\. ' { if (NF == 2) print tolower($1) } ' | awk '/./' | sort | uniq ) ; do
+
+    echo "('$tld', '$TTYPE')," >> $TLD_TMP
+
+done
+sed -i~orig '$ s/.$/;/' $TLD_TMP
+psql $CONN_STRING -tf $TLD_TMP
+
+echo "$(date): $0 COMPLETED"

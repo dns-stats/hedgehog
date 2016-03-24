@@ -131,7 +131,7 @@ class DnsReaderServer(SocketServer.UDPServer):
             self.nodes[node[0]] = node[1]
         if not self.nodes:
             cur.close()
-            raise ValueError('No nodes found for server id with IP addresses {}'.format(self.db_server_id))
+            raise ValueError('No nodes found for server id {} with an IP address'.format(self.db_server_id))
         self.logger.debug('SQL Result: Server id {} has IP Adresses for node(s) id {}'.format(self.db_server_id, self.nodes))
     
         ''' Get max serial number '''
@@ -227,6 +227,7 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         zone_size = self._get_zone_size()
         if zone_size == 0:
             ''' Return because we didn't get an answer '''
+            self.server.logger.warn('Warning: No zone size returned from {}'.format(self.client_address[0]))
             return
         cur = self.server.conn.cursor()
         for node in self.server.nodes.keys():
