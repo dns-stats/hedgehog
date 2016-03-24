@@ -58,14 +58,12 @@ done
 echo "$(date): $0 COMMENCED"
 
 TTYPE=$(psql -tc "select id from tld_types where type_name='New-gTLD'")
-echo "insert into tlds (alabel, type) values " > $TLD_TMP
 
 for tld in $(curl ftp://rs.internic.net/domain/root.zone | awk -F\. ' { if (NF == 2) print tolower($1) } ' | awk '/./' | sort | uniq ) ; do
 
-    echo "('$tld', '$TTYPE')," >> $TLD_TMP
+    echo "insert into tlds (alabel, type) values ('$tld', $TTYPE);" >> $TLD_TMP
 
 done
-sed -i~orig '$ s/.$/;/' $TLD_TMP
 psql $CONN_STRING -tf $TLD_TMP
 
 echo "$(date): $0 COMPLETED"
