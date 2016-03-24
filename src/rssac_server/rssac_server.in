@@ -206,6 +206,7 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         cur.close()
         
     def _get_zone_size(self):
+        self.server.logger.debug('Starting get_zone_size')
         zone      = StringIO.StringIO()
         zone_size = 0
         xfr       = dns.query.xfr(self.client_address[0], self.qname, keyname=self.server.keyname,
@@ -220,11 +221,14 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
             ''' Need to subtract 2 bytes for the TCP length field '''
             zone_size = sys.getsizeof(zone.getvalue()) - 2
         zone.close()
+        self.server.logger.debug('Done get_zone_size')
         return zone_size
 
     def _process_zone_size(self):
+        self.server.logger.debug('Starting process_zone_size')
         start = time.time()
         zone_size = self._get_zone_size()
+        self.server.logger.debug('zone_size {}'.format(zone_size))
         if zone_size == 0:
             ''' Return because we didn't get an answer '''
             self.server.logger.warn('Warning: No zone size returned from {}'.format(self.client_address[0]))
@@ -238,7 +242,8 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
             cur.execute(sql, data)
             self.server.conn.commit()
         cur.close()    
-                    
+        self.server.logger.debug('Done process_zone_size')
+        
     def send_response(self):
         ''' Send notify response '''
         response = dns.message.make_response(self.message)
