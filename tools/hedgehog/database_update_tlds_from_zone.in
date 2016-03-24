@@ -32,7 +32,8 @@ fi
 eval $a
 export PGPASSWORD=$PGPASSWORD
 
-TLD_TMP="/tmp/hedgehog_tld_inserts.sql"
+TLD_TMP="/tmp/hedgehog_tld_inserts_from_zone.sql"
+rm $TLD_TMP
 
 usage () {
 	echo
@@ -58,6 +59,7 @@ done
 echo "$(date): $0 COMMENCED"
 
 TTYPE=$(psql -tc "select id from tld_types where type_name='New-gTLD'")
+TCOUNT1=$(psql -tc "select count(*) from tlds where type = $TTYPE")
 
 for tld in $(curl ftp://rs.internic.net/domain/root.zone | awk -F\. ' { if (NF == 2) print tolower($1) } ' | awk '/./' | sort | uniq ) ; do
 
@@ -65,5 +67,7 @@ for tld in $(curl ftp://rs.internic.net/domain/root.zone | awk -F\. ' { if (NF =
 
 done
 psql $CONN_STRING -tf $TLD_TMP
-
+TCOUNT2=$(psql -tc "select count(*) from tlds where type = $TTYPE")
+TNEW=$((TCOUNT2 - TCOUNT1))
+echo "Added $TNEW New gTLDs to database."
 echo "$(date): $0 COMPLETED"
