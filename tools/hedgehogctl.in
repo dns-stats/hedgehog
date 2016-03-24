@@ -13,6 +13,7 @@ TOOLS=( database_init \
         database_update_geoip \
         database_update_nodes \
         database_update_tlds \
+        database_update_tlds_from_zone \
         datafiles_create_summary \
         datafiles_rm_empty_xml_dirs \
         datafiles_tar_old_xml_files \

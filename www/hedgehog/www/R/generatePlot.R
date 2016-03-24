@@ -245,9 +245,13 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
           # Need to order the table before passing it to gviz
           # write.table(de, file="/tmp/de.out")
           # Dont include the IP ddress in the sum!
-          de$total <- rowSums(de[,-1], na.rm=TRUE);
-          de <-arrange(de, desc(total));
-          de$total <- NULL
+          if (ncol(de) > 2) { 
+            de$total <- rowSums(de[,-1], na.rm=TRUE);
+            de <-arrange(de, desc(total));
+            de$total <- NULL
+          } else {
+            de <-arrange(de, desc(de[[2]]));
+          }
           # p <- gvisTable(de)
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
                             options=list(isStacked=TRUE, title=title, height=600, width=940,
@@ -262,10 +266,12 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
         df$x <- factor(df$x, levels=rev(as.character(df$x)))
         dfmelt <- melt(df)
         de <- cast(dfmelt, x ~ key, value='value')
-        de$total <- rowSums(de, na.rm=TRUE)
-        dorder2 <- de[with(de, order(total)), ]
-        x_order <- dorder2$x
-        df$x <- factor(df$x, levels=x_order)
+        if (ncol(de) > 2) {
+          de$total <- rowSums(de, na.rm=TRUE)
+          dorder2 <- de[with(de, order(total)), ]
+          x_order <- dorder2$x
+          df$x <- factor(df$x, levels=x_order)
+        }
       }
 
       nKeys <- length(unique(df$key))
@@ -448,7 +454,8 @@ facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     df["rkey"] = rkey1
 
     dfx <- arrange(df, x, rkey, desc(key))
-    df1 <- aggregate(dfx$y, by=list(x2=dfx$x, rkey=dfx$rkey), FUN=diff)
+    dfx$y <- ifelse(test = (grepl("responses", dfx$key)), yes = -dfx$y, no = dfx$y)
+    df1 <- aggregate(dfx$y, by=list(x2=dfx$x, rkey=dfx$rkey), FUN=sum)
     df1 <- plyr::rename(df1,c("x"="y", "x2"="x", "rkey"="key"))
     if (gvis == 1) {
         linePlot(df1, f, title, xlabel, ylabel, gvis)
@@ -674,18 +681,18 @@ generateYaml <- function(dsccon) {
                 
                 if (i != s$bucket_max) {
                     bucket <- paste(bucket, i+s$bucket_step-1, sep="")
-          value <- de[which(de$x == i + (s$bucket_step - 1)/2),s$name]
+                    value <- de[which(de$x == i + (s$bucket_step - 1)/2),s$name]
                 } 
-        else if (max(de$x) >= s$bucket_max) {
-          value <- sum(subset(de, x >= s$bucket_max, select = s$name))
-        }
+                else if (max(de$x) >= s$bucket_max) {
+                    value <- sum(subset(de, x >= s$bucket_max, select = s$name))
+                }
 
                 if (length(value)==0 || is.na(value) || is.null(value) || value==0) {
-          bucketlist[[bucket]] <- as.integer(0)
+                    bucketlist[[bucket]] <- as.integer(0)
                 } 
-        else {
-                  bucketlist[[bucket]] <- as.numeric(value)
-        }
+                else {
+                    bucketlist[[bucket]] <- as.numeric(value)
+                }
             }  
             yaml_out[[s$name]] <- bucketlist
         }
@@ -899,6 +906,7 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
   # Now decide how to plot it
   if      (is.null(df))                               {plot_file <- "plots/no_connection.png"}
   else if (nrow(df) == 0)                             {plot_file <- "plots/no_results.png"}
+  else if ((nrow(df) == 1) && (pltnm %in% lineplots)) {plot_file <- "plots/no_results.png"}
   else if (pltnm %in% f1count)                        {stackedAreaPlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
   else if (pltnm %in% lineplots)                      {linePlot            (df, plot_file, mytitle, xlab, ylab, gvis)}
   else if (pltnm %in% facetedlineplots)               {facetedLinePlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
