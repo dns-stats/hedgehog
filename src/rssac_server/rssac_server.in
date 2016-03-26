@@ -78,6 +78,7 @@ class DnsReaderServer(SocketServer.UDPServer):
         
         ''' Start logger '''
         self.logger = logging.getLogger('rssac_propagation.server.DnsReaderServer')
+        self.zone_name = zone_name
         
         if key and keyname:
             self.keyname          = keyname
