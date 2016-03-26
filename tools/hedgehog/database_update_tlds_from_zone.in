@@ -33,7 +33,6 @@ eval $a
 export PGPASSWORD=$PGPASSWORD
 
 TLD_TMP="/tmp/hedgehog_tld_inserts_from_zone.sql"
-rm $TLD_TMP
 
 usage () {
 	echo
@@ -57,6 +56,7 @@ while getopts ":h" opt; do
 done
 
 echo "$(date): $0 COMMENCED"
+rm $TLD_TMP
 
 TTYPE=$(psql -tc "select id from tld_types where type_name='New-gTLD'")
 TCOUNT1=$(psql -tc "select count(*) from tlds where type = $TTYPE")
