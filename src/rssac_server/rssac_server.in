@@ -51,7 +51,7 @@ class DnsReaderServer(SocketServer.UDPServer):
     keyring   = None
     keyalgorithm = None
     
-    def __init__(self, server_address, RequestHandlerClass, server_name, key=None, keyname=None, keyalgo=None):
+    def __init__(self, server_address, RequestHandlerClass, server_name, zone_name, key=None, keyname=None, keyalgo=None):
         SocketServer.UDPServer.__init__(
                 self, server_address, RequestHandlerClass)
         
@@ -209,6 +209,7 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         self.server.logger.debug('Starting get_zone_size')
         zone      = StringIO.StringIO()
         zone_size = 0
+        self.server.logger.debug('xfr query address {} qname {} keyname {}'.format(self.client_address[0], self.qname, self.server.keyname))
         xfr       = dns.query.xfr(self.client_address[0], self.qname, keyname=self.server.keyname,
                     keyring=self.server.keyring, keyalgorithm=self.server.keyalgorithm)
         try:
@@ -259,7 +260,7 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
         try:
             self.message = dns.message.from_wire(self.data)
         except dns.name.BadLabelType:
-            #Error processing lable (bit flip?)
+            #Error processing label (bit flip?)
             self.server.logger.error('Received Bad label Type from {}'.format(self.client_address[0]))
         except dns.message.ShortHeader:
             #Received junk
@@ -268,22 +269,26 @@ class DnsReaderHandler(SocketServer.BaseRequestHandler):
             current_time = int(time.time())
             if self.message.opcode() == 4:
                 self.qname = self.message.question[0].name.to_text()
-                if len(self.message.answer) > 0:
-                    answer = self.message.answer[0]
-                    self.serial = answer.to_rdataset()[0].serial
+                if self.qname == self.server.zone_name:
+                    self.server.logger.debug('Received notify for zone {}'.format(self.qname))
+                    if len(self.message.answer) > 0:
+                        answer = self.message.answer[0]
+                        self.serial = answer.to_rdataset()[0].serial
                     
-                    if int(self.serial) <= int(self.server.max_serial):
-                        self.server.logger.debug('{}:{}:load-time already processed or lower then max({})'.format(
-                            self.qname, self.serial, self.server.max_serial))
+                        if int(self.serial) <= int(self.server.max_serial):
+                            self.server.logger.debug('{}:{}:load-time already processed or lower then max({})'.format(
+                                self.qname, self.serial, self.server.max_serial))
+                            self.send_response()
+                            return False
+                        else:    
+                            self.server.logger.debug('Received notify for {} from {}'.format(self.serial, self.client_address[0]))
+                            self.send_response()
+                            return True
+                    else:
+                        self.server.logger.error('Received notify with no serial from {}'.format(self.client_address[0]))
                         self.send_response()
-                        return False
-                    else:    
-                        self.server.logger.debug('Received notify for {} from {}'.format(self.serial, self.client_address[0]))
-                        self.send_response()
-                        return True
                 else:
-                    self.server.logger.error('Received notify with no serial from {}'.format(self.client_address[0]))
-                    self.send_response()
+                    self.server.logger.debug('Received notify for zone {} expected zone {}, ignoring'.format(self.server.zone_name, self.qname))
         return False
 
     def handle(self):
@@ -307,6 +312,7 @@ def main():
     parser.add_argument('-l', '--listen', metavar="0.0.0.0:53", 
             default="0.0.0.0:53", help='listen on address:port ')
     parser.add_argument('-s','--server', help='server name', required=True)
+    parser.add_argument('-z','--zone',help='zone name', required=True)
     args = parser.parse_args()
     host, port = args.listen.split(":")
     
@@ -324,7 +330,7 @@ def main():
     logger.info('rssacd starting up...')
     
     ''' Init and then run the server '''
-    server = DnsReaderServer((host, int(port)), DnsReaderHandler, args.server,
+    server = DnsReaderServer((host, int(port)), DnsReaderHandler, args.server, args.zone,
             args.tsig_key, args.tsig_name, args.tsig_algo) 
     server.serve_forever()
     

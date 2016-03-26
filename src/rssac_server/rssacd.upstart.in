@@ -7,5 +7,5 @@ respawn limit 10 5
 umask 022
 script 
  . @HEDGEHOGYAML@/rssacd.conf
- exec @SBIN@/rssacd -n $TSIG_NAME -k $TSIG_KEY -a $TSIG_ALGO -o $LOG --listen $LISTEN --server $SERVER $OTHER_ARGS
+ exec @SBIN@/rssacd -n $TSIG_NAME -k $TSIG_KEY -a $TSIG_ALGO -o $LOG --listen $LISTEN --server $SERVER --zone $ZONE $OTHER_ARGS
 end script
