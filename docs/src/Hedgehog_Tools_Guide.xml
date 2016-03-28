@@ -75,7 +75,6 @@ Supported options:
 Usage: database_update_geoip options
 Supported options:
   -h Show this help.]]></ac:plain-text-body></ac:structured-macro>
-<p>&nbsp;</p>
 <h4>database_update_nodes</h4>
 <ul>
 <li>Run this script if new nodes or servers are added to the system</li></ul><ac:structured-macro ac:macro-id="4d9265e8-3cd1-4f78-b752-2861b5671147" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">text</ac:parameter><ac:plain-text-body><![CDATA[Add/update the servers and nodes in the database. This reads input from file
@@ -90,15 +89,14 @@ Usage: /usr/local/bin/hedgehog_database_update_nodes options
 Supported options:
   -d debug mode (set -x).
   -h Show this help.]]></ac:plain-text-body></ac:structured-macro>
-<h4>database_update_tlds</h4>
+<h4>database_update_tlds_from_zone</h4>
 <ul>
-<li>Run this script to update the categorisation of TLDs in the database</li></ul><ac:structured-macro ac:macro-id="7ef95ada-9bd4-46b3-b66a-ba2cfbd01256" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Update the TLD list in the database. This reads input from files
-from the /opt/hedgehog/etc/hedgehog/tlds.d directory.
-No action is taken on TLDs that are in the database but are not in the input files.
-Usage: database_update_tlds options
+<li>Run this script to update the categorisation of TLDs in the database from the root zone held in the IANA database.</li></ul><ac:structured-macro ac:macro-id="7ef95ada-9bd4-46b3-b66a-ba2cfbd01256" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Update the TLD list in the database. This reads input from IANA ftp site
+from the directory.
+No action is taken on TLDs that are in the database but are not in the input data.
+Usage: database_update_tlds_from_zone options
 Supported options:
-  -h Show this help]]></ac:plain-text-body></ac:structured-macro>
-<p>&nbsp;</p>
+  -h Show this help.]]></ac:plain-text-body></ac:structured-macro>
 <h3>Datafiles</h3>
 <h4>datafiles_create_summary</h4>
 <ul>

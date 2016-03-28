@@ -47,8 +47,8 @@ dataset traffic_volume_queries dns Transport:transport IPVersion:dns_ip_version 
 dataset traffic_volume_responses dns Transport:transport IPVersion:dns_ip_version replies-only; 
 dataset traffic_sizes_queries dns Transport:transport MsgLen:msglen queries-only; 
 dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-only; ]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="4eaba3e3-a548-4198-89ac-4dfc069be91f" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# New in 2.1
-dataset client_subnet_vs_tld dns ClientSubnet:cip4_net TLD:tld queries-only max-cells=50;
-dataset server_addr dns All:null ServerAddr:server queries-only;]]></ac:plain-text-body></ac:structured-macro>
+dataset server_addr dns All:null ServerAddr:server queries-only;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="26a887fa-d2f8-4988-9415-ab76c5e22739" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p>Data collection for the server_addr dataset is not yet supported in the official release of DSC, but is available using the latest code from the DSC github repo. Also, note this dataset will contain the source addresses of all responses (QR = 1) seen on the collection node even if they do not originate from the local_address specified in the dsc.conf (i.e. if another server sends a response to the collection node for some reason).</p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <h1>Plots</h1>
 <p>The relationship between the Hedgehog plots and those produced by the DSC Presenter are listed here for convenience.</p>
@@ -334,6 +334,89 @@ dataset server_addr dns All:null ServerAddr:server queries-only;]]></ac:plain-te
 <tr>
 <td colspan="1">&nbsp;</td>
 <td colspan="1">Zone propagation time</td></tr></tbody></table>
+<p>The following plots are new in 2.1</p>
+<table>
+<tbody>
+<tr>
+<th>Hedgehog plot category</th>
+<th>Hedgehog plot display name</th></tr>
+<tr>
+<td><strong>Node Statistics</strong></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<p>By instance</p></td></tr>
+<tr>
+<td>&nbsp;</td>
+<td>By server IP address</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">By city</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">By country</td></tr>
+<tr>
+<td colspan="1"><strong>QTYPE vs TLS</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">QTYPE for most popular Undelegated TLDs</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">QTYPE for most popular ccTLDs</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">QTYPE for most popular Legacy TLDs</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">QTYPE for most popular New TLDs</td></tr>
+<tr>
+<td colspan="1"><strong>Client Subnet Statistics</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Busiest client ASNs &nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Busiest client BGP prefix</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">RCODE by client ASNs &nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">RCODE by clients by BGP prefix&nbsp;</td></tr>
+<tr>
+<td colspan="1"><strong>Classification</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Query classification by clients by BGP prefix</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Query classification by client ASNs</td></tr>
+<tr>
+<td colspan="1"><strong>RSSAC</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p>Zone size</p></td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Zone propagation time</td></tr>
+<tr>
+<td colspan="1"><strong>GEO</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Busiest client locations by country&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Busiest client locations by city</td></tr></tbody></table><ac:structured-macro ac:macro-id="f7a8bc07-2c7e-482e-850b-ad49fc4eae75" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<ul>
+<li><strong>RSSAC: Zone size and Zone propagation time graphs.</strong> In order for data to be available for these graphs, an instance of the <em>rssacd</em><span>&nbsp;demon&nbsp;must be run to collect the data (it is not provided by the DSC collector).</span></li>
+<li><strong>GEO: Busiest client location by country.</strong> Both client locations and collection node locations can be displayed on this graph. For node locations to be displayed the nodes must have a city specified via the nodes.csv file.</li></ul></ac:rich-text-body></ac:structured-macro>
 <h1>Directory Structure</h1>
 <p>If installed from source code Hedgehog uses the following directory structure under the install &lt;prefix&gt; directory (/usr/local/ by default)</p>
 <p><ac:image ac:width="550"><ri:attachment ri:filename="Hedgehog_directory_structure.jpg" /></ac:image></p>
@@ -348,16 +431,16 @@ dataset server_addr dns All:null ServerAddr:server queries-only;]]></ac:plain-te
 <div class="tablesorter-header-inner">Contents</div></th></tr></thead>
 <tbody>
 <tr>
-<td>&lt;prefix&gt;/etc/hedgehog</td>
-<td>/etc/hedgehog</td>
+<td>&lt;prefix&gt;/etc/hedgehog/</td>
+<td>/etc/hedgehog/</td>
 <td colspan="1">Hedgehog configuration files (yaml and nodes)</td></tr>
 <tr>
 <td colspan="1">&lt;prefix&gt;/etc/hedgehog/*.sample</td>
 <td colspan="1">/usr/share/doc/hedgehog/examples/*.sample</td>
 <td colspan="1">Sample Hedgehog configuration files</td></tr>
 <tr>
-<td>&lt;prefix&gt;/var/hedgehog</td>
-<td>/var/lib/hedgehog</td>
+<td>&lt;prefix&gt;/var/hedgehog/</td>
+<td>/var/lib/hedgehog/</td>
 <td colspan="1">
 <p>'data' directory containing XML data</p>
 <p>'www' directory containing cached plots and rssac reports</p></td></tr>
@@ -370,8 +453,8 @@ dataset server_addr dns All:null ServerAddr:server queries-only;]]></ac:plain-te
 <td colspan="1">/usr/bin/refile_and_grok</td>
 <td colspan="1">refile_and_grok script</td></tr>
 <tr>
-<td colspan="1">&lt;prefix&gt;/libexec/hedgehog</td>
-<td colspan="1">/usr/lib/hedgehog</td>
+<td colspan="1">&lt;prefix&gt;/libexec/hedgehog/</td>
+<td colspan="1">/usr/lib/hedgehog/</td>
 <td colspan="1">Hedgehog tools scripts and DDL updates</td></tr></tbody></table>
 <p>In the rest of this document only the relative path under the install location is given so the instructions are applicable to both methods of install.</p>
 <h1>Tools</h1>
