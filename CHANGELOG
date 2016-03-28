@@ -14,13 +14,25 @@
 # limitations under the License.
 #
 
-Hedgehog 2.1.0b1 
+Hedgehog 2.1.0b2 - 2015-03-28
+-----------------------------
+
+* Add script to update TLDs from IANA
+* Updates to documentation
+* Bug fix to handling of nodes.csv input
+* Ensure output format consistent with latest RSSAC02 specs
+* Fix issues with rssacd
+* Support '.' in server names
+* Move webdav config
+* Fix issues with jquery dependancies
+
+
+Hedgehog 2.1.0b1 - 2015-02-01 
 ------------------------------
 
 Features:
 * Added new graphs for different types of TLD (QTYPE and RCODE for most
   popular TLD). Some support for displaying IDN in their unicode glyphs.
-* Added new graph for Client subnet vs TLD
 * Added new graph to display Geo-locations of querying subnets and nodes
 * Added new graphs to display query sources as BGP prefixes or ASN
 * Added new graphs to group nodes by Country/City/Instance
