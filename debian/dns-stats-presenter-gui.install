@@ -1,0 +1,7 @@
+usr/share/dns-stats-presenter/conf/dns-stats-presenter.conf /etc/apache2/sites-available
+usr/share/dns-stats-presenter/conf/rssac.yaml
+etc/dns-stats-presenter/dns-stats-presenter_gui.yaml
+etc/dns-stats-presenter/dns-stats-presenter_gui.yaml.sample /usr/share/doc/dns-stats-presenter/examples/
+usr/share/dns-stats-presenter/www/
+usr/lib/dns-stats-presenter/plotcache_*
+usr/lib/dns-stats-presenter/rssac_*

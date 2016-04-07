@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+if test "$1" = "purge"; then
+    # this could be wrapped inside debconf question whether to remove the data or not
+    rm -rf /usr/lib/dns-stats-presenter/DDL_updates
+
+    rm -rf /var/lib/dns-stats-presenter/data
+    dpkg-statoverride --remove /var/lib/dns-stats-presenter/data >/dev/null 2>/dev/null || true
+    
+    if getent passwd dns-stats-presenter > /dev/null; then
+      deluser --system dns-stats-presenter
+    fi
+fi
+
+#DEBHELPER#

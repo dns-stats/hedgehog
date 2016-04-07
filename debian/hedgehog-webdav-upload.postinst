@@ -1,7 +1,0 @@
-#!/bin/sh
-set -e
-
-# Add hedgehog to the www-data group as webdav will upload as www-data
-adduser hedgehog www-data
-
-#DEBHELPER#

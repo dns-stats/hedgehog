@@ -1,6 +1,0 @@
-usr/bin/hedgehogctl
-usr/share/man/man1/hedgehogctl.1
-etc/hedgehog/hedgehog.yaml
-etc/hedgehog/hedgehog.yaml.sample /usr/share/doc/hedgehog/examples/
-usr/lib/hedgehog/check_user_perms
-usr/lib/hedgehog/conf_read

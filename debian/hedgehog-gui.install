@@ -1,7 +1,0 @@
-usr/share/hedgehog/conf/hedgehog.conf /etc/apache2/sites-available
-usr/share/hedgehog/conf/rssac.yaml
-etc/hedgehog/hedgehog_gui.yaml
-etc/hedgehog/hedgehog_gui.yaml.sample /usr/share/doc/hedgehog/examples/
-usr/share/hedgehog/www/
-usr/lib/hedgehog/plotcache_*
-usr/lib/hedgehog/rssac_*

@@ -29,12 +29,12 @@ override_dh_auto_configure:
 
 override_dh_auto_install:
 	dh_auto_install
-	echo "R:Depends=r-base-core (>= ${rversion})" >> debian/r-hedgehog-rpostgresqlhelper.substvars
+	echo "R:Depends=r-base-core (>= ${rversion})" >> debian/r-dns-stats-presenter-rpostgresqlhelper.substvars
 	install -d -m 755 $(CURDIR)/debian/tmp/usr/lib/R/site-library
 	R CMD INSTALL -l $(CURDIR)/debian/tmp/usr/lib/R/site-library \
-		--clean $(CURDIR)/debian/tmp/usr/share/hedgehog/R_packages/RPostgreSQLHelper \
+		--clean $(CURDIR)/debian/tmp/usr/share/dns-stats-presenter/R_packages/RPostgreSQLHelper \
 		--built-timestamp="$(builttime)"
-	rm -rf $(CURDIR)/debian/tmp/usr/share/hedgehog/R_packages
+	rm -rf $(CURDIR)/debian/tmp/usr/share/dns-stats-presenter/R_packages
 
 override_dh_install:
 	dh_install --fail-missing -X.la

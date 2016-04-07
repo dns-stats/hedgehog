@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: hedgehog
-Source: https://github.com/dns-stats/hedgehog
+Upstream-Name: dns-stats-presenter
+Source: https://github.com/dns-stats/dns-stats-presenter
 
 Files: *
 Copyright: 2014 Internet Corporation for Assigned Names and Numbers
@@ -10,7 +10,7 @@ Files: m4/boost.m4
 Copyright: 2007, 2008, 2009, 2010, 2011 Benoit Sigoure
 License: GPL3+autotools-exception
 
-Files: www/hedgehog/www/stylesheets/skeleton.css
+Files: www/dns-stats-presenter/www/stylesheets/skeleton.css
 Copyright: 2011 Dave Gamache
 License: Expat
 

@@ -1,9 +1,0 @@
-#!/bin/sh
-set -e
-
-if test "$1" = "purge"; then
-  # Remove hedgehog from the www-data group
-  deluser hedgehog www-data
-fi
-
-#DEBHELPER#

@@ -1,4 +1,4 @@
-Source: hedgehog
+Source: dns-stats-presenter
 Section: net
 Priority: optional
 Maintainer: Ondřej Surý <ondrej@debian.org>
@@ -19,10 +19,10 @@ Build-Depends: apache2-dev (>= 2.4),
                help2man
 Standards-Version: 3.9.5
 Homepage: http://dns-stats.org/
-Vcs-Git: https://github.com/dns-stats/hedgehog.git
-Vcs-Browser: https://github.com/dns-stats/hedgehog
+Vcs-Git: https://github.com/dns-stats/dns-stats-presenter.git
+Vcs-Browser: https://github.com/dns-stats/dns-stats-presenter
 
-Package: hedgehog-database
+Package: dns-stats-presenter-database
 Architecture: all
 Depends: ${misc:Depends},
          ${python:Depends},
@@ -31,42 +31,42 @@ Depends: ${misc:Depends},
          python-ipy,
          libgetdns1,
          python-getdns
-Suggests: hedgehog-doc,
+Suggests: dns-stats-presenter-doc,
           unbound,
           pgtune
 Description: visualisation tool for DNS [Database setup file]
- Hedgehog is a visualisation tool for DNS statistics that consumes data
+ dns-stats-presenter is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
  This package contains a script to assist with the Postgresql database setup
 
-Package: hedgehog-common
+Package: dns-stats-presenter-common
 Architecture: all
 Depends: libyaml-tiny-perl,
          ${misc:Depends},
          postgresql-client-common,
          postgresql-client
 Description: visualisation tool for DNS [common files]
- Hedgehog is a visualisation tool for DNS statistics that consumes data
+ dns-stats-presenter is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
  This package contains common configuration files and support scripts.
 
-Package: hedgehog-doc
+Package: dns-stats-presenter-doc
 Architecture: all
 Section: doc
 Depends: ${misc:Depends}
 Description: visualisation tool for DNS [documentation]
- Hedgehog is a visualisation tool for DNS statistics that consumes data
+ dns-stats-presenter is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
- This package contains documentation for Hedgehog.
+ This package contains documentation for dns-stats-presenter.
 
-Package: hedgehog-gui
+Package: dns-stats-presenter-gui
 Architecture: all
 Section: web
 Depends: ${misc:Depends},
-         hedgehog-common (>= ${source:Version}~),
+         dns-stats-presenter-common (>= ${source:Version}~),
          apache2 (>= 2.4),
          libapache2-mod-r-base,
          libjs-jquery,
@@ -79,38 +79,38 @@ Depends: ${misc:Depends},
          r-cran-ggplot2,
          r-cran-reshape,
          r-cran-rjson,
-         r-hedgehog-rpostgresqlhelper,
+         r-dns-stats-presenter-rpostgresqlhelper,
          unifont,
          libcairo2-dev,
          libxt-dev,
          libpq-dev
-Suggests: hedgehog-doc
+Suggests: dns-stats-presenter-doc
 Description: visualisation tool for DNS [web]
- Hedgehog is a visualisation tool for DNS statistics that consumes data
+ dns-stats-presenter is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
  This package contains web pages and Apache configuration.
 
-Package: hedgehog-webdav-upload
+Package: dns-stats-presenter-webdav-upload
 Architecture: all
 Section: web
 Depends: ${misc:Depends},
-         hedgehog-common (>= ${source:Version}~),
+         dns-stats-presenter-common (>= ${source:Version}~),
          apache2 (>= 2.4),
          adduser,
-         hedgehog-data-manager
-Suggests: hedgehog-doc
+         dns-stats-presenter-data-manager
+Suggests: dns-stats-presenter-doc
 Description: visualisation tool for DNS [web]
- Hedgehog is a visualisation tool for DNS statistics that consumes data
+ dns-stats-presenter is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
  This package contains Apache configuration to allow secure upload via webdav.
 
 
-Package: hedgehog-data-manager
+Package: dns-stats-presenter-data-manager
 Architecture: any
 Multi-Arch: foreign
-Depends: hedgehog-common (>= ${source:Version}~),
+Depends: dns-stats-presenter-common (>= ${source:Version}~),
          ${misc:Depends},
          ${shlibs:Depends},
          ${python:Depends},
@@ -120,35 +120,35 @@ Depends: hedgehog-common (>= ${source:Version}~),
          unzip,
          adduser,
          curl
-Suggests: hedgehog-doc
+Suggests: dns-stats-presenter-doc
 Description: visualisation tool for DNS [DSC Extractor]
- Hedgehog is a visualisation tool for DNS statistics that consumes data
+ dns-stats-presenter is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
  This package contains DSC Statistics Extractor.
 
-Package: r-hedgehog-rpostgresqlhelper
+Package: r-dns-stats-presenter-rpostgresqlhelper
 Architecture: all
 Section: gnu-r
 Depends: ${R:Depends},
          ${misc:Depends}
-Description: GNU R package for Hedgehog R PostgreSQL Helper
- Hedgehog is a visualisation tool for DNS statistics that consumes data
+Description: GNU R package for dns-stats-presenter R PostgreSQL Helper
+ dns-stats-presenter is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
- This package contains GNU R PostgreSQL Helper used by Hedgehog.
+ This package contains GNU R PostgreSQL Helper used by dns-stats-presenter.
 
-Package: hedgehog
+Package: dns-stats-presenter
 Architecture: all
 Depends: ${misc:Depends},
-         r-hedgehog-rpostgresqlhelper,
-         hedgehog-data-manager,
-         hedgehog-gui,
-         hedgehog-doc,
-         hedgehog-common,
-         hedgehog-database
+         r-dns-stats-presenter-rpostgresqlhelper,
+         dns-stats-presenter-data-manager,
+         dns-stats-presenter-gui,
+         dns-stats-presenter-doc,
+         dns-stats-presenter-common,
+         dns-stats-presenter-database
 Description: visualisation tool for DNS [common files]
- Hedgehog is a visualisation tool for DNS statistics that consumes data
+ dns-stats-presenter is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
  This package installs all components.
