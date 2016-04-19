@@ -266,7 +266,7 @@ INSERT INTO dataset (name) VALUES ('server_addr');
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('server_addr','1.Node Statistics','By server IP address','Server IP address') 
+    VALUES ('server_addr','11.Server IP','By server IP address','Server IP address') 
     RETURNING id
 ) 
 INSERT INTO dataset_visible_plot SELECT id, (select id from dataset where name='server_addr') FROM rows;
