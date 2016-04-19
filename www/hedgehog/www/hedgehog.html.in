@@ -56,10 +56,11 @@ Developed by Sinodun IT (www.sinodun.com)
   <div class="container">
     <hr style='margin-bottom:5px; margin-top:1px;'/>
     <div class="three columns">
-      <img id="helpimg" src="images/HH_logo.png" alt="About" height="70" width="190" title="About Hedgehog" />
-      <!--<h4 class="remove-bottom">DNS-STATS:</h4>
-      <h4 class="remove-bottom">Hedgehog</h4>-->
-      
+      <div class="logo" id="logo">
+          <h5 class="remove-bottom" style="text-align: center; font-weight: bold">DNS-STATS</h5>
+          <h5 class="remove-bottom" style="text-align: center">Hedgehog @HH_PACKAGE_VERSION@:<br>
+          <a href="https://en.wikipedia.org/wiki/Hedgehog#Genera_and_species">@HH_VERSION_NAME@ release</a></h5>
+      </div>
     </div>
     <form method="get" name="plotParams">
       <div class="four columns" id="timedisplay"><!-- 
@@ -148,7 +149,7 @@ Developed by Sinodun IT (www.sinodun.com)
     </div>
     <div class="sixteen columns" id="copyright" >
       <hr style='margin-top:5px;' />
-      &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Version @HH_PACKAGE_VERSION@. Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
+      &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
     
       <hr style='margin-top:5px;' />
       This product includes GeoLite2 data created by MaxMind, available from
