@@ -1,0 +1,26 @@
+# Format is: alabel, type
+
+aero, Legacy-gTLD
+arpa, Legacy-gTLD
+asia, Legacy-gTLD
+biz, Legacy-gTLD
+cat, Legacy-gTLD
+com, Legacy-gTLD
+coop, Legacy-gTLD
+edu, Legacy-gTLD
+gov, Legacy-gTLD
+info, Legacy-gTLD
+int, Legacy-gTLD
+jobs, Legacy-gTLD
+mil, Legacy-gTLD
+mobi, Legacy-gTLD
+museum, Legacy-gTLD
+name, Legacy-gTLD
+net, Legacy-gTLD
+org, Legacy-gTLD
+post, Legacy-gTLD
+pro, Legacy-gTLD
+sncf, Legacy-gTLD
+tel, Legacy-gTLD
+travel, Legacy-gTLD
+xxx, Legacy-gTLD

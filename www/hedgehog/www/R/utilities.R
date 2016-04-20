@@ -1,5 +1,5 @@
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 handleTimeframe <- function() {
 	
 	if (hh_debug) {
-		system('logger -p user.notice In handleTimeFrame')
+		system('logger -p user.notice Hedgehog: In handleTimeFrame')
 	}
     
 	# Ensure data being pulled back is no more recent than presentation_delay_in_hours ago
@@ -38,7 +38,7 @@ handleTimeframe <- function() {
 validateGetParams <- function() {
 	
 	if (hh_debug) {
-		system('logger -p user.notice In validateGetParams')
+		system('logger -p user.notice Hedgehog: In validateGetParams')
 	}
 	
 	if (is.null(GET$type)) 
@@ -47,27 +47,27 @@ validateGetParams <- function() {
     # Check that all calls to this function have the required parameters
 	if (GET$type == "generatePlot" || GET$type == "generateYaml") {
 		if (is.null(GET$start) || is.null(GET$stop)) {
-			system('logger -p user.notice Invalid time')
+			system('logger -p user.notice Hedgehog: Invalid time')
 			return(FALSE)
 		}
 		if (is.null(GET$pltid)) 	 {
-			system('logger -p user.notice In Hedgehog:validateGetParams - invalid pltid')
+			system('logger -p user.notice Hedgehog: In Hedgehog:validateGetParams - invalid pltid')
 			return(FALSE)
 		}
 		if (is.null(GET$svrid))		 {
-			system('logger -p user.notice In Hedgehog:validateGetParams - invalid svrid')
+			system('logger -p user.notice Hedgehog: In Hedgehog:validateGetParams - invalid svrid')
 			return(FALSE)
 		}
 		if (is.null(GET$gvis))			 {
-			system('logger -p user.notice In Hedgehog:validateGetParams - invalid gvis')
+			system('logger -p user.notice Hedgehog: In Hedgehog:validateGetParams - invalid gvis')
 			return(FALSE)
 		}
 		if (is.null(GET$svrnm)) 				 {
-			system('logger -p user.notice In Hedgehog:validateGetParams - invalid svrnm')
+			system('logger -p user.notice Hedgehog: In Hedgehog:validateGetParams - invalid svrnm')
 			return(FALSE)
 		}
 		if (is.null(GET$ndarr))					 {
-			system('logger -p user.notice In Hedgehog:validateGetParams - invalid ndarr')
+			system('logger -p user.notice Hedgehog: In Hedgehog:validateGetParams - invalid ndarr')
 			return(FALSE)
 		}
 		handleTimeframe()

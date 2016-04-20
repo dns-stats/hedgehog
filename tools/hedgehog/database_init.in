@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,7 +88,6 @@ echo
 export PGPASSWORD=$hhconfig_database_owner_pass
 
 psql -h $hhconfig_database_host -d $hhconfig_database_name <<EOF
-  CREATE SCHEMA dsc AUTHORIZATION "$hhconfig_database_owner";
   REVOKE ALL ON DATABASE "$hhconfig_database_name" FROM public;
   ALTER DEFAULT PRIVILEGES FOR ROLE $hhconfig_database_owner IN SCHEMA dsc GRANT SELECT ON TABLES TO hh_read;
   GRANT CONNECT ON DATABASE "$hhconfig_database_name" TO hh_read;
@@ -122,25 +121,29 @@ echo
 # Populate the dsc.plot and dsc.iana_lookup tables
 echo "Populating lookup tables (dsc.plot, dsc.iana_lookup)"
 psql -h $hhconfig_database_host -d $hhconfig_database_name  < @DATA@/hedgehog/sql/insert_lookup_data.sql #> /dev/null
-
-echo "Populate servers and nodes"
-@LIBEXEC@/database_update_nodes -s
 ###########################################################
 
 ###################  RUN DDL scripts  #####################
 ###########################################################
 # Run any scripts needed to update the DB
 echo "Running DDL scripts"
-@LIBEXEC@/DDL_updates/000008_ddl_traffic_difference
-# Skip the index creation as database_manage_partitions will do it
-# for us. Still need to run the script too ensure database versions are correct.
-@LIBEXEC@/DDL_updates/000009_ddl_node_index -s
+# 000010_ddl not run, as requires super user. Done in DB create.
+@LIBEXEC@/DDL_updates/000011_ddl_new_graphs
+# DB schema now contains the new index, therefore only run script to update version
+@LIBEXEC@/DDL_updates/000012_ddl_lower_key_index -s
+###########################################################
+
+###################  POPULATE TABLES  #####################
+###########################################################
+echo "Populate servers and nodes"
+@LIBEXEC@/database_update_tlds
+@LIBEXEC@/database_update_geoip
+@LIBEXEC@/database_update_nodes
 ###########################################################
 
 #############  PARTITION DATA TABLES  #####################
 ###########################################################
 # Partition the dsc.data table: create 1 table per month per server per plot
-# TODO: replace this will a call to the manage_partitions script
 echo "Creating partitioned tables for dsc.data (1 table per month per server per plot type)"
 echo "This may take some time if there is a lot of historic data to import"
 i=1
@@ -155,3 +158,4 @@ do
   DNOW=`date --date="$DNOW_FIRST" +%Y-%m`
 done
 ###########################################################
+echo "database_init complete"

@@ -62,6 +62,17 @@ const std::string currentDateTime() {
 
 }
 
+void replace_string(std::string& str, const std::string& from, const std::string& to) {
+    if(from.empty())
+        return;
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
+}
+
+
 DSCIOManager::DSCIOManager(const enum INPUT_OUTPUT input, const enum INPUT_OUTPUT output, const string& conn_string, const string& processing_start_date_string, bool rssac) {
 
     input_ = input;
@@ -211,7 +222,9 @@ DSCIOManager::dsc_import_input_from_source() {
     
     string node = bfs::initial_path().filename().generic_string();
     string server = bfs::initial_path().parent_path().filename().generic_string();
+    //transform to 'internal' name
     replace(server.begin(), server.end(), '-', '_');
+    replace_string(server, ".", "__");
     transform(server.begin(), server.end(), server.begin(), ::tolower);
     
     cout << "*** Processing server: " << server << endl;

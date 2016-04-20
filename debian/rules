@@ -18,7 +18,7 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
 # main loop
 %:
-	dh $@  --with autotools-dev,autoreconf
+	dh $@  --with autotools-dev,autoreconf,python2
 
 # the R install logic simplified from r-cran.mk
 rversion	:= $(shell dpkg-query -W -f='$${Version}' r-base-dev)

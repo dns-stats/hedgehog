@@ -26,7 +26,7 @@ Developed by Sinodun IT (www.sinodun.com)
 	<!-- Basic Page Needs
   ================================================== -->
 	<meta charset="utf-8">
-	<title>Hedgehog</title>
+	<title>DNS-STATS: About Hedgehog</title>
 	<meta name="Hedgehog" content="">
 	<meta name="jad@sinodun.com" content="">
 
@@ -36,9 +36,9 @@ Developed by Sinodun IT (www.sinodun.com)
 
 	<!-- CSS
   ================================================== -->
-	<link rel="stylesheet" href="stylesheets/base.css?version=PACKAGEVERSION">
-	<link rel="stylesheet" href="stylesheets/skeleton.css?version=PACKAGEVERSION">
-	<link rel="stylesheet" href="stylesheets/layout.css?version=PACKAGEVERSION">
+	<link rel="stylesheet" href="stylesheets/base.css?version=@HH_PACKAGE_VERSION@">
+	<link rel="stylesheet" href="stylesheets/skeleton.css?version=@HH_PACKAGE_VERSION@">
+	<link rel="stylesheet" href="stylesheets/layout.css?version=@HH_PACKAGE_VERSION@">
 
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -55,19 +55,36 @@ Developed by Sinodun IT (www.sinodun.com)
     <body>
         <div class="container">
             <div class="sixteen columns">
-                <h2 class="remove-bottom">About Hedgehog</h2>
-                <h5>Version @HH_PACKAGE_VERSION@</h5>
+                </br>
+                <h2 class="remove-bottom">About DNS-STATS:Hedgehog</h2>
+                <h5>Version @HH_PACKAGE_VERSION@: @HH_VERSION_NAME@ release</h5>
                 <hr style='margin-bottom:10px;' />
-                <a href="hedgehog.html">Hedgehog</a> is a visualisation tool for DNS statistics that consumes data acquired with the <a href="http://dns.measurement-factory.com/tools/dsc/">DSC</a> collector. <br/> Hedgehog was initially developed for <a href="http://www.icann.org/">ICANN</a> by <a href="http://sinodun.com/">Sinodun IT</a> and is now released open source under the Apache License, version 2.0. For more information on the development and support of Hedgehog see the <a href="http://dns-stats.org/">dns-stats</a> website.
+                    <a href="hedgehog.html">DNS-STATS:Hedgehog</a> is a visualisation tool for DNS statistics that consumes data acquired with the 
+                    <a href="http://dns.measurement-factory.com/tools/dsc/">DSC</a> collector. <br/> Hedgehog was initially developed for 
+                    <a href="http://www.icann.org/">ICANN</a> by <a href="http://sinodun.com/">Sinodun IT</a> and is now released open 
+                    source under the Apache License, version 2.0. For more information on the development and support of DNS-STATS:Hedgehog see 
+                    the <a href="http://dns-stats.org/">dns-stats</a> website.<br>
+                    The DNS-STATS:Hedgehog software releases are named after <a href="https://en.wikipedia.org/wiki/Hedgehog#Genera_and_species">subspecies</a> of hedgehogs.
                 <hr />
                 <ul>
+                    <h5>Quick Help</h5></br>
                     <li><strong>Plots</strong>
                         <ul class="discs">
-                            <li>The paradigm in Hedgehog is that the user selects a set of criteria (plot, time window, plot type and node selection) and then hits the 'Generate Plot!' button. (It is not the case that changing e.g. the plot or node selection immediately re-generates the current plot.)</li>
-                            <li>The static plots are .png files. Hedgehog offers the option to view these plots as normal line plots, stacked line plots or line plots with a logarithmic y-axis.</li>
-                            <li>The interactive plots are based on GoogleViz and provide zoom controls (fixed intervals at the top left and a slider bar at the bottom) and display data values along the top as the user moves their mouse over the plot window.</li>
-                            <li>Plots are cached as they are viewed. The 'day' plots (midnight-midnight) for the previous day are cached overnight.</li>
-                            <li>For line plots of less than or equal to one day interval the data points are 1 minute apart by default. Where the time interval is greater than 1 day the data is averaged to improve the appearance of the plot. These averaged plots contain a fixed number of data points which results in the interval between the data points being 7 minutes for a 'week' plot and ~30 minutes for a 'month' plot.</li>
+                            <li>The paradigm in Hedgehog is that the user selects a set of criteria (plot, time window, 
+                                plot type and node selection) and then hits the 'Generate Plot!' button. (It is not the case
+                                that changing e.g. the plot or node selection immediately re-generates the current plot.)</li>
+                            <li>The static plots are .png files. Hedgehog offers the option to view these plots as normal
+                                line plots, stacked line plots or line plots with a logarithmic y-axis.</li>
+                            <li>The interactive plots are based on GoogleViz and provide zoom controls (fixed intervals 
+                                at the top left and a slider bar at the bottom) and display data values along the top as the
+                                user moves their mouse over the plot window.</li>
+                            <li>Plots are cached as they are viewed. The 'day' plots (midnight-midnight) for the previous
+                                day are cached overnight.</li>
+                            <li>For line plots of less than or equal to one day interval the data points are 1 minute 
+                                apart by default. Where the time interval is greater than 1 day the data is averaged to improve
+                                the appearance of the plot. These averaged plots contain a fixed number of data points which 
+                                results in the interval between the data points being 7 minutes for a 'week' plot and ~30 minutes
+                                for a 'month' plot.</li>
                         </ul>
                     </li>
                     <li><strong>Time</strong>
@@ -83,14 +100,31 @@ Developed by Sinodun IT (www.sinodun.com)
                     </li>
                     <li><strong>Node selection</strong>
                         <ul class="discs">
-                            <li>The nodes are displayed in groups, including an 'All' group. Within each group the node selection can be altered with the 'Actions' buttons. The icons next to the group names indicate if all (full circle), some (half circle) or none (empty circle) of the nodes in that group are included in the plot selection. Clicking on an individual node selects or de-selects that node. </li>
+                            <li>The nodes are displayed in different tabs for each top level Group, including an 'All' group.</li> 
+                            <li>The nodes may be further grouped for display/selection purposes by 
+                                either Country/City/Instance or not grouped at all. This grouping is controlled via the radio selection next to
+                                the server drop down. This selection does not affect how nodes are grouped in plots; choose a different plot
+                                under the 'Node Statistics' category to change the grouping in plots.</li>
+                            <li>Within each Group tab, bulk node selections can be altered with the 'Actions' buttons.
+                                The icons next to the Group/Country/City/Instance names indicate if all (full circle), some (half circle) or none (empty circle) of the nodes
+                                in that choice are included in nodes for plot generation. Clicking on an individual Country/City/Instance/Node selects or de-selects that choice. </li>
                         </ul>
                     </li>
+                    <li><strong>Static link</strong>
+                         <ul class="discs">
+                             <li>The static link provided below the plot window is a link to a cached version of the plot file on the Hedgehog server. 
+                             This link may not be valid if the cache has been flushed since the plot was originally produced.</li>
+                         </ul>
+                     </li>
                 </ul>
             </div>
             <div class="sixteen columns" id="copyright" >
                 <hr />
                 &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
+            
+              <hr style='margin-top:5px;' />
+              This product includes GeoLite2 data created by MaxMind, available from
+              <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
             </div>
         </div>
     </body>

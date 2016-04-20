@@ -43,7 +43,10 @@ $(document).ready(function() {
     window.selectedOpt = null;
 
     // populate plot and server dropdowns and nodetabs then generate default plot    
-    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), brew("initNodeTabsHtml"), brew("getDefaultPlotId")).done(function(db,rp, pt, ss, nt, dp){
+    // , brew("initnodeslist"),
+    $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), 
+           brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), 
+           brew("getSupportURL")).done(function(db,rp, pt, ss, nd, dg, dp, su){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -67,7 +70,6 @@ $(document).ready(function() {
         // initialise server drop down id to 1 (or 'DB error' if applicable)
         //TODO(asap): Default server should be a config option
         $("#servers").html(ss[0]);
-        $("#servers").val(1);
 
         // check we have at least 1 server
         var servers_ok = server_list_has_content();
@@ -78,15 +80,22 @@ $(document).ready(function() {
             return;
 	    }
 
-        // initialise node tabs
-        $("#nodetabs").html(nt[0]);
+        // initialise node tabs and grouping
+        initNodeHtml(nd[0]);
+        $('#ng_' + dg[0]).prop('checked', true);
+
         setServersGroups();
         initnodetabs();
         serverTab();
+        
+        // checks for undefined, null and empty string
+        if (!(!su[0] || su[0].length === 0 || !su[0].trim())) {
+            $("#support_link").attr('href', su[0]);
+        }
 
         // generate default plot
-       genDSCGraph();
-       setInitHelpMsg(true);
+        genDSCGraph();
+        setInitHelpMsg(true);
 
     });
     
@@ -99,7 +108,7 @@ $(document).ready(function() {
     $("#plotType").change(function() {
        enableGenerate(true);
     });
-    
+
     // register callback function for when the generate plot button is clicked
     $("#generate").click(function() {
         genDSCGraph();
@@ -132,9 +141,10 @@ function genDSCGraph() {
     // call hedgehog.brew to generate a plot
     var gvis = 0;
     if ($('#googleviz').prop('checked') === true) gvis = 1;
-    
+
     var pltid = $("#plotType option:selected").val();
-    var svrnm = $("#servers option:selected").text();
+    var svrnm_tmp = $("#servers option:selected").text();
+    var svrnm = parse_name(svrnm_tmp);
     var svrid = $("#servers option:selected").val();
         
     var ndset = {};
@@ -142,7 +152,7 @@ function genDSCGraph() {
     $("input[type='checkbox'].nodeselection").each(function(){
         if( $(this).attr('id').split('_')[2] === svrnm) {
             if( $(this).is(':checked') ) {
-                var node_id = $(this).val().split("_")[0];
+                var node_id = $(this).attr('id').split("_")[0];
                 ndset[node_id] = true;
             }else{
                 allselected = false;
@@ -158,7 +168,8 @@ function genDSCGraph() {
         }
         ndarr = ndarr.substring(0, ndarr.length - 1);
         if(ndarr === '') {
-            ndarr = -1;
+            window.alert("You must select at least one node")
+            return
         }
     }
     
@@ -212,16 +223,19 @@ function toggle_plot() {
         $('#liny').removeClass('hidden');
         $('#logy').addClass('hidden');
         $('#stack').addClass('hidden');
+        $("#ploturi").val($("#liny").prop("name"));
     } else if ($("#rblogy").prop('checked')) {
         window.selectedOpt = "#rblogy";
         $('#liny').addClass('hidden');
         $('#logy').removeClass('hidden');
         $('#stack').addClass('hidden');
+        $("#ploturi").val($("#logy").prop("name"));
     } else if ($("#rbstack").prop('checked')) {
         window.selectedOpt = "#rbstack";
         $('#liny').addClass('hidden');
         $('#logy').addClass('hidden');
         $('#stack').removeClass('hidden');
+        $("#ploturi").val($("#stack").prop("name"));
     }
 }
 

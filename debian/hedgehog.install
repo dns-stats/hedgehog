@@ -1,3 +1,0 @@
-usr/share/hedgehog/conf/hedgehog.conf /etc/hedgehog/apache.conf
-usr/share/hedgehog/conf/rssac.yaml /etc/hedgehog/rssac.yaml
-usr/share/hedgehog/www/

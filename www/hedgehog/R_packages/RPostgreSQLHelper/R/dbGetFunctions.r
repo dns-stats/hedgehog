@@ -1,5 +1,5 @@
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ maxAttempts <- 3
         }
     }
 
-    dbiConnection <<- try(dbConnect(dbiDriver, dbConnStr))	
+    dbiConnection <- eval(parse(text = paste("dbConnect(dbdrv,",  dbConnStr,")")))
 
 }
 
@@ -77,13 +77,13 @@ dbGetResultSet <- function(dbiDriver, dbiConnection, dbConnStr, sqlQueryStr){
         rs <- try(dbSendQuery(dbiConnection ,sqlQueryStr))
         if(class(rs) == "try-error"){
             if(attempt == 1){
-                system('logger -p user.notice database connection lost')
+                system('logger -p user.notice Hedgehog: Error sending query to database')
             }
             if(attempt == (maxAttempts+1)){
-                system('logger -p user.crit apache2 failed to reconnect to database: administrator action required')
+                system('logger -p user.notice Hedgehog: Critical Giving up trying to send query to the database: administrator action required')
                 rs <- NULL
             }else{
-                system(paste("logger -p user.notice re-connecting to the database: attempt ", attempt, " of ", maxAttempts, sep=""))
+                system(paste("logger -p user.notice Hedgehog: Info re-connecting to the database: attempt ", attempt, " of ", maxAttempts, sep=""))
                 .reload(dbiDriver, dbiConnection, dbConnStr)
             }
         }else break

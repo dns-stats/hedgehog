@@ -1,5 +1,5 @@
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(Hedgehog, 2.0.0rc2,  dns-stats-users@dns-stats.org)
+AC_INIT(Hedgehog, 2.1.0b2,  dns-stats-users@dns-stats.org)
 AC_CONFIG_SRCDIR([tools/hedgehogctl.in])
 AC_CONFIG_HEADER([config.h])
 
-AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[7],[Database version])
-AC_SUBST([DB_SCHEMA_VERSION],[7])
+AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[9],[Database version])
+AC_SUBST([DB_SCHEMA_VERSION],[9])
+AC_SUBST([VERSION_NAME],[Daurian])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -41,6 +42,12 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_LIBTOOL
 LT_INIT
+AM_PATH_PYTHON
+AC_PATH_PROG(HELP2MAN, help2man)
+if test -z "$HELP2MAN"
+then
+  AC_MSG_ERROR("help2man not found")
+fi
 
 AC_CONFIG_FILES(Makefile conf/Makefile tools/Makefile)
 

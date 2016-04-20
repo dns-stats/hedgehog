@@ -1,0 +1,112 @@
+#!/bin/bash
+# 
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   database_update_tlds
+#
+
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -wc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+TLDS_DIR=$CONF_DIR/tlds.d
+TLD_TMP="/tmp/hedgehog_tld_inserts.sql"
+COUNT=0
+
+usage () {
+	echo
+	echo "Update the TLD list in the database. This reads input from files"
+	echo "from the $TLDS_DIR directory."
+	echo "No action is taken on TLDs that are in the database but are not in the input files."
+	echo 
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "$(date): $0 COMMENCED"
+
+if [ ! -d "$TLDS_DIR" ] ; then
+	echo "No tlds.d dir found. Expecting a dir $TLDS_DIR... done..."
+	exit 1
+fi
+
+echo "insert into tlds (alabel, type)" > $TLD_TMP
+
+for TLD_FILE in ${TLDS_DIR}/* ; do
+  # Process the tld file
+  echo "Processing file: " $TLD_FILE
+  while read line || [[ -n "$line" ]]; do
+  	trimmed_line=$(echo $line | sed -e 's/^ *//' -e 's/ *$//')
+
+  	if [[ -z ${trimmed_line} ]] || [[ "${trimmed_line}" =~ ^# ]] ; then
+  		continue
+  	fi	
+	
+  	OIFS=$IFS
+  	IFS=','
+  	read -ra arrline <<< "$trimmed_line"
+  	IFS=$OIFS
+  	ALABEL=$(echo ${arrline[0]} | sed -e 's/^ *//' -e 's/ *$//')
+    TLDTYPE=$(echo ${arrline[1]} | sed -e 's/^ *//' -e 's/ *$//')
+    
+  	# First, validate the input	
+  	if [ -z "$ALABEL" ] ; then
+  		echo "Missing alabel. This entry will be ignored."
+  		continue
+  	fi	
+	
+  	if ! [[ "${ALABEL}" =~ ^[a-zA-Z0-9\-]+$ ]] ; then
+  		echo "alabel name '${ALABEL}' is invalid. It may contain alphanumeric characters and hyphens (-) only. This entry will be ignored."
+  		continue
+  	fi
+    
+  	if [ -z "$TLDTYPE" ] ; then
+    	echo "Missing TLD type field for alabel $ALABEL - alabel ignored"
+    	continue
+    fi
+    
+    if [ $COUNT -gt 0 ]; then
+      echo "UNION" >> $TLD_TMP
+    fi
+    echo "select lower('${ALABEL}'), id from tld_types where type_name='${TLDTYPE}'" >> $TLD_TMP
+    (( COUNT+=1 ))
+  done < ${TLD_FILE}
+done
+echo ";" >> $TLD_TMP
+psql $CONN_STRING -tf $TLD_TMP
+
+echo "$(date): $0 COMPLETED"

@@ -1,24 +1,28 @@
 
-<p><ac:structured-macro ac:name="toc" /></p>
+<p><ac:structured-macro ac:macro-id="a93a02e9-93ad-4b13-b26a-5c1cb6b996ce" ac:name="toc" ac:schema-version="1" /></p>
 <h1>Overview of Hedgehog</h1>
 <p>Hedgehog is a visualisation tool for DNS statistics that consumes data&nbsp;acquired with the DSC collector.</p>
 <p>Hedgehog was initially developed for ICANN by Sinodun IT and is now released&nbsp;open source under the Apache License, version 2.0. For more information on the development and support of Hedgehog see the <a href="http://www.dns-stats.org">http://www.dns-stats.org</a>&nbsp;website.</p>
 <h1>Components</h1>
-<p>Hedgehog comprises 2 components which can be run on the same or different machines:</p>
+<p>Hedgehog comprises 3 components which can be run on the same or different machines:</p>
 <ul>
+<li>A Postgres Database</li>
 <li>Data Manager
 <ul>
 <li>Scripts for database creation and management</li>
 <li>XML/DAT processing</li></ul></li>
-<li>Web front-end</li></ul>
+<li>Web GUI front-end</li></ul>
 <h2>Installation options</h2>
-<p>Hedgehog can be installed to run on a single server with both components and the DB local to that server.&nbsp;</p>
+<p>Hedgehog can be installed to run on a single server with all the components local to that server.&nbsp;</p>
 <p><ac:image ac:height="400"><ri:attachment ri:filename="Hedgehog_component_view.jpg" /></ac:image></p>
 <p>Alternatively the DB may be on a remote server and the Data Manager and Web front-end may be on different servers as shown below.</p>
 <p><ac:image ac:height="400"><ri:attachment ri:filename="Hedgehog_component_view_split.jpg" /></ac:image></p>
-<p>The installation is documented separately in the Installation guide PDF.</p>
+<h3>Install from Packages (Ubuntu)</h3>
+<p>In 2.1 packages for Ubuntu are provided for Hedgehog. It is recommended to use this method for new installs and that existing installs migrate to this method in 2.1 (see the Installation and Upgrade Guides for details).</p>
+<h3>Install from Source Code</h3>
+<p>2.1 can also be installed directly from source code if desired.</p>
 <h1>Datasets</h1>
-<p>An example dsc.conf file for the data sets that Hedgehog supports is given below:</p><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[# Basic data sets
+<p>An example dsc.conf file for the data sets that Hedgehog supports is given below:</p><ac:structured-macro ac:macro-id="4b93a047-e94d-4b6b-a945-fb6e5ec2414a" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# Basic data sets
 dataset qtype dns All:null Qtype:qtype queries-only;
 dataset rcode dns All:null Rcode:rcode replies-only;
 dataset opcode dns All:null Opcode:opcode queries-only;
@@ -37,15 +41,17 @@ dataset rd_bit dns All:null RD:rd_bit queries-only;
 dataset ipv6_rsn_abusers dns All:null ClientAddr:client queries-only,aaaa-or-a6-only,root-servers-net-only max-cells=50;
 dataset transport_vs_qtype dns Transport:transport Qtype:qtype queries-only;
 dataset direction_vs_ipproto ip Direction:ip_direction IPProto:ip_proto any;
-dataset dns_ip_version_vs_qtype dns IPVersion:dns_ip_version Qtype:qtype queries-only;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[# Additional data sets for RSSAC
+dataset dns_ip_version_vs_qtype dns IPVersion:dns_ip_version Qtype:qtype queries-only;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="eb6a3061-2017-49ee-aad8-6b96ad729e08" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# Additional data sets for RSSAC
 dataset unique_sources dns IPVersion:dns_ip_version ClientAddr:client queries-only; 
 dataset traffic_volume_queries dns Transport:transport IPVersion:dns_ip_version queries-only; 
 dataset traffic_volume_responses dns Transport:transport IPVersion:dns_ip_version replies-only; 
 dataset traffic_sizes_queries dns Transport:transport MsgLen:msglen queries-only; 
-dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-only; ]]></ac:plain-text-body></ac:structured-macro>
+dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-only; ]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="4eaba3e3-a548-4198-89ac-4dfc069be91f" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# New in 2.1
+dataset server_addr dns All:null ServerAddr:server queries-only;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="26a887fa-d2f8-4988-9415-ab76c5e22739" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p>Data collection for the server_addr dataset is not yet supported in the official release of DSC, but is available using the latest code from the DSC github repo. Also, note this dataset will contain the source addresses of all responses (QR = 1) seen on the collection node even if they do not originate from the local_address specified in the dsc.conf (i.e. if another server sends a response to the collection node for some reason).</p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <h1>Plots</h1>
-<p>The relationship between the Hedgehog plots and those produced by DSC are listed here for convenience.</p>
+<p>The relationship between the Hedgehog plots and those produced by the DSC Presenter are listed here for convenience.</p>
 <table>
 <tbody>
 <tr>
@@ -321,39 +327,164 @@ dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-on
 <td colspan="1">Traffic volume differences</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Unique sources</td></tr></tbody></table>
+<td colspan="1">Unique sources</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Zone size</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Zone propagation time</td></tr></tbody></table>
+<p>The following plots are new in 2.1</p>
+<table>
+<tbody>
+<tr>
+<th>Hedgehog plot category</th>
+<th>Hedgehog plot display name</th></tr>
+<tr>
+<td><strong>Node Statistics</strong></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<p>By instance</p></td></tr>
+<tr>
+<td>&nbsp;</td>
+<td>By server IP address</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">By city</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">By country</td></tr>
+<tr>
+<td colspan="1"><strong>QTYPE vs TLS</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">QTYPE for most popular Undelegated TLDs</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">QTYPE for most popular ccTLDs</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">QTYPE for most popular Legacy TLDs</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">QTYPE for most popular New TLDs</td></tr>
+<tr>
+<td colspan="1"><strong>Client Subnet Statistics</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Busiest client ASNs &nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Busiest client BGP prefix</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">RCODE by client ASNs &nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">RCODE by clients by BGP prefix&nbsp;</td></tr>
+<tr>
+<td colspan="1"><strong>Classification</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Query classification by clients by BGP prefix</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Query classification by client ASNs</td></tr>
+<tr>
+<td colspan="1"><strong>RSSAC</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p>Zone size</p></td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Zone propagation time</td></tr>
+<tr>
+<td colspan="1"><strong>GEO</strong></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Busiest client locations by country&nbsp;</td></tr>
+<tr>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">Busiest client locations by city</td></tr></tbody></table><ac:structured-macro ac:macro-id="f7a8bc07-2c7e-482e-850b-ad49fc4eae75" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<ul>
+<li><strong>RSSAC: Zone size and Zone propagation time graphs.</strong> In order for data to be available for these graphs, an instance of the <em>rssacd</em><span>&nbsp;demon&nbsp;must be run to collect the data (it is not provided by the DSC collector).</span></li>
+<li><strong>GEO: Busiest client location by country.</strong> Both client locations and collection node locations can be displayed on this graph. For node locations to be displayed the nodes must have a city specified via the nodes.csv file.</li></ul></ac:rich-text-body></ac:structured-macro>
 <h1>Directory Structure</h1>
-<p>Hedgehog uses the following directory structure under the install &lt;prefix&gt; directory (/usr/local/ by default)</p>
+<p>If installed from source code Hedgehog uses the following directory structure under the install &lt;prefix&gt; directory (/usr/local/ by default)</p>
 <p><ac:image ac:width="550"><ri:attachment ri:filename="Hedgehog_directory_structure.jpg" /></ac:image></p>
+<p>When installing from a Ubuntu package the structure is different:</p>
+<table>
+<thead>
+<tr>
+<th>Location (install from source)</th>
+<th>
+<div class="tablesorter-header-inner">Location (install from package)</div></th>
+<th colspan="1">
+<div class="tablesorter-header-inner">Contents</div></th></tr></thead>
+<tbody>
+<tr>
+<td>&lt;prefix&gt;/etc/hedgehog/</td>
+<td>/etc/hedgehog/</td>
+<td colspan="1">Hedgehog configuration files (yaml and nodes)</td></tr>
+<tr>
+<td colspan="1">&lt;prefix&gt;/etc/hedgehog/*.sample</td>
+<td colspan="1">/usr/share/doc/hedgehog/examples/*.sample</td>
+<td colspan="1">Sample Hedgehog configuration files</td></tr>
+<tr>
+<td>&lt;prefix&gt;/var/hedgehog/</td>
+<td>/var/lib/hedgehog/</td>
+<td colspan="1">
+<p>'data' directory containing XML data</p>
+<p>'www' directory containing cached plots and rssac reports</p></td></tr>
+<tr>
+<td colspan="1">&lt;prefix&gt;/bin/hedgehogctl</td>
+<td colspan="1">/usr/bin/hedgehogctl</td>
+<td colspan="1">Wrapper script for Hedgehog tools</td></tr>
+<tr>
+<td colspan="1">&lt;prefix&gt;/bin/refile_and_grok</td>
+<td colspan="1">/usr/bin/refile_and_grok</td>
+<td colspan="1">refile_and_grok script</td></tr>
+<tr>
+<td colspan="1">&lt;prefix&gt;/libexec/hedgehog/</td>
+<td colspan="1">/usr/lib/hedgehog/</td>
+<td colspan="1">Hedgehog tools scripts and DDL updates</td></tr></tbody></table>
+<p>In the rest of this document only the relative path under the install location is given so the instructions are applicable to both methods of install.</p>
 <h1>Tools</h1>
 <p>Hedgehog provides a set of Data Manager scripts to support the database and data file management, and Web scripts to generate cached plots and the RSSAC reports. They are documented separately in the Hedgehog Tools PDF.&nbsp;</p>
 <h1>Data Manager</h1>
 <h2>Upload of Data</h2>
 <p>It is assumed that the user has already deployed an upload mechanism used with the DSC collector and presenter. A common practice is to use ssh for the upload.</p>
-<p>Hedgehog also supports the use of WebDAV for uploads, validated with certificates. This is particularly useful for deployments with many nodes as it scales better than ssh.&nbsp;</p>
-<p>TODO: Document usage of WebDAV</p>
+<p>Hedgehog also supports the use of WebDAV for uploads, validated with certificates. This is particularly useful for deployments with many nodes as it scales better than ssh. It can be configured with the hedgehog-webdav-upload package.</p>
 <h2><span style="line-height: 1.25;">Import of data</span></h2>
 <p>Hedgehog provides a refile_and_grok script for this purpose. See the Installation guide for more details of how to configure this.</p>
 <h2>Monitoring data import</h2>
 <p>The import process produces two different logs for the user to track the progress of the data import:</p>
 <ul>
-<li>The<em> refile_and_grok</em>&nbsp;script writes output about which nodes it is processing to a <em>refile_and_grok.out</em> file in the Hedgehog <em>&lt;prefix&gt;/var/hedgehog/data</em> directory. This gives a high level view of the processing.&nbsp;<br />&nbsp;</li>
-<li>The import also generates a log file per node in the <em>&lt;prefix&gt;/var/hedgehog/data/&lt;server&gt;/&lt;node&gt;</em>&nbsp;directory called <em>dsc-extractor.out</em>. This lists more details on the processing of each XML file for a specific node.&nbsp;<br />&nbsp;</li>
-<li>A utility script is also provided: <em>&lt;prefix&gt;/bin/hedgehogctl datafiles_create_summary</em>&nbsp;which can be run to get an summary of the current state of processing.</li></ul>
+<li>The<em> refile_and_grok</em>&nbsp;script writes output about which nodes it is processing to a <em>refile_and_grok.out</em> file in the Hedgehog <em>/var/hedgehog/data</em> directory. This gives a high level view of the processing.&nbsp;<br />&nbsp;</li>
+<li>The import also generates a log file per node in the <em>/var/hedgehog/data/&lt;server&gt;/&lt;node&gt;</em>&nbsp;directory called <em>dsc-extractor.out</em>. This lists more details on the processing of each XML file for a specific node.&nbsp;<br />&nbsp;</li>
+<li>A utility script is also provided: <em>/bin/hedgehogctl datafiles_create_summary</em>&nbsp;which can be run to get an summary of the current state of processing.</li></ul>
 <h2>Adding or updating servers and nodes</h2>
 <p>If new servers or nodes need to be added to the system then the user should:</p>
 <ul>
-<li>update the <em>&lt;prefix&gt;/etc/hedgehog/nodes.csv</em> files as required to include the new servers/nodes<br />&nbsp;</li>
-<li>run the <em>&lt;prefix&gt;/bin/hedgehogctl database_update_nodes</em>&nbsp;script which will update the data in the database and create any required directory structures</li></ul><ac:structured-macro ac:name="note"><ac:rich-text-body>
-<p>In the event of adding new servers the user&nbsp;<strong>must</strong>&nbsp;also then run the&nbsp;<em>&lt;prefix&gt;/bin/hedgehogctl database_manage_partition</em> scripts to create the required database tables so that data can be imported for the new server.&nbsp;</p></ac:rich-text-body></ac:structured-macro>
+<li>update the <em>/etc/hedgehog/nodes.csv</em> files as required to include the new servers/nodes<br />&nbsp;</li>
+<li>run the&nbsp;<em>/bin/hedgehogctl database_update_nodes</em>&nbsp;script which will update the data in the database and create any required directory structures</li></ul><ac:structured-macro ac:macro-id="049c0d31-3cdd-4ef8-ac3c-ef5ad4e0e487" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p>In the event of adding new servers the user&nbsp;<strong>must</strong>&nbsp;also then run the&nbsp;<em>/bin/hedgehogctl database_manage_partition</em> scripts to create the required database tables so that data can be imported for the new server.&nbsp;</p></ac:rich-text-body></ac:structured-macro>
 <h1>Web front-end</h1>
 <h2>Plot caching</h2>
-<p>Hedgehog caches plot image files as they are generated by the user. The plot files are cached in the directory listed in the <em>&lt;prefix&gt;/etc/hedgehog/hedgehog.yaml</em> file in the directories section for 'plotcache' (this path is auto-generated in 2.0 and should not be changed by the user).</p>
+<p>Hedgehog caches plot image files as they are generated by the user. The plot files are cached in the directory listed in the <em>/etc/hedgehog/hedgehog.yaml</em> file in the directories section for 'plotcache' (this path is auto-generated in 2.0 and should not be changed by the user).</p>
 <ul>
-<li>The reuse of cached plots can be enabled/disabled by changing the <em>use_plot_caching</em>&nbsp;option in the <em>&lt;prefix&gt;/share/www/conf/hedgehog_gui.yaml</em> configuration file<br />&nbsp;</li>
+<li>The reuse of cached plots can be enabled/disabled by changing the <em>use_plot_caching</em>&nbsp;option in the /<em>share/www/conf/hedgehog_gui.yaml</em> configuration file<br />&nbsp;</li>
 <li>The <em>caching_delay_in_hours</em>&nbsp;option in the same file controls the delay applied to caching the most recently uploaded data. For example the default for this is 1 i.e. only plots for which the end time is more than one hour ago will be cached. This avoids caching plots where the data may still be being imported for some nodes if there were a delay in upload or processing for some reason.&nbsp;<br />&nbsp;</li>
 <li>If desired, a cron job can be created that will create cached plots for specific time periods, for example it may be useful to have a cron job to create daily plots for the previous day (see the section on Maintenance). This will make loading of the homepage faster.&nbsp;<br />&nbsp;</li>
-<li>If needed the cached files for selected or all plots may be deleted by running the<em> &lt;prefix&gt;/bin/hedgehogctl plotcache_rm_cached_plots</em>&nbsp;script.&nbsp;</li></ul>
+<li>If needed the cached files for selected or all plots may be deleted by running the<em>&nbsp;/bin/hedgehogctl plotcache_rm_cached_plots</em>&nbsp;script.&nbsp;</li></ul>
 <h2>RSSAC reports</h2>
 <h3>Data collection</h3>
 <p>If the required datasets are collected via the DSC collector (see Datasets above), Hedgehog can produce RRSAC reports as described in the &quot;<span style="line-height: 1.4285715;">&nbsp;</span><a href="https://www.icann.org/en/system/files/files/rssac-002-measurements-root-20nov14-en.pdf"><span style="line-height: 1.4285715;">RSSAC Recommendation on Measurements of the Root Server System -&nbsp;</span><span style="line-height: 1.4285715;">RSSAC 002</span></a><span style="line-height: 1.4285715;">&nbsp;</span>&quot; document for the following metrics:</p>
@@ -361,7 +492,11 @@ dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-on
 <li>traffic-volume</li>
 <li>traffic-size</li>
 <li>rcode-volume</li>
-<li>unique-sources&nbsp;</li></ul>
+<li>unique-sources</li>
+<li>zone-size</li>
+<li>load-time</li></ul>
+<h3>RSSACD</h3>
+<p>In order to collect the zone-size and load-time statistics a dedicated <em>rssacd</em> demon must be run on the Hedgehog Data Manager to collect the information directly from the nodes. It requires that the IP addresses of the nodes have been populated via the nodes.csv file. More details are given in the Installation/Upgrade Guides.</p>
 <h3>Generating the reports</h3>
 <ul>
 <li>To produce the RSSAC reports 2 scripts must be run <span>(see the&nbsp;Hedgehog Tools guide for more information)</span>:
@@ -369,7 +504,7 @@ dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-on
 <li><span>the&nbsp;</span><em>&lt;prefix&gt;/bin/hedgehogctl database_process_rssac_data</em><span>&nbsp;script via the Database tools component</span></li>
 <li>the <em>&lt;prefix&gt;/bin/hedgehogctl rssac_generate_reports</em>&nbsp;script on the Web front-end component that will store and display the results&nbsp;</li></ol></li>
 <li><span>The resulting yaml files (along with matching plot files) are stored in the directory listed in the&nbsp;</span><em>&lt;prefix&gt;/etc/hedgehog/hedgehog.yaml</em><span>&nbsp;file in the directories section for '</span><em>rssac</em><span>' (this path is auto-generated in 2.0 and should not be changed by the user).&nbsp;</span></li>
-<li>The generated files are served by the Hedgehog front end and can be found by clicking on the &quot;RSSAC reports&quot; link at the bottom left of the Hedgehog webpage.&nbsp;</li></ul><ac:structured-macro ac:name="info"><ac:rich-text-body>
+<li>The generated files are served by the Hedgehog front end and can be found by clicking on the &quot;RSSAC reports&quot; link at the bottom left of the Hedgehog webpage.&nbsp;</li></ul><ac:structured-macro ac:macro-id="515cb692-5b1f-4ad1-8da2-56862ef2a46f" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
 <p>Note that RSSAC reports can be run for any server, however the name of the server affects the value in the service field of the generated yaml: &nbsp;</p>
 <p>If the server name is of the pattern &quot;*-root&quot; where * is a letter, then the service will be &quot;*.<a href="http://root-servers.org">root-servers.org</a>&quot;. For all other server names the service will simply be the server name.&nbsp;</p></ac:rich-text-body></ac:structured-macro>
 <p>The script&nbsp;can either be run manually, or via a cron job as described in the Maintenance section of the installation guide.</p>
@@ -386,17 +521,10 @@ dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-on
 <ul>
 <li>&nbsp;The full list of possible plots are displayed via the drop down menu in the GUI, regardless of whether there is data in the database for the plot.<br />&nbsp;</li>
 <li>
-<p>There is a known issue with the SVG line plots where long legends are not wrapped properly:<br /> <a href="https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536">https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536</a>&nbsp;. This affects, for example, the 'Traffic volume' plot.&nbsp;<span>&nbsp;A configuration option is available (</span><em>default_interactive_plot_type</em><span>&nbsp;in&nbsp;</span><em>hedgehog_gui</em><span>.yaml) which can specify the system to produce non-SVG line plots that do not have this issue - however these plots require Flash.</span><br />&nbsp;</p></li>
-<li>
-<p>The plot is not sorted according to size correctly in the interactive plots for horizontal bar charts. The static plots should be used instead. This includes:</p>
-<ul>
-<li>QTYPE for most popular TLD</li>
-<li>Busient client subnet</li>
-<li>CODE by client subnet&nbsp;</li>
-<li>Root abusers&nbsp;</li>
-<li>Query classification by subnet<br />&nbsp;</li></ul></li>
-<li>Server, node and group names may only contain alphanumeric characters and hyphens (-).<br />&nbsp;</li>
-<li>The Unique Sources plot is not available until after the RSSAC report has been generated for the date in question.</li></ul>
+<p>There is a known issue with the SVG line plots where long legends are not wrapped properly:<br /><a href="https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536">https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536</a>&nbsp;. This affects, for example, the 'by node' plot if there are many nodes.&nbsp;<span>&nbsp;A configuration option is available (</span><em>default_interactive_plot_type</em><span>&nbsp;in&nbsp;</span><em>hedgehog_gui</em><span>.yaml) which can specify the system to produce non-SVG line plots that do not have this issue - however these plots require Flash.<br /><br /></span></p></li>
+<li>No static plots are provided for the GEO plot category. Plotting of the GEO &quot;Busiest client locations by country' plot is dynamic and may be slow if there are many countries to be plotted.&nbsp;<br />&nbsp;</li>
+<li>Server, node and group and instance names may only contain alphanumeric characters, full stops (.) and hyphens (-).<span>&nbsp;Country and city names can only contain&nbsp;<span>alphanumeric characters, spaces and hyphens (-)</span></span><br />&nbsp;</li>
+<li>The Unique Sources plot is not available until after the RSSAC report has been generated for the date in question.&nbsp;</li></ul>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
