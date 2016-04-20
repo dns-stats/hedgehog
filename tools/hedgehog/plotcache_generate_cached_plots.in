@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,14 +23,18 @@
 # File:   plotcache_generate_cached_plots
 #
 
-eval $(@LIBEXEC@/conf_read)
+# We need user with access to the plotcache directory
+a=$(@LIBEXEC@/check_user_perms -pc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
 
-REQUIRED_API_VERSION=@DB_VERSION@
-DB_NAME=$hhconfig_database_name
-FROM=`date --date="- 1 day" +%Y-%m-%dT00:00`
-TO=`date --date="- 1 day" +%Y-%m-%dT23:59`
+FROM=$(date --date="- 1 day" +%Y-%m-%dT00:00)
+TO=$(date --date="- 1 day" +%Y-%m-%dT23:59)
 SQ="'"
-export PGPASSWORD=$hhconfig_database_read_pass
 
 usage () {
     echo
@@ -62,9 +66,7 @@ while getopts ":s:e:DWMh" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ $USER != $hhconfig_database_reader ] && echo "Must be $hhconfig_database_reader to run this script" && exit 1
+echo "$(date): $0 COMMENCED"
 
 # Validate the start date
 if [[ ! $FROM =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]$ ]] ; then
@@ -91,39 +93,43 @@ if [ ${is_valid} -ne 0 ] ; then
 fi
 
 # Check that Start date is earlier than End date
-FROM_seconds=`date --utc --date "${FROM}" +%s`
-TO_seconds=`date --utc --date "${TO}" +%s`
-[ ${FROM_seconds} -ge ${TO_seconds} ] && echo "Error: Start date must be earlier than End date to generate plots" && exit 1
+FROM_seconds=$(date --utc --date "${FROM}" +%s)
+TO_seconds=$(date --utc --date "${TO}" +%s)
+if [ ${FROM_seconds} -ge ${TO_seconds} ] ; then
+  echo "Error: Start date must be earlier than End date to generate plots"
+  exit 1
+fi
 
-DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
-[ -z "$DAY" ] && [ -z "$WEEK" ] && [ -z "$MONTH" ] && usage && exit 1
+if [[ -z "$DAY" && -z "$WEEK" && -z "$MONTH" ]] ; then
+  usage
+  exit 1
+fi
 
-echo "INFO: `find $hhconfig_directories_plotcache -type f | wc -l` cached plots"
-echo "SYSMON INFO: `du -c $hhconfig_directories_plotcache | grep total` disk usage for $hhconfig_directories_plotcache"
+echo "INFO: $(find $PLOT_CACHE_DIR -type f | wc -l) cached plots"
+echo "SYSMON INFO: $(du -c $PLOT_CACHE_DIR | grep total) disk usage for $PLOT_CACHE_DIR"
 
 # TODO: do not hard code this path
 URL="localhost/hedgehog/brew/hedgehog.brew"
 TYPE="generatePlot"
-declare -a STOPS=(`seq $(date +%s -d ${TO}) -86400 $(date +%s -d ${FROM})`)
+declare -a STOPS=($(seq $(date +%s -d ${TO}) -86400 $(date +%s -d ${FROM})))
 INTERACTIVE="0 1"
-PLOTIDS=`echo "select id from dsc.plot where name in (select name from dsc.visible_plot) ORDER BY id DESC;" | psql -h $hhconfig_database_host -td $DB_NAME`
-SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME`
+PLOTIDS=$(psql $CONN_STRING -tc "select id from dsc.plot where name in (select name from dsc.visible_plot) ORDER BY id DESC;")
+SERVERNMS=$(psql $CONN_STRING -tc "SELECT display_name FROM dsc.server;")
 NDARR=-1 # all nodes
 
 # Call brew script in order to cache the default plots
 for SVRNM in $SERVERNMS ; do
-    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -h $hhconfig_database_host -td $DB_NAME | tr -d [[:space:]]`
+    SVRID=$(psql $CONN_STRING -tc "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | tr -d [[:space:]])
     for STOP in ${STOPS[@]} ; do
-        STOP=`date --date @${STOP} +%Y-%m-%dT%R`
+        STOP=$(date --date @${STOP} +%Y-%m-%dT%R)
         STARTS=()
-        [ -n "$DAY" ] && STARTS+=(`date --date="${STOP}" +%Y-%m-%dT00:00`)
-        [ -n "$WEEK" ] && STARTS+=(`date --date="${STOP} 1 week ago + 1 day" +%Y-%m-%dT00:00`)
-        [ -n "$MONTH" ] && STARTS+=(`date --date="${STOP} 1 month ago + 1 day" +%Y-%m-%dT00:00`)
+        [ -n "$DAY" ] && STARTS+=($(date --date="${STOP}" +%Y-%m-%dT00:00))
+        [ -n "$WEEK" ] && STARTS+=($(date --date="${STOP} 1 week ago + 1 day" +%Y-%m-%dT00:00))
+        [ -n "$MONTH" ] && STARTS+=($(date --date="${STOP} 1 month ago + 1 day" +%Y-%m-%dT00:00))
         for START in ${STARTS[@]} ; do
             for GVIS in $INTERACTIVE ; do
                 for PLTID in $PLOTIDS ; do
-                    echo `date` ": curl --max-time 300 --retry 1 --get \"${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}\""
+                    echo $(date) ": curl --max-time 300 --retry 1 --get \"${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}\""
                     curl -s -o /dev/null --max-time 300 --retry 1 --get "${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}" 2>&1
                 done
             done
@@ -131,6 +137,6 @@ for SVRNM in $SERVERNMS ; do
     done
 done
 
-echo "INFO: `find $hhconfig_directories_plotcache -type f | wc -l` cached plots"
-echo "SYSMON INFO: `du -c $hhconfig_directories_plotcache | grep total` disk usage for $hhconfig_directories_plotcache"
-echo "`date`: $0 COMPLETED"
+echo "INFO: $(find $PLOT_CACHE_DIR -type f | wc -l) cached plots"
+echo "SYSMON INFO: $(du -c $PLOT_CACHE_DIR | grep total) disk usage for $PLOT_CACHE_DIR"
+echo "$(date): $0 COMPLETED"

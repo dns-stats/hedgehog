@@ -1,6 +1,6 @@
 
 ## 
-## Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+## Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 ## 
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ www:
   default_interactive_plot_type : svg         # 'flash' -> plot requires flash
                                               # 'svg'   -> plot is SVG/VML and does not require flash
                                               # (but with svg plots some legends do not wrap properly)
+  default_node_grouping         : instance    # choose from 'none', 'instance', 'city' or 'country'
   use_plot_caching              : 1           # '1' -> true, use cached plots when possible
                                               # '0' -> false, never use cached plots
   caching_delay_in_hours        : 1           # If 'use_plot_caching=1' then only plots with an end time
@@ -36,4 +37,6 @@ www:
                                               # More recent plots are not cached as data may still be
                                               # being imported
   presentation_delay_in_hours   : 0           # Number of hours behind now for which the GUI will display data
+  support_url                   :             # configurable target for "Support" external link on Homepage.
+                                              # The default dns-stats.org issue tracker used if left blank
 ...

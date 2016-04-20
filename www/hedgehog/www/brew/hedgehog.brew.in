@@ -1,6 +1,6 @@
 <%
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ hh_debug <<- 0
 initPltType <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In initPltType')
+	    system('logger -p user.notice Hedgehog: In initPltType')
     }
 
     %><%=gui_config$www$default_plot_type%><%
@@ -39,7 +39,7 @@ initPltType <- function() {
 initPlotDDHtml <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In initPlotDDHtml')
+	    system('logger -p user.notice Hedgehog: In initPlotDDHtml')
     }
 
 	# TODO: These queries should only return plots that are configured for display
@@ -84,7 +84,7 @@ initPlotDDHtml <- function() {
 initServerDDHtml <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In initServerDDHtml')
+	    system('logger -p user.notice Hedgehog: In initServerDDHtml')
     }
 
     if (!(prepStmnt("getsrvrid_display_name", dsccon))) {
@@ -109,139 +109,69 @@ initServerDDHtml <- function() {
     return(TRUE)
 }
 
-# Initialise the All and region node tabs html
-initNodeTabsHtml <- function() {
-	
-	if (hh_debug) {
-	    system('logger -p user.notice In initNodeTabsHtml')
+# Generate a nested JSON structure the js code can use to create the node tabs
+initNodeData <- function() {
+    if (hh_debug) {
+        system('logger -p user.notice Hedgehog: In initNodeTabsHtml')
     }
 
     if (!(prepStmnt("getsrvrid_display_name", dsccon)) || !(prepStmnt("getgroups", dsccon)) || !(prepStmnt("getnodes", dsccon)) || !(prepStmnt("getnodesbyregion", dsccon))) {
         %>DB error preparing node query<%
         return(FALSE)
     }
-    
-    servers <- dbGetDataFrame(dbdrv, dsccon, dbconstr, "EXECUTE getsrvrid_display_name;")
 
-    if (is.null(servers)) {
-		%>DB connection error<%
-		return(FALSE)
-    } 
-	else if(nrow(servers) < 1) {
-		%>No servers found in DB<%
-		return(FALSE)
+    server=list()
+    servers_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, "EXECUTE getsrvrid_display_name;")
+    if (!is.null(servers_df) && nrow(servers_df) >= 1) {
+        for (s in 1:nrow(servers_df)) {
+            group_list=list()
+            srvr_id <- servers_df[s,1]
+            srvr_nm <- servers_df[s,2]
+            groups_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getgroups(", srvr_id, ");", sep=""))
+            
+            for (g in 0:nrow(groups_df)) {
+                nodes=list()
+                if (g == 0) {
+                    gp_nm = 'All'
+                    nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodes(", srvr_id, ");", sep=""))
+                } else {
+                    gp_nm <- groups_df[g,1]
+                    # Other should really appear at the end of the list......
+                    if  (gp_nm == 'Other'){
+                        nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ",'');", sep=""))
+                    } else {
+                        nodes_df <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
+                    }
+                }
+                for (n in 1:nrow(nodes_df)) {
+                    # Query fills in blank fields so we don't need to check here
+                    nd_id      = nodes_df[n,1]
+                    nd_nm      = nodes_df[n,2]
+                    nd_country = nodes_df[n,3]
+                    nd_city    = nodes_df[n,4]
+                    nd_sg      = nodes_df[n,5]
+                    node  = list(node_name=nd_nm, node_id=nd_id, node_country=nd_country, node_city=nd_city, node_sg=nd_sg)
+                    nodes = c(nodes, list(node))
+                }
+                group=list(group_name=gp_nm, node_list=nodes)
+                group_list=c(group_list, list(group))
+            }
+            server_list=list(server=srvr_nm, groups=group_list)
+            server=c(server, list(server_list))
+        }
+        node_json = rjson::toJSON(server)
+        output = cat(node_json)
+        %><%output%><%
+        return(TRUE)
     }
-
-	grouphtml <- "<div class=\"sixteen columns\" id=\"groupcontent\">"
-	nodehtml <- "<div class=\"sixteen columns\" id=\"nodecontent\">"
-
-	for (s in 1:nrow(servers)) {
-		srvr_id <- servers[s,1]
-		srvr_nm <- servers[s,2]
-
-		groups <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getgroups(", srvr_id, ");", sep=""))
-
-		if (is.null(groups)) {
-			%>DB connection error<%
-			return(FALSE)
-		} 
-		else if (nrow(groups) < 1) {
-			%>No groups found in DB<%
-			return(FALSE)
-		}
-		
-		if (s==1) {
-			grouphtml <- paste(grouphtml, "<div class=\"server_showing\" id=\"", srvr_nm, "\">", sep="")
-			gs <- "group_showing"
-			ck <- "checked"
-		} 
-		else {
-			grouphtml <- paste(grouphtml, "<div class=\"hidden\" id=\"", srvr_nm, "\">", sep="")
-			gs <- "hidden"
-			ck <- ""
-		}
-
-		for (g in 1:nrow(groups)) {
-		
-			gp_nm <- groups[g,1]
-
-			if (g==1) {
-				grouphtml <- paste(grouphtml, "<div class=\"Tabs\"><ul><li class=\"activeGpTab\" id=\"li_All_", srvr_nm, 
-								   "\" onclick=\"gpTab('All_", srvr_nm,"')\"><a>All<img id=\"cb_All_", srvr_nm, "_img\" src=\"images/none.png\" 
-								   alt=\"none selected\" height=\"10\" width=\"10\" /></a></li>", sep="")
-
-				nodes <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodes(", srvr_id, ");", sep=""))
-                        
-				if (is.null(nodes)) {
-					%>DB connection error...<%
-					return(FALSE)
-				}
-				else if (nrow(nodes) < 1) {
-					%>No nodes found in DB...<%
-					return(FALSE)
-				}
-				
-				nodehtml <- paste(nodehtml, "<div class=\"", gs, "\" id=\"All_", srvr_nm, "\">", sep="")
-				nodehtml <- paste(nodehtml, "<div class=\"allnone\"><a style=\"font-weight:bold;\">Actions:</a> ", sep="")
-				nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectAllBtn\"  value=\"Select all nodes\"    
-								  title=\"Select all available nodes for plotting\" onclick=\"selectAll('cb_All_", srvr_nm, "')\"> ", sep="")
-				nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectNoneBtn\" value=\"De-select all nodes\" 
-								  title=\"De-select all available nodes \"          onclick=\"selectNone('cb_All_", srvr_nm, "')\"> <hr></div><div class=\"node_cbs\">", sep="")
-				for (n in 1:nrow(nodes)) {
-					nd_id <- nodes[n,1]
-					nd_nm <- nodes[n,2]
-					nodehtml <- paste(nodehtml, "<input type=\"checkbox\" class=\"nodeselection\" id=\"", nd_id, "_All_", srvr_nm, "\" name=\"cb_All_", srvr_nm,
-									  "\" value=\"", nd_id, "_All_", srvr_nm, "\"onclick=\"selectNode('", nd_id, "_All_", srvr_nm, "')\"", ck, ">",
-									  "<label class=\"\" for=\"",	nd_id, "_All_", srvr_nm, "\" title=\"Toggle node selection\">", nd_nm, "</label>", sep="")
-				}
-				nodehtml <- paste(nodehtml, "</div></div>", sep="")
-			}
-
-			grouphtml <- paste(grouphtml, "<li id=\"li_", gp_nm, "_", srvr_nm, "\" onclick=\"gpTab('", gp_nm, "_", srvr_nm, "')\"><a>", gp_nm, "<img id=\"cb_", gp_nm, "_",
-							   srvr_nm, "_img\" src=\"images/none.png\" alt=\"none selected\" height=\"10\" width=\"10\" /></a></li>", sep="")
-                    
-			nodes <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getnodesbyregion(", srvr_id, ", '", gp_nm,"');", sep=""))
-
-			if (is.null(nodes)) {
-				%>DB connection error...<%
-				return(FALSE)
-			}
-			else if (nrow(nodes) < 1) {
-				%>No nodes found for this region in DB...<%
-				return(FALSE)
-			}
-			
-			nodehtml <- paste(nodehtml, "<div class=\"hidden\" id=\"", gp_nm, "_", srvr_nm, "\">", sep="")
-			nodehtml <- paste(nodehtml, "<div class=\"allnone\"><a style=\"font-weight:bold;\">Actions:</a> ", sep="")
-			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectOnlyRegionBtn\"  value=\"Select only ", gp_nm, "\"    
-							  title=\"Select only the nodes in this region for plotting\"   onclick=\"selectOnly('cb_", gp_nm, "_", srvr_nm,"')\"> ", sep="")
-			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectAllRegionBtn\"   value=\"Include all ", gp_nm, "\"    
-							  title=\"Include all the nodes in this region for plotting\"   onclick=\"selectAll('cb_", gp_nm, "_", srvr_nm,"')\"> ", sep="")
-			nodehtml <- paste(nodehtml, "<input type=\"button\" id=\"selectNoneRegionBtn\"  value=\"Exclude all ", gp_nm, "\" 
-							  title=\"De-select all the nodes in this region for plotting\" onclick=\"selectNone('cb_", gp_nm, "_", srvr_nm,"')\"><hr></div><div class=\"node_cbs\">", sep="")
-
-			for (n in 1:nrow(nodes))   {
-				nd_id <- nodes[n,1]
-				nd_nm <- nodes[n,2]
-				nodehtml <- paste(nodehtml, "<input type=\"checkbox\" class=\"nodeselection\" id=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\" name=\"cb_", gp_nm, "_",
-								  srvr_nm, "\" value=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\"onclick=\"selectNode('", nd_id, "_", gp_nm, "_", srvr_nm, "')\"", ck,
-								  ">", "<label class=\"\" for=\"", nd_id, "_", gp_nm, "_", srvr_nm, "\" title=\"Toggle node selection\">", nd_nm, "</label>", sep="")
-			}
-			nodehtml <- paste(nodehtml, "</div></div>", sep="")
-		}     
-		grouphtml <- paste(grouphtml, "</ul></div></div>", sep="")
-	}
-	grouphtml <- paste(grouphtml, "</div>", sep="")
-	nodehtml <- paste(nodehtml, "</div>", sep="")
-	%><%=grouphtml%><br class="clear" /><%=nodehtml%><%
-
-    return(TRUE)
+    %>No data returned<%
+    return(FALSE)
 }
 
 getDefaultPlotId <- function() {
 	
 	if (hh_debug) {
-	    system('logger -p user.notice In getDefaultPlotId')
+	    system('logger -p user.notice Hedgehog: In getDefaultPlotId')
 	}
 	
 	# Query the db to get the default plot id
@@ -259,12 +189,48 @@ getDefaultPlotId <- function() {
 	%><%=as.integer(defaultpltid[1])%><%
 }
 
+getDefaultGrouping <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice Hedgehog: In getDefaultGrouping')
+	}
+	
+	grouping = gui_config$www$default_node_grouping
+	if (is.null(grouping)) {
+		system('logger -p user.warning Hedgehog: Missing Node Grouping in config file. Using None.')
+		%>none<%
+		return(TRUE)
+	}
+
+	if      (grouping == "instance") {%>instance<%} 
+	else if (grouping == "city")     {%>city<%}
+	else if (grouping == "country")  {%>country<%} 
+	else if (grouping == "none")     {%>none<%}
+	else {
+		system('logger -p user.warning Hedgehog: Unsupported Node Grouping present in config file. Using None.')
+		%>none<%
+	}
+	return(TRUE)
+}
+
+getSupportURL <- function() {
+	
+	if (hh_debug) {
+	    system('logger -p user.notice Hedgehog: In getSupportURL')
+	}
+
+    # Calling code checks for missing url
+	%><%=gui_config$www$support_url%><%
+
+	return(TRUE)
+}
+
 generatePlot <- function(){
 
     #TODO(refactor): Move more of this code out to the generatePlot.R file
 
 	if(hh_debug){
-		system('logger -p user.notice In generatePlot')
+		system('logger -p user.notice Hedgehog: In generatePlot')
 	}
 
 	source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep=""))
@@ -295,6 +261,7 @@ generatePlot <- function(){
 	
 	# Initialise plot parameters
 	initPlotOptions()
+	
 	
 	# Initialise name of plot file and make sure the cache directory exists
 	plot_dir = paste(hh_config$directories$plotcache, "/", svrnm, "/", pltnm, sep="") 
@@ -330,21 +297,22 @@ generatePlot <- function(){
     
 	# OK - we have a plot file so now lets generate the html to hold that
 	now <- format(Sys.time(), '%Y-%m-%dT%H:%M')
+	
+	plot_file_raw = gsub('../','/',plot_file)
 	if (plot_file != "plots/no_graph.png" && plot_file != "plots/no_results.png" && plot_file != "plots/no_connection.png") {
-		plot_file <- sub(hh_config$directories$plotcache, "../plotcache/", plot_file)
+		plot_file <- sub(hh_config$directories$plotcache, "../plotcache", plot_file)
         
 		if (gvis == '1') {
 			%><div id="plot">
 				<hr />
-				<iframe scrolling="no" width="100%" height="520px" frameborder="0" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
-				<hr />
+				<iframe scrolling="no" width="100%" height=600px" frameborder="0" id="plotframe" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
 			</div><%
 		}
 		else if (pltnm %in% log_option) {
 			log_file <- sub(".png", "-log.png", plot_file)
 			stack_file <- sub(".png", "-stack.png", plot_file)
-			%><div id="opts">
-				<hr />
+			%><div id="opts" class="" style="height=10px">
+				<hr style="margin-bottom:10px;"/>
 				<input type="radio" name="pltoptions" id="rbliny" onclick="toggle_plot()" title="Line plot with linear y-axis" checked>
 				<label for="rbliny" title="Line plot with linear y-axis">Linear scale</label>
 				<input type="radio" name="pltoptions" id="rblogy" onclick="toggle_plot()" title="Line plot with log y-axis">
@@ -353,25 +321,26 @@ generatePlot <- function(){
 				<label for="rbstack"  title="Stacked line plot with linear y-axis">Stacked linear</label>
 			</div>
 			<div id="plot">
-				<img src="<%=plot_file%>?nocache=<%=now%>" id= "liny" />
-				<img src="<%=log_file%>?nocache=<%=now%>" class="hidden" id="logy" />
-				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" />
-				<hr />
+				<img src="<%=plot_file%>?nocache=<%=now%>" id= "liny" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',plot_file)%>"/>
+				<img src="<%=log_file%>?nocache=<%=now%>" class="hidden" id="logy" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',log_file)%>" />
+				<img src="<%=stack_file%>?nocache=<%=now%>" class="hidden" id="stack" name="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',stack_file)%>"/>
 			</div><%
 		}
 		else {
 			%><div id="plot">
 				<hr />
-				<img src="<%=plot_file%>?nocache=<%=now%>" />
-				<hr />
+				<img id="staticplot" src="<%=plot_file%>?nocache=<%=now%>" />
 			</div><%
 		}
+		%><div id="plink" class="" style="height:27px; width:960px;">
+			<label style="font-size:80%" for="ploturi">Static Link</label>
+			<input type="text" id="ploturi" readonly="readonly" value="http://<%=SERVER$hostname%><%=gsub("\\.\\./",'/',plot_file)%>" style="width: 870px; height:7px; font-size:80%">
+		</div><%
 	}
 	else {
 		%><div id="plot">
 			<hr />
 			<img src="<%=plot_file%>" />
-			<hr />
 		</div><%
 	}
 }
@@ -379,7 +348,7 @@ generatePlot <- function(){
 validateDbVersion <- function() {
 	
 	if (hh_debug) {
-		system('logger -p user.notice In validateDbVersion')
+		system('logger -p user.notice Hedgehog: In validateDbVersion')
 	}
 
 	if (!(prepStmnt("getdbversion", dsccon))) {
@@ -407,7 +376,7 @@ validateDbVersion <- function() {
 #########################################################
 
 if (hh_debug) {
-    system('logger -p user.notice Call to Hedgehog brew')
+    system('logger -p user.notice Hedgehog: Call to Hedgehog brew')
 }
 
 source(paste(hh_config$directories$web_source, "/R/utilities.R", sep = ""))
@@ -428,20 +397,27 @@ if (is.null(hh_config$database$read_pass)) {
     db_password <- hh_config$database$read_pass
 }
 dsccon <- try(dbConnect(dbdrv, dbname = hh_config$database$name, user = hh_config$database$read_user, port = hh_config$database$port, host = hh_config$database$host, password = db_password))
-dbconstr <<-paste('dbname = ', hh_config$database$name, ', user = ', hh_config$database$read_user, ', port = ', hh_config$database$port, ', host = ', hh_config$database$host, ', password = ', hh_config$database$read_pass, sep="")
+dbconstr <<-paste('dbname = \'', hh_config$database$name, '\', user = \'', hh_config$database$read_user, '\', port = ', hh_config$database$port, ', host = \'', hh_config$database$host, '\', password = \'', hh_config$database$read_pass,'\'', sep="")
+if (hh_debug) {
+  msg <- paste('logger -p user.notice dsccon: ', dbconstr)
+  system(msg)
+}
 
 if (class(dsccon) != "try-error") {
 	dbSendQuery(dsccon, "set statement_timeout to 300000;")
 	source(paste(hh_config$directories$web_source, "/R/prepareStatement.R", sep = ""))
 	source(paste(hh_config$directories$web_source, "/R/generatePlot.R", sep = ""))
 	switch(GET$type,
-	    validateDBVersion = {validateDbVersion()},
-		initPlotDDHtml    = {initPlotDDHtml()},
-		initServerDDHtml  = {initServerDDHtml()},
-		initNodeTabsHtml  = {initNodeTabsHtml()},
-		getDefaultPlotId  = {getDefaultPlotId()},
-		generatePlot      = {generatePlot()},
-		generateYaml      = {generateYaml(dsccon)}
+		validateDBVersion  = {validateDbVersion()},
+		initPlotDDHtml     = {initPlotDDHtml()},
+		initServerDDHtml   = {initServerDDHtml()},
+		initNodeTabsHtml   = {initNodeTabsHtml()},
+		initNodeData       = {initNodeData()},
+		getDefaultPlotId   = {getDefaultPlotId()},
+		getDefaultGrouping = {getDefaultGrouping()},
+		getSupportURL      = {getSupportURL()},
+		generatePlot       = {generatePlot()},
+		generateYaml       = {generateYaml(dsccon)}
 	)
 	dbDisconnect(dsccon)
 } else {
