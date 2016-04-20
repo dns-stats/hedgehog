@@ -17,6 +17,7 @@
 Hedgehog 2.1.0b2 - 2015-03-28
 -----------------------------
 
+* Add release name of "Daurian" for 2.1
 * Add script to update TLDs from IANA
 * Updates to documentation
 * Bug fix to handling of nodes.csv input
