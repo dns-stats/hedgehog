@@ -1,0 +1,154 @@
+Source: hedgehog
+Section: net
+Priority: optional
+Maintainer: Ondřej Surý <ondrej@debian.org>
+Build-Depends: apache2-dev (>= 2.4),
+               autotools-dev,
+               debhelper (>= 9),
+               libboost-all-dev,
+               libcairo2-dev,
+               libpqxx-dev,
+               libtool,
+               libxt-dev,
+               r-base-dev,
+               dh-autoreconf,
+               python,
+               python-yaml,
+               python-dnspython,
+               python-psycopg2,
+               help2man
+Standards-Version: 3.9.5
+Homepage: http://dns-stats.org/
+Vcs-Git: https://github.com/dns-stats/hedgehog.git
+Vcs-Browser: https://github.com/dns-stats/hedgehog
+
+Package: hedgehog-database
+Architecture: all
+Depends: ${misc:Depends},
+         ${python:Depends},
+         postgresql-9.3-ip4r,
+         postgresql-plpython-9.3,
+         python-ipy,
+         libgetdns1,
+         python-getdns
+Suggests: hedgehog-doc,
+          unbound,
+          pgtune
+Description: visualisation tool for DNS [Database setup file]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains a script to assist with the Postgresql database setup
+
+Package: hedgehog-common
+Architecture: all
+Depends: libyaml-tiny-perl,
+         ${misc:Depends},
+         postgresql-client-common,
+         postgresql-client
+Description: visualisation tool for DNS [common files]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains common configuration files and support scripts.
+
+Package: hedgehog-doc
+Architecture: all
+Section: doc
+Depends: ${misc:Depends}
+Description: visualisation tool for DNS [documentation]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains documentation for Hedgehog.
+
+Package: hedgehog-gui
+Architecture: all
+Section: web
+Depends: ${misc:Depends},
+         hedgehog-common (>= ${source:Version}~),
+         apache2 (>= 2.4),
+         libapache2-mod-r-base,
+         libjs-jquery,
+         libjs-jquery-ui,
+         r-base,
+         r-base-core,
+         r-cran-cairodevice,
+         r-cran-dbi,
+         r-cran-digest,
+         r-cran-ggplot2,
+         r-cran-reshape,
+         r-cran-rjson,
+         r-hedgehog-rpostgresqlhelper,
+         unifont,
+         libcairo2-dev,
+         libxt-dev,
+         libpq-dev
+Suggests: hedgehog-doc
+Description: visualisation tool for DNS [web]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains web pages and Apache configuration.
+
+Package: hedgehog-webdav-upload
+Architecture: all
+Section: web
+Depends: ${misc:Depends},
+         hedgehog-common (>= ${source:Version}~),
+         apache2 (>= 2.4),
+         adduser,
+         hedgehog-data-manager
+Suggests: hedgehog-doc
+Description: visualisation tool for DNS [web]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains Apache configuration to allow secure upload via webdav.
+
+
+Package: hedgehog-data-manager
+Architecture: any
+Multi-Arch: foreign
+Depends: hedgehog-common (>= ${source:Version}~),
+         ${misc:Depends},
+         ${shlibs:Depends},
+         ${python:Depends},
+         python-yaml,
+         python-dnspython,
+         python-psycopg2,
+         unzip,
+         adduser,
+         curl
+Suggests: hedgehog-doc
+Description: visualisation tool for DNS [DSC Extractor]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains DSC Statistics Extractor.
+
+Package: r-hedgehog-rpostgresqlhelper
+Architecture: all
+Section: gnu-r
+Depends: ${R:Depends},
+         ${misc:Depends}
+Description: GNU R package for Hedgehog R PostgreSQL Helper
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains GNU R PostgreSQL Helper used by Hedgehog.
+
+Package: hedgehog
+Architecture: all
+Depends: ${misc:Depends},
+         r-hedgehog-rpostgresqlhelper,
+         hedgehog-data-manager,
+         hedgehog-gui,
+         hedgehog-doc,
+         hedgehog-common,
+         hedgehog-database
+Description: visualisation tool for DNS [common files]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package installs all components.
