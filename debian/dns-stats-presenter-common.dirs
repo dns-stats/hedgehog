@@ -1,5 +1,0 @@
-etc/dns-stats-presenter/
-usr/lib/dns-stats-presenter
-usr/share/doc/dns-stats-presenter/examples/
-var/log/dns-stats-presenter
-var/lib/dns-stats-presenter

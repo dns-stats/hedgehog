@@ -1,6 +1,0 @@
-usr/bin/dns-stats-presenterctl
-usr/share/man/man1/dns-stats-presenterctl.1
-etc/dns-stats-presenter/dns-stats-presenter.yaml
-etc/dns-stats-presenter/dns-stats-presenter.yaml.sample /usr/share/doc/dns-stats-presenter/examples/
-usr/lib/dns-stats-presenter/check_user_perms
-usr/lib/dns-stats-presenter/conf_read

@@ -1,3 +1,3 @@
 version=3
-opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/dns-stats-presenter-$1\.tar\.gz/,uversionmangle=s/(\d)[_\.\-\+]?((RC|rc|pre|dev|beta|alpha|b|a)\d*)$/$1~$2/ \
-  https://github.com/dns-stats/dns-stats-presenter/tags .*/v?(\d\S*)\.tar\.gz
+opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/hedgehog-$1\.tar\.gz/,uversionmangle=s/(\d)[_\.\-\+]?((RC|rc|pre|dev|beta|alpha|b|a)\d*)$/$1~$2/ \
+  https://github.com/dns-stats/hedgehog/tags .*/v?(\d\S*)\.tar\.gz

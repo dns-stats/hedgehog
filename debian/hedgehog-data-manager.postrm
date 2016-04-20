@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+if test "$1" = "purge"; then
+    # this could be wrapped inside debconf question whether to remove the data or not
+    rm -rf /usr/lib/hedgehog/DDL_updates
+
+    rm -rf /var/lib/hedgehog/data
+    dpkg-statoverride --remove /var/lib/hedgehog/data >/dev/null 2>/dev/null || true
+    
+    if getent passwd hedgehog > /dev/null; then
+      deluser --system hedgehog
+    fi
+fi
+
+#DEBHELPER#

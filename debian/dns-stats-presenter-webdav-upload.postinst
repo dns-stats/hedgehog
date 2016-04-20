@@ -1,7 +1,0 @@
-#!/bin/sh
-set -e
-
-# Add dns-stats-presenter to the www-data group as webdav will upload as www-data
-adduser dns-stats-presenter www-data
-
-#DEBHELPER#
