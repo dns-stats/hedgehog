@@ -6,20 +6,14 @@
 set -e
 # set -x 
 
-usage () {
-	echo
-	echo "Run a Hedgehog command"
-	echo
-	echo "Usage: $(basename $0) [help|list] [COMMAND] [command_options]"
-	echo
-  exit 1
-}
-
 TOOLS=( database_init \
         database_manage_partitions \
         database_process_rssac_data \
         database_rm_old_rssac_data \
+        database_update_geoip \
         database_update_nodes \
+        database_update_tlds \
+        database_update_tlds_from_zone \
         datafiles_create_summary \
         datafiles_rm_empty_xml_dirs \
         datafiles_tar_old_xml_files \
@@ -32,6 +26,34 @@ HELP=0
 FIRST_COMMAND_ARG=2
 COMMAND=${1}
 shopt -s nocasematch
+
+
+usage () {
+	echo
+	echo "Run a Hedgehog command"
+	echo
+	echo "Usage: $(basename $0) [help|list] [COMMAND] [command_options]"
+	echo
+  if [ -z "$1" ] ; then
+	  echo "The list of COMMANDs is:"
+  	printf '  %s\n' "${TOOLS[@]}"
+  else
+    echo "The list of available COMMANDs can be found by using the list option."
+  fi
+	echo
+  exit 1
+}
+
+if [[  " ${1} " == " help2man " ]] ; then
+  usage help2man
+fi
+
+# Remove commands that are not installed
+for cmd in ${TOOLS[@]} ; do
+  if [ ! -x ${SCRIPT_DIR}/${cmd} ] ; then
+    TOOLS=(${TOOLS[@]/$cmd})
+  fi
+done
 
 if [[  " ${1} " == " list " ]] ; then
   echo "Valid commands are:"

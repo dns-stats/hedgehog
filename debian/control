@@ -28,7 +28,12 @@ Depends: ${misc:Depends},
          ${python:Depends},
          postgresql-9.3-ip4r,
          postgresql-plpython-9.3,
-         python-ipy
+         python-ipy,
+         libgetdns1,
+         python-getdns
+Suggests: hedgehog-doc,
+          unbound,
+          pgtune
 Description: visualisation tool for DNS [Database setup file]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -39,15 +44,8 @@ Package: hedgehog-common
 Architecture: all
 Depends: libyaml-tiny-perl,
          ${misc:Depends},
-         ${python:Depends},
-         python-yaml,
-         python-dnspython,
-         python-psycopg2,
          postgresql-client-common,
-         postgresql-client,
-         unzip
-Recommends: hedgehog-gui
-Suggests: dsc-statistics-collector
+         postgresql-client
 Description: visualisation tool for DNS [common files]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -58,8 +56,6 @@ Package: hedgehog-doc
 Architecture: all
 Section: doc
 Depends: ${misc:Depends}
-Recommends: hedgehog-gui
-Suggests: dsc-statistics-collector
 Description: visualisation tool for DNS [documentation]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -69,13 +65,12 @@ Description: visualisation tool for DNS [documentation]
 Package: hedgehog-gui
 Architecture: all
 Section: web
-Depends: hedgehog-common (>= ${source:Version}~),
+Depends: ${misc:Depends},
+         hedgehog-common (>= ${source:Version}~),
          apache2 (>= 2.4),
          libapache2-mod-r-base,
-         libyaml-tiny-perl,
-         postgresql,
-         postgresql-client,
-         postgresql-contrib,
+         libjs-jquery,
+         libjs-jquery-ui,
          r-base,
          r-base-core,
          r-cran-cairodevice,
@@ -88,25 +83,44 @@ Depends: hedgehog-common (>= ${source:Version}~),
          unifont,
          libcairo2-dev,
          libxt-dev,
-         libpq-dev,
-         libapache2-mod-r-base,
-         ${misc:Depends}
-Suggests: dsc-statistics-collector,
-          pgbouncer,
-          hedgehog-doc
+         libpq-dev
+Suggests: hedgehog-doc
 Description: visualisation tool for DNS [web]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
  .
  This package contains web pages and Apache configuration.
 
-Package: hedgehog-dsc-extractor
+Package: hedgehog-webdav-upload
+Architecture: all
+Section: web
+Depends: ${misc:Depends},
+         hedgehog-common (>= ${source:Version}~),
+         apache2 (>= 2.4),
+         adduser,
+         hedgehog-data-manager
+Suggests: hedgehog-doc
+Description: visualisation tool for DNS [web]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package contains Apache configuration to allow secure upload via webdav.
+
+
+Package: hedgehog-data-manager
 Architecture: any
 Multi-Arch: foreign
 Depends: hedgehog-common (>= ${source:Version}~),
          ${misc:Depends},
          ${shlibs:Depends},
-         adduser
+         ${python:Depends},
+         python-yaml,
+         python-dnspython,
+         python-psycopg2,
+         unzip,
+         adduser,
+         curl
+Suggests: hedgehog-doc
 Description: visualisation tool for DNS [DSC Extractor]
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
@@ -123,3 +137,18 @@ Description: GNU R package for Hedgehog R PostgreSQL Helper
  acquired with the DSC collector.
  .
  This package contains GNU R PostgreSQL Helper used by Hedgehog.
+
+Package: hedgehog
+Architecture: all
+Depends: ${misc:Depends},
+         r-hedgehog-rpostgresqlhelper,
+         hedgehog-data-manager,
+         hedgehog-gui,
+         hedgehog-doc,
+         hedgehog-common,
+         hedgehog-database
+Description: visualisation tool for DNS [common files]
+ Hedgehog is a visualisation tool for DNS statistics that consumes data
+ acquired with the DSC collector.
+ .
+ This package installs all components.

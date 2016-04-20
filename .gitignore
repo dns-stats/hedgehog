@@ -1,5 +1,6 @@
 #Vagrant
 .vagrant
+._*
 
 # Generated automatically
 /build
@@ -17,3 +18,4 @@ Makefile.in
 /missing
 /m4/libtool.m4
 /m4/lt*
+/src/rssac_server/*.pyc

@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,20 +25,22 @@
 
 #TODO: Add option to select all servers or just one server
 
-eval $(@LIBEXEC@/conf_read)
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -wc)
+if [ $? -ne 0 ] ; then
+	echo "$a"
+	exit 1
+fi
+eval "$a"
+export PGPASSWORD=$PGPASSWORD
 
-REQUIRED_API_VERSION=@DB_VERSION@
-DB_NAME=$hhconfig_database_name
-DEFAULT_DAY=`date --date="$(date +%Y-%m-15)" +%Y%m%d`
-NOW=`date --date="now" +%Y%m%d`
-FORCE_SUM_DEL=0
-DELETE_RAW=0
-export PGPASSWORD=$hhconfig_database_owner_pass
+DEFAULT_DAY=$(date --date="$(date +%Y-%m-15)" +%Y%m%d)
+NOW=$(date --date="now" +%Y%m%d)
 
 if [ $DEFAULT_DAY -ge $NOW ] ; then
-	START=`date --date="$NOW - 2 month" +%Y-%m`
+	START=$(date --date="$NOW - 2 month" +%Y-%m)
 else
-	START=`date --date="$NOW - 1 month" +%Y-%m`
+	START=$(date --date="$NOW - 1 month" +%Y-%m)
 fi
 
 
@@ -68,15 +70,10 @@ while getopts ":m:h" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ $USER != $hhconfig_database_owner ] && echo "Must be $hhconfig_database_owner to run this script" && exit 1
-
-DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+echo "$(date): $0 COMMENCED"
 
 # Validate the input date. Add day since (oddly) date won't parse just year and month
-if [ ! -z $START ] ; then
+if [ ! -z "$START" ] ; then
 	if [[ ! $START =~ ^[0-9]{4}-[0-1][0-9]$ ]] ; then
 			echo "Error: The start date is not in the required format of YYYY-MM" 
 			exit 1
@@ -88,8 +85,8 @@ if [ ! -z $START ] ; then
 		exit 1
 	fi
 	
-	START_FIRST=`date --date=$START-01 +%Y%m%d`
-	NOW_FIRST=`date --date="$NOW" +%Y%m01`
+	START_FIRST=$(date --date=$START-01 +%Y%m%d)
+	NOW_FIRST=$(date --date="$NOW" +%Y%m01)
 	if [ $NOW_FIRST -le $START_FIRST ] ; then
 		echo "Error: The given month cannot be this month or in the future." 
 		exit 1
@@ -98,22 +95,21 @@ fi
 
 echo "Deleting unique_source data during and before ${START}" 
 
-SQ="'"
 UNIQUE_SOURCE_RAW_PLOT_NAME="unique_sources_raw"
 
-TABLE_NAMES=`psql -h $hhconfig_database_host $DB_NAME -tc "select tablename from pg_tables where schemaname='dsc' order by tablename" | grep $UNIQUE_SOURCE_RAW_PLOT_NAME`   
+TABLE_NAMES=$(psql $CONN_STRING -tc "select tablename from pg_tables where schemaname='dsc' order by tablename" | grep $UNIQUE_SOURCE_RAW_PLOT_NAME)
 
-START_TRUNC=`date --date="$START-01" +%Y%m%d `
+START_TRUNC=$(date --date="$START-01" +%Y%m%d)
 for TABLENAME in $TABLE_NAMES
 do
 	(( SIZE=${#TABLENAME}-7 ))
-	TMP_DATE=`echo ${TABLENAME:$SIZE} | sed -e 's/_/-/'`
-	TABLE_DATE=`date --date="$TMP_DATE-01" +%Y%m%d`
+	TMP_DATE=$(echo ${TABLENAME:$SIZE} | sed -e 's/_/-/')
+	TABLE_DATE=$(date --date="$TMP_DATE-01" +%Y%m%d)
 	if [ $START_TRUNC -ge $TABLE_DATE ] ; then
-		echo "Deleting table $TABLENAME"
-		psql -h $hhconfig_database_host $DB_NAME -c "truncate $TABLENAME;"
+		echo "Truncating table $TABLENAME"
+		psql $CONN_STRING -c "truncate $TABLENAME;"
 	fi
 done
 
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"
 exit 0

@@ -1,22 +1,45 @@
 ######################### NODES CONFIGURATION FILE ###################
-# Format is:     server-name, node-name, node-region
-# Each field can contain alphanumeric characters and hyphens (-) only 
+# Format is:     server-name, node-name, [node-group],[node-country],
+#                [node-city],[node-instance],[node-ip]
+# Server name, node name, group and instance fields can contain alphanumeric
+# characters, full stops (.) and hyphens (-) only.
+# Country and city fields can contain alphanumeric characters, spaces and
+# hyphens (-) only.
+# Nodes may be grouped and plotted by Country,City or Instance in 2.1.
 # '#' is the comment character
 # 
-# server-name  - This must be unique and it must match the name used in the
-#                data directory path for uploaded files.
-# node-name    - This must be unique for a given server and it must match the name
-#                used in the data directory path for uploaded files.
-# node-group   - This is used in the node grouping tabs in the Hedgehog front end.
-#                It should be unique for a given server. It is optional and if not
-#                specified the node is added to a group called 'Other'.
-# 
+# server-name   - This must be unique and it must match the name used in the
+#                 data directory path for uploaded files.
+# node-name     - This must be unique for a given server and it must 
+#                 match the name used in the data directory path for 
+#                 uploaded files.
+# node-group    - This is used in the node grouping tabs in the Hedgehog
+#                 front end. It should be unique for a given server. 
+#                 It is optional and if not
+#                 specified the node is added to a group called 'Other'.
+# node-country  - This is the country that the node is located in
+#                 It is optional and if not specified 'No Country' is used.
+# node-city     - This is the city that the node is located in
+#                 It is optional and if not specified 'No City' is used.
+#                 This is used to plot node locations in GEO plots
+# node-instance - This is used to collect nodes into subgroups called 'Instances' 
+#                 (e.g. nodes within the same city) for convenient selection
+#                 and plotting. It should be unique for a given group. It is 
+#                 optional and if not specified 'No Instance' is used.
+# node-ip       - The management IP address of the node (IPv4 or IPv6)
+#                 It is optional and if not specified is left blank. This is 
+#                 required if RSSAC load-time/zone-size data is to be collected.
+#
 # Example input: (uncomment the following)
-
-#Server-A,Node-1,Region-1
-#Server-A,Node-2,Region-1
-#Server-A,Node-3,Region-2
-#Server-A,Node-4,Region-3
-#Server-B,Node-1,Region-1
-#Server-B,Node-2,Region-2
-#Server-C,Node-5,Region-4
+#
+#Server-A,Node-1,Region-1,Country-1,City-1,Instance-1,10.0.0.2
+#Server-A,Node-2,Region-1,Country-1,City-2,Instance-2,
+#Server-A,Node-3,Region-1,Country-2,City-3,Instance-3,
+#Server-A,Node-4,Region-1,Country-2,City-3,Instance-3,
+#Server-A,Node-5,Region-2,Country-3,City-4,Instance-4,
+#Server-A,Node-6,Region-2,Country-3,City-4,Instance-4,
+#Server-A,Node-7,Region-3,Country-3,City-4,Instance-5,10.0.0.3
+#Server-B,Node-1,Region-1,Country-4,,,
+#Server-B,Node-2,Region-2,,,Instance-6,
+#Server-C,Node-5
+######################################################################

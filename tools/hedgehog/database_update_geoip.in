@@ -1,0 +1,95 @@
+#!/bin/bash
+# 
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   database_update_geoip
+#
+
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -wc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+TMP_DIR=/tmp
+
+usage () {
+	echo
+	echo "Update the GeopIP list in the database. This reads input from ${TMP_DIR}"
+	echo 
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "$(date): $0 COMMENCED"
+
+cd $TMP_DIR
+rm -f GeoLite2-City-CSV.zip.md5
+curl -O http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip.md5
+if [ -f GeoLite2-City-CSV.zip ] ; then
+  md5sum GeoLite2-City-CSV.zip | awk ' { print $1 } ' | diff -w GeoLite2-City-CSV.zip.md5 -
+  if [ $? -ne 0 ] ; then
+    rm GeoLite2-City-CSV.zip
+  fi
+fi
+if [ ! -f GeoLite2-City-CSV.zip ] ; then
+  curl -O http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip
+  md5sum GeoLite2-City-CSV.zip | awk ' { print $1 } ' | diff -w GeoLite2-City-CSV.zip.md5 -
+  if [ $? -ne 0 ] ; then
+    echo "Error downloading and md5-ing GeoLite2-City-CSV.zip"
+    exit 1
+  fi
+fi
+  
+unzip -oj GeoLite2-City-CSV.zip
+
+echo "Preparing City Blocks data..."
+@LIBEXEC@/utility_prepare_GeoLite2-City-Blocks-IPvX
+
+echo "Preparing Location data..."
+@LIBEXEC@/utility_prepare_GeoLite2-City-Locations-en
+			
+psql $CONN_STRING << EOF                                                                                                                                          
+BEGIN;
+delete from geoip;
+\copy geoip (ip_range, geoname, latitude, longitude) from '/tmp/blocks_ready_to_import.csv' (HEADER false, DELIMITER ',', FORMAT 'csv')
+delete from locations;
+\copy locations (geoname_id, name, city) from '/tmp/locations_ready_to_import.csv' (HEADER false, DELIMITER ',', FORMAT 'csv')
+COMMIT;
+EOF
+
+rm -f /tmp/blocks_ready_to_import.csv /tmp/locations_ready_to_import.csv
+
+echo "$(date): $0 COMPLETED"

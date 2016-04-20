@@ -1,4 +1,5 @@
+etc/hedgehog/
 usr/lib/hedgehog
-usr/lib/hedgehog/DDL_updates
 usr/share/doc/hedgehog/examples/
-var/lib/hedgehog/data
+var/log/hedgehog
+var/lib/hedgehog

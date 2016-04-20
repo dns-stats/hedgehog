@@ -1,3 +1,9 @@
+hedgehog (2.1.0~b2-1) trusty; urgency=medium
+
+  * First public packaged release
+
+ -- John Dickinson <jad@sinodun.com>  Wed, 20 Apr 2016 13:40:46 +0000
+
 hedgehog (2.0.0~rc2-1) unstable; urgency=medium
 
   * Initial release (Closes: #785027)

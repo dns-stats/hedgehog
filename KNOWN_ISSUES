@@ -1,5 +1,5 @@
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,17 +25,8 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
   Flash plots for the interactive plots (google charts). There is a known 
   issue with the SVG plots where long legends are not wrapped properly:
   https://code.google.com/p/google-visualization-api-issues/issues/detail?id=1536
-  This affects, for example, the 'Traffic volume' plot. However, we prefer SVG
+  This affects, for example, the 'by_node' plot. However, we prefer SVG
   to flash given all the flash vulnerabilities of late. 
-
-* The plot is not sorted according to size correctly in the interactive plots
-  for horizontal bar charts. The static plots should be used instead. This
-  includes:
-  - QTYPE for most popular TLD
-  - Busient client subnet
-  - RCODE by client subnet
-  - Root abusers
-  - Query classification by subnet
 
 * Support for RSSAC reports is added for XML imports only, however extended 
   RCODES cannot be collected by the existing DSC collector so only base RCODES
@@ -49,3 +40,9 @@ KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
   then the 'generate graph' button becomes enabled again and a second
   plot can be generated that will then over write the first.
 
+* No static plots are produced for the GEO type plots.The geochart is ignoring 
+  the instruction in the html not to show the color code in the tooltips.
+
+* Server, node and group and instance names may only contain alphanumeric 
+  characters, full stops (.) and hyphens (-). Country and city names can
+  only contain alphanumeric characters, spaces and hyphens (-)
