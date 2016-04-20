@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,16 +25,19 @@
 
 #TODO(asap): Add a flag to allow the user to specify a single server to run the report for
 
-eval $(@LIBEXEC@/conf_read)
+# eval $(@LIBEXEC@/conf_read)
 
-REQUIRED_API_VERSION=@DB_VERSION@
-DB_NAME=$hhconfig_database_name
-DEFAULT_DAY=`date --date="- 7 day" +%Y-%m-%d`
-START=`date --date="${DEFAULT_DAY}" +%Y-%m-%dT00:00`
+a=$(@LIBEXEC@/check_user_perms -pgc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+DEFAULT_DAY=$(date --date="- 7 day" +%Y-%m-%d)
+START=$(date --date="${DEFAULT_DAY}" +%Y-%m-%dT00:00)
 INPUT_START=""
-# DELETE_RAW_DATA_FLAG=""
-# PROCESS_UNIQUE_SOURCES=1;
-export PGPASSWORD=$hhconfig_database_read_pass
 
 usage () {
     echo
@@ -45,16 +48,12 @@ usage () {
     echo
     echo "Supported options:"
     echo "  -d Date on which to create RSSAC reports (default is 7 days ago: \"${DEFAULT_DAY}\", format: YYYY-MM-DD)"
-    # echo "  -u Don't process the unique source data before generating the report"
-    # echo "  -D Also delete the raw unique_source data from the database to save space (default: no delete)"
     echo "  -h Show this help"
 }
 
-while getopts ":d:Duh" opt; do
+while getopts ":d:h" opt; do
     case $opt in
         d  ) INPUT_START=$OPTARG ;;
-        # D  ) DELETE_RAW_DATA_FLAG=" -D " ;;
-        # u  ) PROCESS_UNIQUE_SOURCES=0 ;;
         h  ) usage
              exit 1 ;;
         \? ) usage
@@ -62,12 +61,10 @@ while getopts ":d:Duh" opt; do
     esac
 done
 
-echo "`date`: $0 COMMENCED"
-USER=$(whoami)
-[ $USER != $hhconfig_database_reader ] && echo "Must be $hhconfig_database_reader to run this script" && exit 1
+echo "$(date): $0 COMMENCED"
 
 # Validate the input date
-if [ ! -z ${INPUT_START} ] ; then
+if [ ! -z "${INPUT_START}" ] ; then
 	if [[ ! $INPUT_START =~ ^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$ ]] ; then
 			echo "Error: The start date is not in the required format of YYYY-MM-DD" 
 			exit 1
@@ -78,19 +75,17 @@ if [ ! -z ${INPUT_START} ] ; then
 		echo "Error: The start date is invalid" 
 		exit 1
 	fi
-	START=`date --date="${INPUT_START}" +%Y-%m-%dT00:00`
-        DEFAULT_DAY=`date --date="${INPUT_START}" +%Y-%m-%d`
+	START=$(date --date="${INPUT_START}" +%Y-%m-%dT00:00)
+        DEFAULT_DAY=$(date --date="${INPUT_START}" +%Y-%m-%d)
 fi
 
-STOP=`date --date="${START}" +%Y-%m-%dT23:59`
-
-DB_API_VERSION=`psql -h $hhconfig_database_host $DB_NAME -tc  "select version from dsc.version;"`
-[ $DB_API_VERSION != $REQUIRED_API_VERSION ] && echo "Error: Database API version incorrect." && exit 1
+STOP=$(date --date="${START}" +%Y-%m-%dT23:59)
 
 SQ="'"
+CURL_ARGS="--max-time 300 --retry 1 --get"
 # TODO: do not hardcode this path
 URL="localhost/hedgehog/brew/hedgehog.brew"
-TOP_OUTPUTDIR="$hhconfig_directories_rssac/`date --date=${START} +%Y`/`date --date=${START} +%m`"
+TOP_OUTPUTDIR="$RSSAC_DIR/$(date --date=${START} +%Y)/$(date --date=${START} +%m)"
 TYPES="generateYaml generatePlot"
 GVIS=0
 # Specify some strings for special handling
@@ -103,44 +98,40 @@ echo
 echo "Creating RSSAC reports from ${START} to ${STOP} in ${TOP_OUTPUTDIR}" 
 echo
 
-# if [ ${PROCESS_UNIQUE_SOURCES} -eq 1 ] ; then
-# 	echo "Calling process_unique_source_data script"
-# 	echo "@LIBEXEC@/process_unique_source_data -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}"
-# 	@LIBEXEC@/database_process_rssac_data -s ${DEFAULT_DAY} ${DELETE_RAW_DATA_FLAG}
-# 	echo
-# fi
-
-PLOTIDS=`echo "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' and name != '$TRAFFIC_VOLUME_DIFF' ORDER BY id DESC;" | psql -h $hhconfig_database_host -td $DB_NAME`
-SERVERNMS=`echo "SELECT display_name FROM dsc.server;" | psql -h $hhconfig_database_host -td $DB_NAME `
+PLOTIDS=$(psql $CONN_STRING -tc "SELECT id FROM dsc.plot where ddcategory='9.RSSAC' and name != '$TRAFFIC_VOLUME_DIFF' ORDER BY id DESC;")
+SERVERNMS=$(psql $CONN_STRING -tc "SELECT display_name FROM dsc.server;")
 NDARR=-1 # all nodes
 
 for SVRNM in $SERVERNMS ; do
-    SVRID=`echo "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | psql -h $hhconfig_database_host -td $DB_NAME | tr -d [[:space:]]`
+    SVRID=$(psql $CONN_STRING -tc "SELECT id FROM dsc.server WHERE display_name=${SQ}${SVRNM}${SQ};" | tr -d [[:space:]])
     SVRNM_LC="$(echo ${SVRNM} | tr '[:upper:]' '[:lower:]')"
 
     for TYPE in $TYPES ; do
         EXT="yaml"
-         [ "${TYPE}" == "generatePlot" ] && EXT="png"
-
+        if [ "${TYPE}" == "generatePlot" ] ; then
+			EXT="png"
+		fi
+		
         for PLTID in $PLOTIDS ; do
-			PLTNM=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -h $hhconfig_database_host -td $DB_NAME | sed 's/[[:space:]]//g'`
+			PLTNM=$(psql $CONN_STRING -tc "SELECT name FROM dsc.plot where id=${PLTID};" | sed 's/[[:space:]]//g')
 			# Clear out the file in the plot cache to make sure we get the most up to date plots in the reports
-			rm -rf $hhconfig_directories_plotcache/${SVRNM}/${PLTNM}/${START}-${STOP}-all*.png >/dev/null 2>&1
+			rm -rf $RSSAC_DIR/${SVRNM}/${PLTNM}/${START}-${STOP}-all*.png >/dev/null 2>&1
 			# Generate the file. Yaml gets written to the rssac directory, plots go into the plotcache
 			echo "*** Generating '${EXT}' for: " ${PLTNM}
-            echo `date` ": curl --max-time 300 --retry 1 --get \"${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}\""
-            RESULT=`curl -s --max-time 300 --retry 1 --get "${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}" 2>&1`
+			CURL_URL="${URL}?type=${TYPE}&start=${START}&stop=${STOP}&gvis=${GVIS}&pltid=${PLTID}&svrnm=${SVRNM}&svrid=${SVRID}&ndarr=${NDARR}"
+            echo $(date) ": curl $CURL_ARGS \"$CURL_URL\""
+            RESULT=$(curl $CURL_ARGS "$CURL_URL" 2>&1)
             echo ${RESULT}
 			echo
 			
             if [ "${TYPE}" == "generatePlot" ] ; then
 				# Retrieve the plot from the plot cache
-                PLTFILE=`echo ${RESULT} | sed 's/^.*img src="\([^"?]*\).*/\1/' | sed "s:../plotcache:$hhconfig_directories_plotcache:" | sed 's/-log//' | sed 's/-stack//'`
+                PLTFILE=$(echo ${RESULT} | sed 's/^.* src="\([^"?]*\).*/\1/' | sed "s:../plotcache:$PLOT_CACHE_DIR:" | sed 's/-log//' | sed 's/-stack//')
 
                 if [ "${PLTFILE}" != "plots/no_graph.png" ] && [ "${PLTFILE}" != "plots/no_results.png" ] && [ "${PLTFILE}" != "plots/no_connection.png" ] ; then                   
 					# Report names are the same as plot names but use dash instead of underscore
 					# TODO: use $PLTNM instead of redoing the query then substitute _ with -
-					REP_NAME=`echo "SELECT name FROM dsc.plot where id=${PLTID};" | psql -h $hhconfig_database_host -td $DB_NAME | sed 's/_/-/g' | sed 's/[[:space:]]//g'`
+					REP_NAME=$(psql $CONN_STRING -tc "SELECT name FROM dsc.plot where id=${PLTID};" | sed 's/_/-/g' | sed 's/[[:space:]]//g')
 					# Special handling. The traffic size data has 2 plots but both need to go into the same directory
 					PLT_DIR_NM=${REP_NAME}
 					if [ "${PLTNM}" == "${TRAFFIC_SIZE_SMALL}" ] || [ "${PLTNM}" == "${TRAFFIC_SIZE_BIG}" ] ; then
@@ -154,4 +145,4 @@ for SVRNM in $SERVERNMS ; do
         done
     done
 done
-echo "`date`: $0 COMPLETED"
+echo "$(date): $0 COMPLETED"

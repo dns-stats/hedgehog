@@ -72,19 +72,6 @@ WITH (
 );
 
 --
--- Name: geo; Type: TABLE; Schema: dsc; 
---
-CREATE TABLE dsc.geo
-(
-  id serial NOT NULL,
-  name character varying(255) NOT NULL,
-  country_code char(2) NOT NULL
-)
-WITH (
-  OIDS=FALSE
-);
-
---
 -- Name: dataset; Type: TABLE; Schema: dsc; 
 --
 CREATE TABLE dsc.dataset
@@ -232,11 +219,6 @@ ALTER TABLE ONLY dsc.visible_plot
   ADD CONSTRAINT pk_visible_plot PRIMARY KEY (id),
   ADD CONSTRAINT uniq_visible_plot_name UNIQUE (name);
 
---
--- Name: dsc_pk_geo; Type: CONSTRAINT; Schema: dsc; 
---
-ALTER TABLE ONLY dsc.geo
-  ADD CONSTRAINT pk_geo PRIMARY KEY (name);
 
 --
 -- Name: pk_il; Type: CONSTRAINT; Schema: dsc; 

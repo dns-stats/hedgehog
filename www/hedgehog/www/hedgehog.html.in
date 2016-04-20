@@ -26,7 +26,7 @@ Developed by Sinodun IT (www.sinodun.com)
 	<!-- Basic Page Needs
   ================================================== -->
 	<meta charset="utf-8">
-	<title>Hedgehog</title>
+	<title>DNS-STATS:Hedgehog</title>
 	<meta name="Hedgehog" content="">
 	<meta name="jad@sinodun.com" content="">
 
@@ -36,9 +36,9 @@ Developed by Sinodun IT (www.sinodun.com)
 
 	<!-- CSS
   ================================================== -->
-	<link rel="stylesheet" href="stylesheets/base.css?version=PACKAGEVERSION">
-	<link rel="stylesheet" href="stylesheets/skeleton.css?version=PACKAGEVERSION">
-	<link rel="stylesheet" href="stylesheets/layout.css?version=PACKAGEVERSION">
+	<link rel="stylesheet" href="stylesheets/base.css?version=@HH_PACKAGE_VERSION@">
+	<link rel="stylesheet" href="stylesheets/skeleton.css?version=@HH_PACKAGE_VERSION@">
+	<link rel="stylesheet" href="stylesheets/layout.css?version=@HH_PACKAGE_VERSION@">
 
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -54,9 +54,13 @@ Developed by Sinodun IT (www.sinodun.com)
 </head>
 <body>
   <div class="container">
+    <hr style='margin-bottom:5px; margin-top:1px;'/>
     <div class="three columns">
-      <h2 class="remove-bottom">Hedgehog</h2>
-      <h5>Version @HH_PACKAGE_VERSION@ <a href="about.html"><img id="helpimg" src="images/help.png" alt="About" height="24" width="24" title="Help" /></a></h5>
+      <div class="logo" id="logo">
+          <h5 class="remove-bottom" style="text-align: center; font-weight: bold">DNS-STATS</h5>
+          <h5 class="remove-bottom" style="text-align: center">Hedgehog @HH_PACKAGE_VERSION@:<br>
+          <a href="https://en.wikipedia.org/wiki/Hedgehog#Genera_and_species">@HH_VERSION_NAME@ release</a></h5>
+      </div>
     </div>
     <form method="get" name="plotParams">
       <div class="four columns" id="timedisplay"><!-- 
@@ -121,15 +125,16 @@ Developed by Sinodun IT (www.sinodun.com)
       <div class="sixteen columns" id="outerplot"><!-- 
         auto populated by gengraph.js
    --></div>
-      <div class="one-third column" id="srvr_select">
+      <hr style='margin-top:5px;margin-bottom:5px'/>
+      <div class="sixteen columms" id="srvr_select">
       <label for="servers">Servers</label>
-      <select name="servers" id="servers" onchange="serverTab()"><!-- 
+      <select name="servers" id="servers" onchange="serverTab()">
+<!-- 
         auto populated by gengraph.js
    --></select>
       </div>
       <div class="sixteen columns" id="nodetabs"><!-- 
-        auto populated by gengraph.js
-        TODO: Node tab appears shifted to the right by a few pixels.
+         auto populated by nodetabs.js
    --></div>
     </form>
     <div class="eight columns" id="local_links" >
@@ -139,22 +144,33 @@ Developed by Sinodun IT (www.sinodun.com)
     <!-- TODO: Better job of links -->
     <div class="eight columns" id="ext_links" >
       <hr style='margin-bottom:5px;' />
-      External Links:  &nbsp; <a href="https://github.com/dns-stats/hedgehog/wiki" target="_blank">Hedgehog Homepage</a> &nbsp; <a href="http://dns-stats.org/" target="_blank">dns-stats.org</a>
+      External Links:  &nbsp; <a href="https://github.com/dns-stats/hedgehog/wiki" target="_blank">Hedgehog Wiki</a> &nbsp; <a href="http://dns-stats.org/" target="_blank">dns-stats.org</a>
+      &nbsp; <a id="support_link" href="https://github.com/dns-stats/hedgehog/issues" target="_blank">Support</a>
     </div>
     <div class="sixteen columns" id="copyright" >
       <hr style='margin-top:5px;' />
       &copy; <a href="http://www.icann.org/">Internet Corporation for Assigned Names and Numbers</a> <br/>Developed by <a href="http://sinodun.com/">Sinodun Internet Technologies</a>.
-    </div>
+    
+      <hr style='margin-top:5px;' />
+      This product includes GeoLite2 data created by MaxMind, available from
+      <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
+	  <br/>Powered by: <a href="http://www.postgresql.org">PostgreSQL</a>, <a href="http://rapache.net/index.html">RApache</a>, <a href="https://httpd.apache.org">Apache</a>, 
+	  <a href="https://developers.google.com/chart/?hl=en">Google Charts</a>, <a href="https://www.r-project.org">R</a>, <a href="https://jquery.com">jQuery</a>, <a href="https://getdnsapi.net">getdns</a>
+    </div>  
   </div><!-- container -->
 
 </body>
 
     <!-- Javascript
-  ================================================== -->
+  ================================================== 
+    <script language="javascript" type="text/javascript"
+             src="/javascript/jquery/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript"
+             src="/javascript/jquery-ui/jquery-ui.min.js"></script> -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script src="js/gengraph.js?version=PACKAGEVERSION" type="text/javascript"></script>
-    <script src="js/datetimes.js?version=PACKAGEVERSION" type="text/javascript"></script>
-    <script src="js/nodetabs.js?version=PACKAGEVERSION" type="text/javascript"></script>
+    <script src="js/gengraph.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
+    <script src="js/datetimes.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
+    <script src="js/nodetabs.js?version=@HH_PACKAGE_VERSION@" type="text/javascript"></script>
 
 </html>

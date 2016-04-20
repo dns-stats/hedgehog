@@ -1,0 +1,328 @@
+
+<h1><ac:structured-macro ac:macro-id="f9e02cbb-e6f6-4fe6-b9b0-812aded99f27" ac:name="toc" ac:schema-version="1" /></h1>
+<p>The following instructions describe how to install Hedgehog 2.1.0b2 from Ubuntu Packages on Ubuntu 14.04 Server and set up imports of data.</p>
+<p>&nbsp;</p><ac:structured-macro ac:macro-id="b97e1073-8939-41e4-9abc-f56b74e227db" ac:name="numberedheadings" ac:schema-version="1"><ac:rich-text-body>
+<h1>Requirements</h1>
+<h2>Platform support</h2>
+<p>Version 2.1.0b2 of Hedgehog is currently only supported on Ubuntu 14.04.3 LTS Server.</p>
+<h2>Database support</h2>
+<p>Hedgehog has been tested with PostgreSQL 9.3.X. The installation of this of this is not covered in detail since it may or may not be co-located with the other hedgehog components. If not already installed, it will be installed as a dependancy of the hedgehog-database package.</p><ac:structured-macro ac:macro-id="c14a5304-7681-49cf-ade6-acce99a52c63" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
+<p>The Hedgehog servers and PostgreSQL must both be configured to use UTC!</p></ac:rich-text-body></ac:structured-macro>
+<h2>General</h2>
+<h3>Home directory permissions</h3>
+<p>Some users set the permissions on their home directory such that other users cannot read or execute that directory. In this case when running scripts that update the database as the <em>hedgehog</em> or <em>postgres</em> (user via 'sudo -u &lt;user&gt;') meaningless <span>messages are generated from psql about being unable to cd into logged in users home directory. To avoid this</span> spurious output change directory to one that allows other users to read/execute (e.g. /tmp) and run the scripts from there.</p>
+<h1>Hedgehog Installation</h1>
+<h2>Hedgehog packages</h2>
+<p>The Hedgehog PPA is located at</p><ac:structured-macro ac:macro-id="f013ddc3-725e-4d50-91cd-81b5add92556" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo add-apt-repository ppa:dns-stats/presenter]]></ac:plain-text-body></ac:structured-macro>
+<p>Hedgehog comprises 3 main components which can be run on the same or different machines. Configure the additional PPA's as required and then install the main packages from the list below:</p>
+<table>
+<tbody>
+<tr>
+<th>Component</th>
+<th>Description</th>
+<th><span>Main Package</span></th>
+<th colspan="1">Optional Package</th>
+<th colspan="1">Additional Required PPAs</th></tr>
+<tr>
+<td colspan="1">Database</td>
+<td colspan="1">PostgreSQL database for Hedgehog</td>
+<td colspan="1">hedgehog-database</td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p>sudo add-apt-repository ppa:ondrej/pkg-nlnetlabs</p></td></tr>
+<tr>
+<td rowspan="2"><span>Data Manager</span></td>
+<td>
+<p>Scripts for database population and management</p>
+<p>Scripts for XML/DAT processing</p></td>
+<td><span>hedgehog-data-manager</span></td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td colspan="1">(Optional) Apache config for webdav based XML uploads</td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1"><span>hedgehog-webdav-upload</span></td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td>Web GUI</td>
+<td>Web GUI front-end</td>
+<td><span>hedgehog-gui</span></td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">
+<p>sudo add-apt-repository ppa:opencpu/rapache</p></td></tr></tbody></table>
+<p>Notes:</p>
+<ul>
+<li>Multiple Web GUI's can be connected to the same database.</li>
+<li>The upload mechanism for XML/DAT files is for the user to decide (ssh, rsync, Apache, etc.). A package for upload using Apache is provided for convenience.</li></ul>
+<p>For reference the other Hedgehog packages are:</p>
+<table>
+<tbody>
+<tr>
+<th>Description</th>
+<th>Required by</th>
+<th><span>Package</span></th></tr>
+<tr>
+<td>Common package</td>
+<td><span>All main hedgehog packages</span></td>
+<td>hedgehog-common</td></tr>
+<tr>
+<td colspan="1">RPostgresHelper</td>
+<td colspan="1">Web Gui</td>
+<td colspan="1">r-hedgehog-rpostgresqlhelper</td></tr>
+<tr>
+<td colspan="1">Documentation</td>
+<td colspan="1">&nbsp;</td>
+<td colspan="1">hedgehog-doc</td></tr></tbody></table><ac:structured-macro ac:macro-id="ecb01269-c408-4302-9e36-014e66c6709d" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<p><span>Two system users are used by Hedgehog, which are created by the packages:</span></p>
+<table>
+<tbody>
+<tr>
+<th>User</th>
+<th>Default</th>
+<th colspan="1">Component</th>
+<th>Note</th>
+<th colspan="1">Created by</th></tr>
+<tr>
+<td>Database owner</td>
+<td>hedgehog</td>
+<td colspan="1">
+<p>Data Manager</p></td>
+<td>
+<p>This is the user that will own the database created by</p>
+<p>Hedgehog and the top level datafile directories.</p></td>
+<td colspan="1">hedgehog-common package</td></tr>
+<tr>
+<td>Database read user</td>
+<td>www-data</td>
+<td colspan="1">
+<p>Web front-end</p></td>
+<td>
+<p>This defaults to the same as the default apache user</p></td>
+<td colspan="1">apache2 package installation</td></tr></tbody></table>
+<p><span><br /></span></p></ac:rich-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<h2>Web GUI only - Manual install of R packages</h2>
+<p>These instructions&nbsp;are for R packages that must be installed using R's built-in compilation tools (there is no Ubuntu package for them).</p>
+<p>To install interactively: (Some can repositories don't contain packages for all versions of R so if this fails quit R and re-try a different repo)</p><ac:structured-macro ac:macro-id="0ec5c945-2a77-4b6a-a826-7e8009669588" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo R
+install.packages(c("brew","Cairo","googleVis","RPostgreSQL","R.utils","yaml","plyr"))
+q()
+# If you are prompted to save workspace image y/n/c, choose no. ]]></ac:plain-text-body></ac:structured-macro>
+<p><span>For scripting purposes a repo can be specified by using a command of the form:</span></p><ac:structured-macro ac:macro-id="dc01203c-41ac-4999-a61d-4168422bce4f" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[install.packages("name", repos='http://cran.rstudio.com/')]]></ac:plain-text-body></ac:structured-macro>
+<p><span>Hedgehog is tested against version 3.1.1 of R.&nbsp;</span>The package versions that Hedgehog has been tested against are listed below alongside each package.</p>
+<table>
+<thead>
+<tr>
+<th>
+<div class="tablesorter-header-inner">R Package</div></th>
+<th>
+<div class="tablesorter-header-inner">Supported Version</div></th></tr></thead>
+<tbody>
+<tr>
+<td>brew</td>
+<td>1.0-6</td></tr>
+<tr>
+<td>Cairo</td>
+<td>1.5-9</td></tr>
+<tr>
+<td>googleVis</td>
+<td>
+<p>0.5.10</p></td></tr>
+<tr>
+<td colspan="1">RPostgreSQL</td>
+<td colspan="1">0.4</td></tr>
+<tr>
+<td colspan="1">R.utils</td>
+<td colspan="1">2.2.0</td></tr>
+<tr>
+<td colspan="1">yaml</td>
+<td colspan="1">2.1.13</td></tr>
+<tr>
+<td colspan="1">plyr</td>
+<td colspan="1">
+<p class="p1"><span class="s1">1.8.3</span></p></td></tr></tbody></table>
+<p>&nbsp;</p>
+<h1>Hedgehog configuration</h1>
+<ul>
+<li>For the Web GUI and Data Manager components, ensure the /etc/hedgehog/hedgehog.yaml configuration file contains usernames and passwords that will match those configured in the database (see next section).</li>
+<li>Also configure the database parameters (host, port and name) as required.</li></ul><ac:structured-macro ac:macro-id="0d1bf8a9-fedb-4e59-b37b-ee10046ee720" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[database: 
+  host         : /var/run/postgresql # specify a host for the postgresql DB. If
+                                     # this begins with a slash, it specifies the
+                                     # directory in which the socket file is 
+                                     # stored.
+  port         : 5432      # specify port for the postgresql DB.
+  name         : hedgehog  # specify dbname for the postgresql DB.
+  owner        : hedgehog  # specify a user to own the postgresql DB. 
+                           # [Required for Data Manager component]
+  owner_pass   :           # specify a password for the owner user if needed.
+  read_user    : www-data  # specify a read user for the postgresql DB. 
+                           # [Required for Web front-end component]
+  read_pass    :           # specify a password for the read user if needed.
+]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="c8758ff4-856d-4856-8fbf-7cea1311dd79" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
+<p><span>Do not edit the 'directories' section of this file as it is auto-generated.</span></p></ac:rich-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="2e9e18d9-5e44-4f3c-814e-ee8523cd4f4a" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
+<p>Depending on you PostgreSQL configuration you may need to add passwords to this file. If you do then be aware that, by default, this file is readable by all users. You should restrict access to just the hedgehog user on a Data Manager only machine or the hedgehog and www-data user on a combined Data Manager and Web GUI.</p></ac:rich-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<h2>Database configuration</h2>
+<h3>Create a database</h3>
+<p>Ask your DBA to create the necessary database. This is a script to help them. It creates the DATABASE, SCHEMA, FUNCTIONS, EXTENSIONS, LANGUAGES, USERS and ROLES needed to run hedgehog (using default values), and can optionally accept a user specified database name and read/write user names.</p><ac:structured-macro ac:macro-id="0668b5cd-c04e-41ff-9a3c-5afdd1e06520" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u postgres /usr/bin/hedgehog_database_create
+ 
+#If you want to use passwords do something like this or use peer authentication
+sudo -u postgres psql
+alter user hedgehog password 'hedgehog123';
+alter user "www-data" password 'www123';]]></ac:plain-text-body></ac:structured-macro>
+<p>Modify the PostgreSQL configuration as so:</p><ac:structured-macro ac:macro-id="01ae0273-18b3-406f-94e2-8280a94aeaac" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo vi /etc/postgresql/9.3/main/postgresql.conf
+# uncomment and set 'extra_float_digits = 1'
+sudo service postgresql reload]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="973c342a-bce8-456a-ab17-9e56a19d4b3e" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p>We recommend that the 'pgtune' tool is used to obtain an optimal configuration for PostgreSQL. For example:</p><ac:structured-macro ac:macro-id="7d983735-2cec-4162-87c5-9ca0bb7b7b02" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[pgtune -i /etc/postgresql/9.3/main/postgresql.conf -c 200 -T DW]]></ac:plain-text-body></ac:structured-macro>
+<p>Also some queries to the database trigger DNS lookups from functions in the database. It may be optimal to run a local resolver such as Unbound.</p></ac:rich-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<h2><span>Data Manager configuration</span></h2>
+<h3>Specify the nodes/servers</h3><ac:structured-macro ac:macro-id="c5545571-d839-4049-ad6e-f7fe33159301" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p><span>For this version of Hedgehog the servers and nodes to be processed and displayed must be specified manually as described here.</span></p></ac:rich-text-body></ac:structured-macro>
+<ul>
+<li>Edit the the&nbsp;<em>/etc/hedgehog/nodes.csv</em>&nbsp;file to specify the servers, nodes and grouping to be used (example format is provided with entries commented out).</li>
+<li>Note that the current GUI layout is optimised for nodes with short names (&lt;6 characters) of the same length</li></ul>
+<h3><span>Directory permissions</span></h3>
+<p><span>The </span>/var/lib/hedgehog/data/ is used to store incoming XML files</p><ac:structured-macro ac:macro-id="4dbb1824-fd51-4ab2-bbfb-446ada36aae7" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<p>You may also need to alter the permissions on this directory to allow uploads via your chosen mechanism</p></ac:rich-text-body></ac:structured-macro>
+<h3>Create the database tables</h3>
+<p>Run the command below noting the following:</p>
+<ul>
+<li>If you have historic data to import then use the -m flag to specify the month of the oldest data that will need importing. Otherwise the database tables will be created to hold data from this month onwards.</li>
+<li>Note that this script will also create the directory structure for all the specified servers and nodes under the <em>data</em> directory if it does not exist</li>
+<li>(Note the insertion of the GeoIP data can take some time)</li></ul><ac:structured-macro ac:macro-id="d0c9fcbe-2aad-4852-be9b-612559c154d9" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u hedgehog /usr/bin/hedgehogctl database_init]]></ac:plain-text-body></ac:structured-macro>
+<p>Then run the following script to make sure the list of delegated TLDs in the database is up to date.</p><ac:structured-macro ac:macro-id="9430d859-d4fb-41a9-8f93-40d1def154bc" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u hedgehog /usr/bin/hedgehogctl database_update_tlds_from_zone 2>/dev/null]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<h3>(Optional) Webdav upload</h3>
+<p>If using webdav to upload XML files then add the following to the /etc/apache2/envvars file:</p><ac:structured-macro ac:macro-id="a11c155e-6c59-49b9-83e7-58d7c7e47988" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[umask 002]]></ac:plain-text-body></ac:structured-macro>
+<p>Then enable the dependancies:</p><ac:structured-macro ac:macro-id="066dfab5-7cda-4211-ab76-258231b12a24" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo a2enmod dav
+sudo a2enmod ssl
+suod a2enmod dav_fs]]></ac:plain-text-body></ac:structured-macro>
+<p>And then enable the hedgehog webdav site:</p><ac:structured-macro ac:macro-id="69d812de-d2cb-4d27-bde2-fc6e38844623" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo a2ensite hedgehog-webdav-upload]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<h2>Web GUI configuration</h2>
+<p>Check the parameters in the/etc/hedgehog/hedgehog_gui.yaml file, which specifies parameters controlling the behaviour of the web front end. See the &quot;Plot Caching&quot; section in the user guide for a more detailed description of when plots are cached.</p><ac:structured-macro ac:macro-id="8c12ff2e-e48c-479a-9c73-07d46320ec62" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[--- 
+# YAML config for hedgehog GUI.
+# NOTE: If this file is changed then apache must be restarted for the changes to take effect
+www:
+  default_plot_type             : interactive # 'static'      -> png plots
+                                              # 'interactive' -> googlevis plots
+  default_interactive_plot_type : svg         # 'flash' -> plot requires flash
+                                              # 'svg'   -> plot is SVG/VML and 
+                                              # does not require flash (but with svg
+                                              # plots some legends do not wrap properly)
+  default_node_grouping         : instance    # choose from 'none', 'instance', 'city' or
+                                              # 'country'
+  use_plot_caching              : 1           # '1' -> true, use cached plots when possible
+                                              # '0' -> false, never use cached plots
+  caching_delay_in_hours        : 1           # If 'use_plot_caching=1' then only plots with
+                                              # an end time earlier than this number of 
+                                              # hours ago are cached. More recent plots are
+                                              # not cached as data may still be importing
+  presentation_delay_in_hours   : 0           # Number of hours behind now for which the
+                                              # GUI will display data
+  support_url                   :             # configurable target for "Support" external
+                                              # link on Homepage. The default dns-stats.org
+                                              # issue tracker used if left blank]]></ac:plain-text-body></ac:structured-macro>
+<h3>Apache configuration</h3>
+<p>Depending on your exact installation choices and apache configuration y<span style="line-height: 1.4285715;">ou may need to disable the default site using the following command:</span></p><ac:structured-macro ac:macro-id="e1775ee2-a4ef-44c0-be90-b3a01cb3658f" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo a2dissite 000-default.conf]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<ul>
+<li>Add the Hedgehog configuration files to apache and enable the site (this file name can be changed if required to match any local apache policy):</li></ul><ac:structured-macro ac:macro-id="c192783e-4747-437f-a499-ad65bf43e7da" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo a2ensite hedgehog.conf]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="67e4bcea-5042-4b6a-b989-11fc927c8faa" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p><span>apache/rapache write some of their logs to user.* so it can be useful to change the syslog config: </span></p><ac:structured-macro ac:macro-id="2c4f15ea-2138-4fc3-80dd-0a223a7cbd54" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo vi /etc/rsyslog.d/50-default.conf]]></ac:plain-text-body></ac:structured-macro>
+<p>Uncomment the line&nbsp;beginning&nbsp;'user.*'.&nbsp;</p></ac:rich-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<ul>
+<li>Finally, reload apache:</li></ul><ac:structured-macro ac:macro-id="0a195f8a-6d33-4fe2-9394-0bb24d6fb9b7" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo service apache2 reload]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<p>At this point you should test that you can see the servers and nodes in the web front end at the URL http://&lt;server-name&gt;/hedgehog</p>
+<h1>Importing data</h1>
+<p>Hedgehog can process data in the following 3 ways:</p>
+<table>
+<tbody>
+<tr>
+<th>Source format</th>
+<th>Output format</th>
+<th>&nbsp;</th></tr>
+<tr>
+<td>XML</td>
+<td>Database</td>
+<td>For real time uploads</td></tr>
+<tr>
+<td colspan="1">DAT</td>
+<td colspan="1">Database</td>
+<td colspan="1">For import of historic data</td></tr>
+<tr>
+<td colspan="1">XML</td>
+<td colspan="1">DAT</td>
+<td colspan="1">For backwards compatibility with DSC</td></tr></tbody></table>
+<p>&nbsp;</p>
+<p>In each case the <em>/usr/bin/refile_and_grok</em> script is used, it is simply given different parameters:</p><ac:structured-macro ac:macro-id="21652681-c1b3-4673-bd32-acfcc58ff799" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[> refile_and_grok -h
+
+refile_and_grok - finds all input files in working directory and processes to output format
+
+
+-w Working directory to search for input files (default: )
+-i Input file format <XML|DAT> (default: XML)
+-o Output file format <DAT|DB> (default: DB)
+-c Non-interactive mode - use this flag when being run by a cron job
+-s Start date from which to process incoming data (XML input only)
+-r Disable processing of rssac data. Default is to process all data.
+-R Reserved processors. Number of CPUS processors to exclude from import (default 0).
+-a Append output to the refile_and_grok.stdout file (default is overwrite)
+-h Show this help.]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<h2>Importing historical .DAT data</h2><ac:structured-macro ac:macro-id="149250e5-e29b-4aa4-98e9-bb06dfb37926" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u <DB_OWNER> /usr/bin/refile_and_grok -i DAT]]></ac:plain-text-body></ac:structured-macro>
+<p>Be aware that this can take a long time if there is a significant amount of historic data and it may be advisable to run this in stages.</p>
+<h2>Importing real-time .XML data</h2>
+<h3>Manually</h3>
+<ul>
+<li>This can be done manually by running the <em>refile_and_grok</em> script (consider running this nohup as it may take a while depending on how much data there is to process).</li></ul><ac:structured-macro ac:macro-id="86756bf3-267b-4347-bfca-988c04c18ed5" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u <DB_OWNER> /usr/bin/refile_and_grok]]></ac:plain-text-body></ac:structured-macro>
+<ul>
+<li>A snapshot of the progress of the data import can be generated by running the command below:</li></ul><ac:structured-macro ac:macro-id="a2572ef0-72b7-49a4-91a2-631f4881db3e" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u <DB_OWNER> /usr/bin/hedgehogctl datafiles_create_summary]]></ac:plain-text-body></ac:structured-macro>
+<h3>Automatically</h3>
+<ul>
+<li>Configure a regular cron job for <em>refile_and_grok</em> as shown below</li></ul>
+<h2>Importing zone-size and load-time data for RSSAC</h2>
+<p>To do this run&nbsp;the&nbsp;<em>rssacd</em>&nbsp;demon specifying the server of interest. This listens for NOTIFY messages and after receiving one:</p>
+<ul>
+<li>obtains the zone size from the notifying server by performing an XFR and&nbsp;</li>
+<li>probes each node listed for the configured server&nbsp;with an IP address&nbsp;to calculate the zone load time&nbsp;</li></ul><ac:structured-macro ac:macro-id="1b9657e1-b704-4cf4-93dc-70863cc93bc5" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p><span>This requires that management IP addresses are configured for the nodes via the nodes.csv file (also note that&nbsp;</span><em>rssacd</em><span>&nbsp;needs restarting if new nodes are added).</span></p></ac:rich-text-body></ac:structured-macro>
+<p><em style="line-height: 1.42857;">rssacd</em>&nbsp;can be run from the command line for testing, or using an init script.</p>
+<p>From the command line:</p><ac:structured-macro ac:macro-id="91613e48-300d-4b36-ba4d-dc9960e3133b" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[/usr/sbin/rssacd --log ~/var/log/hedgehog/rssacd.log -s <server-name> -z <fully_qualified_zone_name>]]></ac:plain-text-body></ac:structured-macro>
+<p>From an init script:</p>
+<ul>
+<li>Configure the server name, TSIG key, etc. in the /etc/hedgehog/rssac.conf file</li></ul>
+<p>Then run:</p><ac:structured-macro ac:macro-id="02b36a1e-04ba-4e27-94f7-f6f0ba89e056" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[update-rc.d rssacd defaults]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
+<h1>Cron jobs</h1>
+<p>In 2.1.0 several cron jobs need to be configured.</p>
+<h2>Data Manager component</h2>
+<p>Below is an example crontab for a typical data manager install (<em>sudo -u &lt;DB_OWNER&gt; crontab -e</em>).</p><ac:structured-macro ac:macro-id="7e630d0d-a82c-459e-91ed-3b2ba2023f96" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
+<p><strong><span>Note that the </span><em>database_manage_partitions </em><span>script </span><strong>MUST </strong> be run at least once a month to create the tables for next month or the import will fail.</strong></p></ac:rich-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="b7c48198-c2a8-4302-951b-0d6f2adb63cc" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# REQUIRED: 
+# Import XML data every 15 mins
+00,15,30,45 * * * * /usr/bin/refile_and_grok -c >> /var/log/hedgehog/refile_and_grok_xml_to_db.log 2>&1
+# Twice monthly job to make sure the DB tables for next month are created 
+# ahead of time
+0 6 15,28 * * /usr/bin/hedgehogctl database_manage_partitions >> /var/log/hedgehog/database_manage_partitions.log 2>&1
+
+# OPTIONAL:
+# Daily jobs to process RSSAC data. By default data is processed 
+# for a single day 1 week ago. Must be run before the rssac_generate_reports script (see Web GUI Component cron jobs)
+0 1 * * * /usr/bin/hedgehogctl database_process_rssac_data -D >> /var/log/hedgehog/database_process_rssac_data.log 2>&1
+# Weekly job to update the delegated TLDs from the IANA database.
+0 2 * * 0 <prefix>/bin/hedgehogctl database_update_tlds_from_zone >> /var/log/database_update_tlds_from_zone.log 2>&1
+# Monthly job to update the geoIP database.
+0 3 1 * * <prefix>/bin/hedgehogctl database_update_geoip >> /var/log/database_update_geoip.log 2>&1
+# Monthly job to remove empty xml directories that are older than 7 days old
+0 2 1 * * /usr/bin/hedgehogctl datafiles_rm_empty_xml_dirs -D >> /var/log/hedgehog/datafiles_rm_empty_xml_dirs.log 2>&1
+# Monthly job to tar up processed xml directories
+0 2 7 * * /usr/bin/hedgehogctl datafiles_tar_old_xml -D >> /var/log/hedgehog/datafiles_tar_old_xml.log 2>&1]]></ac:plain-text-body></ac:structured-macro>
+<h2>Web GUI component</h2>
+<p>Below is an example crontab for a typical web front-end install (<em>sudo -u &lt;DB_READ_USER&gt; crontab -e</em>)</p><ac:structured-macro ac:macro-id="5a36e95b-fa79-4932-9670-75ca67505fb5" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# OPTIONAL: 
+# Daily job to create cached plots for the previous day to make loading common plots  
+# quicker. Run a few hours after midnight so all data is uploaded.
+0 4 * * * /usr/bin/hedgehogctl plotcache_generate_cached_plots -D >> /var/log/hedgehog/plotcache_generate_cached_plots.log -D 2>&1
+# Daily job to generate RSSAC reports. By default report is generated 
+# for a single day 1 week ago. Must be run after the database_process_rssac_data script (see Data Manager cron jobs)
+0 3 * * * /usr/bin/hedgehogctl rssac_generate_reports >> /var/log/hedgehog/rssac_generate_reports.log 2>&1]]></ac:plain-text-body></ac:structured-macro></ac:rich-text-body></ac:structured-macro>

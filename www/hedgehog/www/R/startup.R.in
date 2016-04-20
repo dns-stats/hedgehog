@@ -1,5 +1,5 @@
 # 
-# Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,11 @@
 # Developed by Sinodun IT (www.sinodun.com)
 #
 
-#system('logger -p user.notice Call to Hedgehog startup.R')
+#system('logger -p user.notice Hedgehog: Call to Hedgehog startup.R')
+
+# Set the locale - For some reason this is set in R on the command line
+# but not in Rapache!
+Sys.setlocale("LC_ALL", 'en_US.UTF-8')
 
 suppressPackageStartupMessages(library(Cairo))
 suppressPackageStartupMessages(library(brew))
@@ -31,8 +35,9 @@ suppressPackageStartupMessages(library(RPostgreSQLHelper))
 suppressPackageStartupMessages(library(digest))
 suppressPackageStartupMessages(library(scales))
 suppressPackageStartupMessages(library(yaml))
-suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(plyr))
 suppressPackageStartupMessages(library(grid))
+suppressPackageStartupMessages(library(rjson))
 
 dbdrv  <- dbDriver("PostgreSQL")
 hh_config <- yaml.load_file("@HH_CONF_FILE@")
