@@ -16,7 +16,8 @@ Build-Depends: apache2-dev (>= 2.4),
                python-yaml,
                python-dnspython,
                python-psycopg2,
-               help2man
+               help2man,
+               r-cran-rpostgresql
 Standards-Version: 3.9.5
 Homepage: http://dns-stats.org/
 Vcs-Git: https://github.com/dns-stats/hedgehog.git
