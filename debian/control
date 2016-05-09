@@ -132,7 +132,8 @@ Package: r-hedgehog-rpostgresqlhelper
 Architecture: all
 Section: gnu-r
 Depends: ${R:Depends},
-         ${misc:Depends}
+         ${misc:Depends},
+         r-cran-rpostgresql
 Description: GNU R package for Hedgehog R PostgreSQL Helper
  Hedgehog is a visualisation tool for DNS statistics that consumes data
  acquired with the DSC collector.
