@@ -1,6 +1,6 @@
 
-<p>This document describes how to upgrade a server from release 2.0.0 to release 2.1.0.b1 of Hedgehog where 2.1 is installed from a tarball of the source code.</p><ac:structured-macro ac:macro-id="c1f1e250-6350-41e9-8a67-1b6f5437640e" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
-<p>2.0.0rc2 and 2.0.0 do not differ and therefore this guide can also be used to upgrade from 2.0.0rc2 to 2.1.0b2</p></ac:rich-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="74b22cff-f3a5-4f86-9916-6f1efe271984" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
+<p>This document describes how to upgrade a server from release 2.0.0 to release 2.1.0rc1 of Hedgehog where 2.1 is installed from a tarball of the source code.</p><ac:structured-macro ac:macro-id="c1f1e250-6350-41e9-8a67-1b6f5437640e" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<p>2.0.0rc2 and 2.0.0 do not differ and therefore this guide can also be used to upgrade from 2.0.0rc2 to 2.1.0rc1</p></ac:rich-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="74b22cff-f3a5-4f86-9916-6f1efe271984" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
 <p><span>Installation from packages is supported from 2.1 onwards. Support for installation directly from source is likely to be discontinued in a future version. It is recommended that users migrate to installing from packages from 2.1 where possible (see the Upgrade Guide).</span></p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <p><ac:structured-macro ac:macro-id="84a2de1f-81fa-4598-a6ba-e2a7a9ab554b" ac:name="toc" ac:schema-version="1"><ac:parameter ac:name="style">none</ac:parameter></ac:structured-macro></p>
@@ -22,9 +22,9 @@ install.packages("plyr")
 q()]]></ac:plain-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <h3>1.2 Download, configure and make new release</h3>
-<p><span>Download the 2.1.0b2 release from github: </span><a href="https://github.com/dns-stats/hedgehog/archive/2.0.0rc2.tar.gz">https://github.com/dns-stats/hedgehog/archive/2.1.0b2.tar.gz</a></p>
-<p>(If you downloaded the above URL with wget the tarball will be called 2.1.0b2.tar.gz)</p><ac:structured-macro ac:macro-id="d4ac4bc4-d914-4e01-9591-3e07f55a2dcb" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[tar -xzf hedgehog-2.1.0b2.tar.gz
-cd hedgehog-2.1.0.b1
+<p><span>Download the 2.1.0rc1 release from github: </span><a href="https://github.com/dns-stats/hedgehog/archive/2.0.0rc2.tar.gz">https://github.com/dns-stats/hedgehog/archive/2.1.0rc1.tar.gz</a></p>
+<p>(If you downloaded the above URL with wget the tarball will be called 2.1.0rc1.tar.gz)</p><ac:structured-macro ac:macro-id="d4ac4bc4-d914-4e01-9591-3e07f55a2dcb" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[tar -xzf hedgehog-2.1.0rc1.tar.gz
+cd hedgehog-2.1.0rc1
 ./autogen.sh
 mkdir build
 cd build
@@ -38,7 +38,7 @@ make]]></ac:plain-text-body></ac:structured-macro>
 <h3>1.4 Disable web front end</h3>
 <p>It is recommended to disable the web front end during upgrade e.g by enabling a holding page.</p>
 <h2>2. Installation</h2>
-<h3>2.1 Install new release</h3><ac:structured-macro ac:macro-id="e23737e8-8cb7-4a34-858a-3c04c8ae1b9f" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[cd hedgehog-2.1.0b2/build
+<h3>2.1 Install new release</h3><ac:structured-macro ac:macro-id="e23737e8-8cb7-4a34-858a-3c04c8ae1b9f" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[cd hedgehog-2.1.0rc1/build
 sudo make install]]></ac:plain-text-body></ac:structured-macro>
 <h3>2.1 Update the database</h3>
 <h4>2.1.2 Update config</h4>
