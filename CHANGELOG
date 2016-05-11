@@ -14,7 +14,12 @@
 # limitations under the License.
 #
 
-Hedgehog 2.1.0b2 - 2015-04-20
+Hedgehog 2.1.0rc1 - 2016-05-09
+------------------------------
+* Updated packaging now that RPostgreSQL is available (thanks to Ondrej Sury)
+
+
+Hedgehog 2.1.0b2 - 2016-04-20
 -----------------------------
 
 * Add release name of "Daurian" for 2.1
@@ -28,7 +33,7 @@ Hedgehog 2.1.0b2 - 2015-04-20
 * Fix issues with jquery dependancies
 
 
-Hedgehog 2.1.0b1 - 2015-02-01 
+Hedgehog 2.1.0b1 - 2016-02-01 
 ------------------------------
 
 Features:
