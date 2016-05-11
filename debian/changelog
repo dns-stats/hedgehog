@@ -1,3 +1,11 @@
+hedgehog (2.1.0~rc1-1) trusty; urgency=medium
+
+  * Update with new RPostgreSQL package (thanks Ondrej Sury)
+  * Update for 2.1.0rc release
+  * Fix links and fonts in docs
+
+ -- Sara Dickinson <sara@sinodun.com>  Wed, 11 May 2016 15:46:24 +0000
+
 hedgehog (2.1.0~b2-2) trusty; urgency=medium
 
   * Added build dependency
