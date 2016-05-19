@@ -1,3 +1,12 @@
+hedgehog (2.1.0~rc2-1) trusty; urgency=medium
+
+  * Bump to rc2 and add default server display name as config options
+  * Fix alphabetical sorting of country/city/instance
+  * Fix user detection from cron jobs
+  * Update docs and CHANGELOG
+
+ -- Sara Dickinson <sara@sinodun.com>  Thu, 19 May 2016 15:29:16 +0000
+
 hedgehog (2.1.0~rc1-1) trusty; urgency=medium
 
   * Update with new RPostgreSQL package (thanks Ondrej Sury)
