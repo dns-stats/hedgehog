@@ -45,8 +45,8 @@ $(document).ready(function() {
     // populate plot and server dropdowns and nodetabs then generate default plot    
     // , brew("initnodeslist"),
     $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), 
-           brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), 
-           brew("getSupportURL")).done(function(db,rp, pt, ss, nd, dg, dp, su){
+           brew("getDefaultServer"), brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), 
+           brew("getSupportURL")).done(function(db,rp, pt, ss, ds, nd, dg, dp, su){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -67,8 +67,7 @@ $(document).ready(function() {
         $("#plotType").html(pt[0]);
         $("#plotType").val(parseInt(dp[0]));
 
-        // initialise server drop down id to 1 (or 'DB error' if applicable)
-        //TODO(asap): Default server should be a config option
+        // Initialise Server drop down item
         $("#servers").html(ss[0]);
 
         // check we have at least 1 server
@@ -78,7 +77,18 @@ $(document).ready(function() {
             $("#outerplot").html('<div class="sixteen columns" id="plot"><hr /><img src="plots/no_results.png" /><hr /></div>');
             setNoResultsMsg(true);
             return;
-	    }
+        }
+
+        // checks user defined default for undefined, null and empty string
+        if (!(!ds[0] || ds[0].length === 0 || !ds[0].trim())) {
+            var options= document.getElementById('servers').options;
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].text === ds[0].trim()) {
+                    options[i].selected = true;
+                    break;
+                }
+            }
+        }
 
         // initialise node tabs and grouping
         initNodeHtml(nd[0]);
