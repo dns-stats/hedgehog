@@ -109,6 +109,18 @@ initServerDDHtml <- function() {
     return(TRUE)
 }
 
+getDefaultServer <- function() {
+  
+  if (hh_debug) {
+      system('logger -p user.notice Hedgehog: In getDefaultServer')
+  }
+  
+    # Calling code checks for no server specified
+  %><%=gui_config$www$default_server%><%
+
+  return(TRUE)
+}
+
 # Generate a nested JSON structure the js code can use to create the node tabs
 initNodeData <- function() {
     if (hh_debug) {
@@ -411,6 +423,7 @@ if (class(dsccon) != "try-error") {
 		validateDBVersion  = {validateDbVersion()},
 		initPlotDDHtml     = {initPlotDDHtml()},
 		initServerDDHtml   = {initServerDDHtml()},
+		getDefaultServer   = {getDefaultServer()},
 		initNodeTabsHtml   = {initNodeTabsHtml()},
 		initNodeData       = {initNodeData()},
 		getDefaultPlotId   = {getDefaultPlotId()},
