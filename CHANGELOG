@@ -14,6 +14,14 @@
 # limitations under the License.
 #
 
+
+Hedgehog 2.1.0rc2 - 2016-05-19
+------------------------------
+* Add default server for drop down as a config option
+* Fix alphabetical sorting of Country/City/Instance in node tab
+* Fix detection of correct user when running from cron jobs
+
+
 Hedgehog 2.1.0rc1 - 2016-05-09
 ------------------------------
 * Updated packaging now that RPostgreSQL is available (thanks to Ondrej Sury)

@@ -17,7 +17,7 @@
 ///
 
 var sortByText = function (a, b) {
-     return $.trim($(a).text()) > $.trim($(b).text());
+     return $.trim($(a).text()).localeCompare($.trim($(b).text()));
 }
 
 function parse_name( myid ) {
