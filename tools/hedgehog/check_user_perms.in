@@ -71,6 +71,7 @@ SPECIFIED_PASS=""
 SPECIFIED_USER=""
 # By default check for a database connection
 CHECK_DB_CONN=1
+MY_USER=$(whoami)
 
 REQUIRED_API_VERSION=@DB_VERSION@
 
@@ -119,9 +120,8 @@ if [ $CHECK_DB_CONN -eq 1 ] ; then
   # a user with the same name as the hedgehog database owner and are using peer
   # authentication
   if [ -z "$PGPASSWORD" ] ; then
-    USER=$(whoami)
-    if [ "$USER" != "$USER_NAME" ] ; then
-      echo "Must be user: $USER_NAME and using peer authentication to run this script"
+    if [ "$MY_USER" != "$USER_NAME" ] ; then
+      echo "Must be user: '$USER_NAME' and using peer authentication to run this script, currently '$MY_USER'"
       exit 1
     fi
   fi
@@ -165,7 +165,7 @@ if [ $CHECK_DB_CONN -eq 1 ] ; then
       fi
     fi
   else
-    echo "The user $USER_NAME does not have the expected database access."
+    echo "The user '$USER_NAME' does not have the expected database access."
     exit 1
   fi
 fi
@@ -180,8 +180,8 @@ fi
 
 if [ $CHECK_DATA_DIR -eq 1 ] ; then
   OWNER=$(stat -c %U $hhconfig_directories_data)
-  if [ "$OWNER" != "$USER" ] ; then
-    echo "The user $USER  does not have write access to the data dirctory $hhconfig_directories_data"
+  if [ "$OWNER" != "$MY_USER" ] ; then
+    echo "The user '$MY_USER'  does not have write access to the data dirctory $hhconfig_directories_data owned by '$OWNER'"
     exit 1
   fi
 fi
@@ -190,24 +190,24 @@ if [ $CHECK_WEB_DIR -eq 1 ] ; then
   # The %rssac removes rssac from the end of the path, thus checking the www directory instead.
   mydir=${hhconfig_directories_rssac/%rssac/}
   WWW_OWNER=$(stat -c %U $mydir)
-  if [ "$WWW_OWNER" != "$USER" ] ; then
-    echo "The user $USER  does not have write access to the www dirctory $mydir"
+  if [ "$WWW_OWNER" != "$MY_USER" ] ; then
+    echo "The user '$MY_USER'  does not have write access to the www dirctory $mydir owned by '$WWW_OWNER'"
     exit 1
   fi
 fi
 
 if [ $CHECK_PLOT_CACHE_DIR -eq 1 ] ; then
   OWNER=$(stat -c %U $hhconfig_directories_plotcache)
-  if [ "$OWNER" != "$USER" ] ; then
-    echo "The user $USER  does not have write access to the plotcache dirctory $hhconfig_directories_plotcache"
+  if [ "$OWNER" != "$MY_USER" ] ; then
+    echo "The user '$MY_USER'  does not have write access to the plotcache dirctory $hhconfig_directories_plotcache owned by '$OWNER'"
     exit 1
   fi
 fi
 
 if [ $CHECK_RSSAC_DIR -eq 1 ] ; then
   OWNER=$(stat -c %U $hhconfig_directories_rssac)
-  if [ "$OWNER" != "$USER" ] ; then
-    echo "The user $USER  does not have write access to the rssac dirctory $hhconfig_directories_rssac"
+  if [ "$OWNER" != "$MY_USER" ] ; then
+    echo "The user '$MY_USER'  does not have write access to the rssac dirctory $hhconfig_directories_rssac, owned by '$OWNER'"
     exit 1
   fi
 fi
