@@ -1,7 +1,7 @@
 
 <p>&nbsp;</p>
-<p>This document describes how to upgrade a server from release 2.0.0 to release 2.1.0.rc1 of Hedgehog where 2.1 is installed from Ubuntu packages</p><ac:structured-macro ac:macro-id="c1f1e250-6350-41e9-8a67-1b6f5437640e" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
-<p>2.0.0rc2 and 2.0.0 do not differ and therefore this guide can also be used to upgrade from 2.0.0rc2 to 2.1.0rc1</p></ac:rich-text-body></ac:structured-macro>
+<p>This document describes how to upgrade a server from release 2.0.0 to release 2.1.0.rc2 of Hedgehog where 2.1 is installed from Ubuntu packages</p><ac:structured-macro ac:macro-id="c1f1e250-6350-41e9-8a67-1b6f5437640e" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<p>2.0.0rc2 and 2.0.0 do not differ and therefore this guide can also be used to upgrade from 2.0.0rc2 to 2.1.0rc2</p></ac:rich-text-body></ac:structured-macro>
 <p><ac:structured-macro ac:macro-id="84a2de1f-81fa-4598-a6ba-e2a7a9ab554b" ac:name="toc" ac:schema-version="1"><ac:parameter ac:name="style">none</ac:parameter></ac:structured-macro></p>
 <p>&nbsp;</p>
 <p><strong><span style="line-height: 1.5625;"><br /></span></strong></p>
@@ -46,7 +46,7 @@ sudo -u <DB_OWNER> /usr/bin/hedgehogctl database_update_tlds_from_zone 2>/dev/nu
 <li>If this is not required then simply run the&nbsp;<em>/usr/bin/hedgehogctl database_update_nodes</em>&nbsp;script again to create the directory structure for upload of XML data in the new location AFTER completing all of step 2<br />&nbsp;</li></ul></li>
 <li><strong>Configuration</strong>&nbsp;- the format of some configuration files has changed in 2.1.&nbsp;<span>It is recommended to manually update the files in&nbsp;</span><em>/etc/hedgehog</em><span>&nbsp;based on the previously used configuration files and the 2.1 samples available in&nbsp;</span><em>/usr/share/doc/hedgehog/examples. </em>Note:
 <ul>
-<li><em>hedgehog_gui.yam</em>l (<em>default_node_grouping</em> and <em>support_url</em>&nbsp;parameters added in 2.1)</li>
+<li><em>hedgehog_gui.yam</em>l (<em>default_node_grouping</em>&nbsp;,&nbsp;<em>support_url </em>and<em> default_server&nbsp;</em>&nbsp;parameters added in 2.1)</li>
 <li>
 <p><em>nodes.csv</em>&nbsp;(format extended)</p></li></ul></li></ul><ac:structured-macro ac:macro-id="b354fe7a-c210-4f26-b30d-e2393f55e791" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
 <p><span>The format of the nodes.csv file has been and extended in 2.1 to support several additional fields to for additional grouping options for nodes and also IP addresses to be used when collecting zone related RSSAC statistics. </span><span>&nbsp;</span></p></ac:rich-text-body></ac:structured-macro>
