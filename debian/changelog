@@ -1,3 +1,15 @@
+hedgehog (2.1.0~rc3-1) trusty; urgency=medium
+
+  [ John Dickinson ]
+  * Added ability to specify number of extractor processes to launch
+
+  [ Sara Dickinson ]
+  * Fixes to refile_and_grok. Fix connection string in update_tlds_from_zone script
+  * Fix listing in hedgehogctl
+  * rc3 release - update version, changeling and docs
+
+ -- Sara Dickinson <sara@sinodun.com>  Wed, 01 Jun 2016 16:02:20 +0000
+
 hedgehog (2.1.0~rc2-1) trusty; urgency=medium
 
   * Bump to rc2 and add default server display name as config options
