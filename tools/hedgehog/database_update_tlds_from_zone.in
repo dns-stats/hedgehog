@@ -58,8 +58,8 @@ done
 echo "$(date): $0 COMMENCED"
 rm $TLD_TMP
 
-TTYPE=$(psql -tc "select id from tld_types where type_name='New-gTLD'")
-TCOUNT1=$(psql -tc "select count(*) from tlds where type = $TTYPE")
+TTYPE=$(psql $CONN_STRING -tc "select id from tld_types where type_name='New-gTLD'")
+TCOUNT1=$(psql $CONN_STRING -tc "select count(*) from tlds where type = $TTYPE")
 
 for tld in $(curl ftp://rs.internic.net/domain/root.zone | awk -F\. ' { if (NF == 2) print tolower($1) } ' | awk '/./' | sort | uniq ) ; do
 
@@ -67,7 +67,7 @@ for tld in $(curl ftp://rs.internic.net/domain/root.zone | awk -F\. ' { if (NF =
 
 done
 psql $CONN_STRING -tf $TLD_TMP
-TCOUNT2=$(psql -tc "select count(*) from tlds where type = $TTYPE")
+TCOUNT2=$(psql $CONN_STRING -tc "select count(*) from tlds where type = $TTYPE")
 TNEW=$((TCOUNT2 - TCOUNT1))
 echo "Added $TNEW New gTLDs to database."
 echo "$(date): $0 COMPLETED"

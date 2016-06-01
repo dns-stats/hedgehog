@@ -96,12 +96,12 @@ if [[ -n "$RESERVED_CPUS"  &&  -n "$PROCESSES" ]] ; then
 	exit
 fi
 
-if ! [[ -n "$PROCESSES"  &&  "$PROCESSES" =~ ^[0-9]+$ ]] ; then
+if [[ -n "$PROCESSES"  &&  ! "$PROCESSES" =~ ^[0-9]+$ ]] ; then
 	echo "Number of processes ($PROCESSES) is not a positive number. Exiting."
 	exit
 fi
 
-if ! [[ -n "$RESERVED_CPUS"  &&  "$RESERVED_CPUS" =~ ^[0-9]+$ ]] ; then
+if [[ -n "$RESERVED_CPUS"  && ! "$RESERVED_CPUS" =~ ^[0-9]+$ ]] ; then
 	echo "Reserved CPUS ($RESERVED_CPUS) is not a positive number. Exiting."
 	exit
 fi
@@ -121,7 +121,7 @@ if [[ -n "$RESERVED_CPUS" ]] ; then
     fi
     # This option allows some CPUS to be reserved for the web front end in the case that the import is running continuously
     CPUS=$(( REAL_CPUS - RESERVED_CPUS ))
-    echo "Using $CPUS processes on $CPUS real CPUs ($RESERVED_CPUS real CPUs reserved)."
+    echo "Using $CPUS processes on $REAL_CPUS real CPUs ($RESERVED_CPUS real CPUs reserved)."
 elif [[ -n "$PROCESSES" ]] ; then
     CPUS=$PROCESSES
     echo "Using $CPUS Processes as requested by user."
