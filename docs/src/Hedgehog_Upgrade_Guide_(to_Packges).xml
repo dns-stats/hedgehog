@@ -1,7 +1,7 @@
 
 <p>&nbsp;</p>
-<p>This document describes how to upgrade a server from release 2.0.0 to release 2.1.0.rc2 of Hedgehog where 2.1 is installed from Ubuntu packages</p><ac:structured-macro ac:macro-id="c1f1e250-6350-41e9-8a67-1b6f5437640e" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
-<p>2.0.0rc2 and 2.0.0 do not differ and therefore this guide can also be used to upgrade from 2.0.0rc2 to 2.1.0rc2</p></ac:rich-text-body></ac:structured-macro>
+<p>This document describes how to upgrade a server from release 2.0.0 to release 2.1.0 of Hedgehog where 2.1 is installed from Ubuntu packages</p><ac:structured-macro ac:macro-id="c1f1e250-6350-41e9-8a67-1b6f5437640e" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<p>2.0.0rc2 and 2.0.0 do not differ and therefore this guide can also be used to upgrade from 2.0.0rc2 to 2.1.0</p></ac:rich-text-body></ac:structured-macro>
 <p><ac:structured-macro ac:macro-id="84a2de1f-81fa-4598-a6ba-e2a7a9ab554b" ac:name="toc" ac:schema-version="1"><ac:parameter ac:name="style">none</ac:parameter></ac:structured-macro></p>
 <p>&nbsp;</p>
 <p><strong><span style="line-height: 1.5625;"><br /></span></strong></p>

@@ -14,6 +14,13 @@
 # limitations under the License.
 #
 
+Hedgehog 2.1.0rc3 - 2016-06-01
+------------------------------
+* Add option to specify number of processes for refile_and_grok to use
+* Fix connection issue in update_tlds_from_zone script
+* Make hedgehogctl produce correct tools list for split installs
+* Minor documentation fixes
+
 
 Hedgehog 2.1.0rc2 - 2016-05-19
 ------------------------------
