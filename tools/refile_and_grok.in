@@ -40,7 +40,8 @@ INPUT="XML"
 OUTPUT="DB"
 START_DATE=""
 RSSAC_FLAG=""
-RESERVED_CPUS=0
+RESERVED_CPUS=""
+PROCESSES=""
 ARGS=""
 LOG="dsc-extractor.out"
 APPEND_LOG=0
@@ -61,7 +62,9 @@ usage () {
     echo
     echo "-r Disable processing of rssac data. Default is to process all data."
     echo
-    echo "-R Reserved processors. Number of CPUS processors to exclude from import (default 0)."
+    echo "-R Reserved real cores. Number of CPU cores to exclude from import (default 0). Specify either -R or -P."
+    echo
+    echo "-P Number of processes to launch (default 1 per real CPU core). Specify either -R or -P."
     echo
     echo "-a Append output to the $PROG.stdout file (default is overwrite)"
     echo
@@ -70,7 +73,7 @@ usage () {
 }
 
 
-while getopts ":w:i:o:cs:raR:h" opt; do
+while getopts ":w:i:o:cs:raR:P:h" opt; do
     case "$opt" in
         w  ) WD=$OPTARG ;;
         i  ) INPUT=$OPTARG ;;
@@ -78,6 +81,7 @@ while getopts ":w:i:o:cs:raR:h" opt; do
         s  ) START_DATE="-s $OPTARG" ;;
         r  ) RSSAC_FLAG="-r" ;;
         R  ) RESERVED_CPUS=$OPTARG ;;
+        P  ) PROCESSES=$OPTARG ;;
         c  ) CRON=1 ;;
         a  ) APPEND_LOG=1 ;;
         h  ) usage
@@ -87,19 +91,46 @@ while getopts ":w:i:o:cs:raR:h" opt; do
     esac
 done
 
-if ! [[ "$RESERVED_CPUS" =~ ^[0-9]+$ ]] ; then
+if [[ -n "$RESERVED_CPUS"  &&  -n "$PROCESSES" ]] ; then
+	echo "Reserved CPUs ($RESERVED_CPUS) and Number of processes ($PROCESSES) cannot both be specified. Exiting."
+	exit
+fi
+
+if [[ -n "$PROCESSES"  &&  ! "$PROCESSES" =~ ^[0-9]+$ ]] ; then
+	echo "Number of processes ($PROCESSES) is not a positive number. Exiting."
+	exit
+fi
+
+if [[ -n "$RESERVED_CPUS"  && ! "$RESERVED_CPUS" =~ ^[0-9]+$ ]] ; then
 	echo "Reserved CPUS ($RESERVED_CPUS) is not a positive number. Exiting."
 	exit
 fi
-# Get number of real cores
+#
+# if [[ -z "$RESERVED_CPUS" ]] ; then
+#     RESERVED_CPUS=0
+# fi
+
+# Get number of real CPUs
 export REAL_CPUS=$(lscpu | awk -F: 'BEGIN { IGNORECASE=1; total=1 } /socket/ { total=total * $2 } END { print total }')
-if [ "$RESERVED_CPUS" -ge "$REAL_CPUS" ] ; then
-	echo "Reserved CPUS ($RESERVED_CPUS) is greater than or equal to the number of available CPUS ($REAL_CPUS). Exiting."
-	exit
+
+# At this point we have either reserved or used or nothing set
+if [[ -n "$RESERVED_CPUS" ]] ; then
+    if [ "$RESERVED_CPUS" -ge "$REAL_CPUS" ] ; then
+    	echo "Reserved CPUS ($RESERVED_CPUS) is greater than or equal to the number of available real CPUS ($REAL_CPUS). Exiting."
+    	exit
+    fi
+    # This option allows some CPUS to be reserved for the web front end in the case that the import is running continuously
+    CPUS=$(( REAL_CPUS - RESERVED_CPUS ))
+    echo "Using $CPUS processes on $REAL_CPUS real CPUs ($RESERVED_CPUS real CPUs reserved)."
+elif [[ -n "$PROCESSES" ]] ; then
+    CPUS=$PROCESSES
+    echo "Using $CPUS Processes as requested by user."
+else
+    # The user didn't specify anything so fallback to defaults
+    CPUS=$REAL_CPUS
+    echo "Using $CPUS processes on $CPUS real CPUs (no real CPUs reserved)."
 fi
-# This option allows some CPUS to be reserved for the web front end in the case that the import is running continuously
-CPUS=$(( REAL_CPUS - RESERVED_CPUS ))
-echo "Using $CPUS CPUS ($REAL_CPUS available, $RESERVED_CPUS reserved)."
+
 
 if [[ "$INPUT" = "XML" || "$INPUT" = "DAT" ]] && [ "$OUTPUT" = "DB" ]
 then
