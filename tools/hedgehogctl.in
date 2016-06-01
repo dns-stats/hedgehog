@@ -6,7 +6,7 @@
 set -e
 # set -x 
 
-TOOLS=( database_init \
+ALL_TOOLS=( database_init \
         database_manage_partitions \
         database_process_rssac_data \
         database_rm_old_rssac_data \
@@ -48,10 +48,10 @@ if [[  " ${1} " == " help2man " ]] ; then
   usage help2man
 fi
 
-# Remove commands that are not installed
-for cmd in ${TOOLS[@]} ; do
-  if [ ! -x ${SCRIPT_DIR}/${cmd} ] ; then
-    TOOLS=(${TOOLS[@]/$cmd})
+# Create new list from just commands that are installed
+for cmd in ${ALL_TOOLS[@]} ; do
+  if [ -x ${SCRIPT_DIR}/${cmd} ] ; then
+    TOOLS=("${TOOLS[@]}" $cmd)
   fi
 done
 
