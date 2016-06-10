@@ -44,7 +44,7 @@ RESERVED_CPUS=0
 ARGS=""
 LOG="dsc-extractor.out"
 APPEND_LOG=0
-
+NUM_RUNNING=0
 
 usage () {
     echo "${PROG} - finds all input files in working directory and processes to output format"
@@ -100,6 +100,15 @@ fi
 # This option allows some CPUS to be reserved for the web front end in the case that the import is running continuously
 CPUS=$(( REAL_CPUS - RESERVED_CPUS ))
 echo "Using $CPUS CPUS ($REAL_CPUS available, $RESERVED_CPUS reserved)."
+
+# Check to see if dsc-extractor is already running and if it is then only start
+# CPUS - num_running_dsc-extractors
+NUM_RUNNING=$(ps -ef | awk ' { print $8 } ' | grep dsc-extractor | wc -l)
+CPUS=$(( CPUS - NUM_RUNNING ))
+if [ $CPUS -le 0 ] ; then
+    echo "To many dsc-extractor processes already running, exiting"
+    exit 1
+fi
 
 if [[ "$INPUT" = "XML" || "$INPUT" = "DAT" ]] && [ "$OUTPUT" = "DB" ]
 then
