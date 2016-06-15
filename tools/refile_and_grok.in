@@ -134,7 +134,7 @@ fi
 
 # Check to see if dsc-extractor is already running and if it is then only start
 # CPUS - num_running_dsc-extractors
-NUM_RUNNING=$(ps -ef | grep ^hedgehog | awk ' { print $8 } ' | grep dsc-extractor | wc -l)
+NUM_RUNNING=$(ps -ef | grep -v grep | awk ' { print $8 } ' | grep dsc-extractor | wc -l)
 CPUS=$(( CPUS - NUM_RUNNING ))
 if [ $CPUS -le 0 ] ; then
     echo "$(date) Too many dsc-extractor processes already running, exiting"
