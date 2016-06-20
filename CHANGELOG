@@ -14,6 +14,11 @@
 # limitations under the License.
 #
 
+Hedgehog 2.1.0 - 2016-06-20
+------------------------------
+* Production release of 'Daurian'
+
+
 Hedgehog 2.1.0rc3 - 2016-06-01
 ------------------------------
 * Add option to specify number of processes for refile_and_grok to use
