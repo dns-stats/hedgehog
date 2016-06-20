@@ -22,9 +22,9 @@ install.packages("plyr")
 q()]]></ac:plain-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <h3>1.2 Download, configure and make new release</h3>
-<p><span>Download the 2.1.0 release from github: </span><a href="https://github.com/dns-stats/hedgehog/archive/2.1.0rc3.tar.gz">https://github.com/dns-stats/hedgehog/archive/2.1.0rc3.tar.gz</a></p>
-<p>(If you downloaded the above URL with wget the tarball will be called 2.1.0rc3.tar.gz)</p><ac:structured-macro ac:macro-id="d4ac4bc4-d914-4e01-9591-3e07f55a2dcb" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[tar -xzf hedgehog-2.1.0rc3.tar.gz
-cd hedgehog-2.1.0rc3
+<p><span>Download the 2.1.0 release from github: </span><a href="https://github.com/dns-stats/hedgehog/archive/2.1.0.tar.gz">https://github.com/dns-stats/hedgehog/archive/2.1.0.tar.gz</a></p>
+<p>(If you downloaded the above URL with wget the tarball will be called 2.1.0.tar.gz)</p><ac:structured-macro ac:macro-id="d4ac4bc4-d914-4e01-9591-3e07f55a2dcb" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[tar -xzf hedgehog-2.1.0.tar.gz
+cd hedgehog-2.1.0
 ./autogen.sh
 mkdir build
 cd build
