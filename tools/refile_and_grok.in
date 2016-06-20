@@ -45,7 +45,7 @@ PROCESSES=""
 ARGS=""
 LOG="dsc-extractor.out"
 APPEND_LOG=0
-
+NUM_RUNNING=0
 
 usage () {
     echo "${PROG} - finds all input files in working directory and processes to output format"
@@ -131,6 +131,16 @@ else
     echo "Using $CPUS processes on $CPUS real CPUs (no real CPUs reserved)."
 fi
 
+
+# Check to see if dsc-extractor is already running and if it is then only start
+# CPUS - num_running_dsc-extractors
+NUM_RUNNING=$(ps -ef | grep -v grep | awk ' { print $8 } ' | grep dsc-extractor | wc -l)
+CPUS=$(( CPUS - NUM_RUNNING ))
+if [ $CPUS -le 0 ] ; then
+    echo "$(date) Too many dsc-extractor processes already running, exiting"
+    exit 1
+fi
+echo "$(date) Starting $CPUS new processes."
 
 if [[ "$INPUT" = "XML" || "$INPUT" = "DAT" ]] && [ "$OUTPUT" = "DB" ]
 then
