@@ -1,3 +1,15 @@
+hedgehog (2.1.0-1) trusty; urgency=medium
+
+  [ John Dickinson ]
+  * added check to prevent too many dsc-extractor processes from starting
+  * Corrected spelling and added dates to log messages
+  * check for grep not hedgehog as process owner
+
+  [ Sara Dickinson ]
+  * 2.1.0 release - update version and docs
+
+ -- Sara Dickinson <sara@sinodun.com>  Mon, 20 Jun 2016 13:07:29 +0000
+
 hedgehog (2.1.0~rc3-1) trusty; urgency=medium
 
   [ John Dickinson ]
