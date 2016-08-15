@@ -280,7 +280,7 @@ generatePlot <- function(){
 		return(FALSE)
 	}
 	check <- grep(svrnm,serverlist$display_name)
-	if (check == 0) {
+	if (length(check) == 0) {
 		return(FALSE)
 	}
 	sid <- serverlist$id[check]
