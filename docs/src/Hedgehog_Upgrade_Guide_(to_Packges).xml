@@ -1,17 +1,12 @@
 
 <p>&nbsp;</p>
-<p>This document describes how to upgrade a server from release 2.0.0 to release 2.1.0 of Hedgehog where 2.1 is installed from Ubuntu packages</p><ac:structured-macro ac:macro-id="c1f1e250-6350-41e9-8a67-1b6f5437640e" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
-<p>2.0.0rc2 and 2.0.0 do not differ and therefore this guide can also be used to upgrade from 2.0.0rc2 to 2.1.0</p></ac:rich-text-body></ac:structured-macro>
+<p>This document describes how to upgrade a server from release 2.1.0 to release 2.1.1 of Hedgehog via packages.&nbsp;</p>
+<p>&nbsp;</p>
 <p><ac:structured-macro ac:macro-id="84a2de1f-81fa-4598-a6ba-e2a7a9ab554b" ac:name="toc" ac:schema-version="1"><ac:parameter ac:name="style">none</ac:parameter></ac:structured-macro></p>
 <p>&nbsp;</p>
-<p><strong><span style="line-height: 1.5625;"><br /></span></strong></p>
 <p><strong><span style="line-height: 1.5625;">Back up the old installation</span></strong></p>
 <p><span style="line-height: 1.5625;">If desired, back up the existing installation (the directory structure in the User Guide is a useful reference) and database.&nbsp;</span></p>
 <h2><span style="line-height: 1.5625;">1. Pre-installation</span></h2>
-<h3>1.1 Install new dependancies</h3>
-<p>&nbsp;</p><ac:structured-macro ac:macro-id="f0031062-01a6-425f-bc36-6e660c090b5b" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo R
-install.packages("plyr")
-q()]]></ac:plain-text-body></ac:structured-macro>
 <h3>1.2 Cron jobs</h3>
 <p>Stop refile and grok cron job running:</p><ac:structured-macro ac:macro-id="08a576ef-79c7-41f7-aa6b-ac1e1d695865" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u hedgegho crontab -e
 # Import XML data every 15 mins
@@ -19,45 +14,29 @@ q()]]></ac:plain-text-body></ac:structured-macro>
 <p>Comment out any other jobs that are about to run. If the dsc-extractor process is running wait for it to finish before continuing.</p>
 <h3>1.3 Disable web front end</h3>
 <p>It is recommended to disable the web front end during upgrade e.g by enabling a holding page.</p>
-<h2>2. Installation</h2>
+<p>&nbsp;</p><ac:structured-macro ac:macro-id="f05d9ecc-d0b2-41af-bfe5-8ffb598a7395" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<p><strong>Source install vs Package install:</strong></p>
+<ul>
+<li><span>If 2.1.0 was installed from source, perform steps 2 and 4.&nbsp;</span></li>
+<li>If 2.1.0 was installed from packages, perform steps 3 and 4.</li></ul></ac:rich-text-body></ac:structured-macro>
+<h2>2. Installation of packages</h2>
 <h3>2.1 Install packages</h3>
 <ul>
-<li>Refer to section 2.1 of the 'Hedgehog Installation from Ubuntu Packages Guide' to install the required packages.&nbsp;</li></ul>
-<h3>2.2 Update the database</h3>
-<h4>2.2.1 Update config</h4>
-<p><span>Run as super user of hedgehog database (e.g. postgres)</span></p><ac:structured-macro ac:macro-id="f49f715f-8762-4462-9661-efd61ef78f79" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u <super-user> psql hedgehog -c "CREATE EXTENSION ip4r SCHEMA dsc;"
-sudo -u <super-user> psql hedgehog -c "CREATE EXTENSION plpythonu SCHEMA pg_catalog;"]]></ac:plain-text-body></ac:structured-macro>
-<p>Update the database configuration fire&nbsp;<code class="bash plain">/etc/postgresql/9</code><code class="bash plain">.3</code><code class="bash plain">/main/postgresql</code><code class="bash plain">.conf by commenting and setting:</code></p><ac:structured-macro ac:macro-id="9fc95149-893b-4446-8e2d-fa15328a11de" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[extra_float_digits = 1]]></ac:plain-text-body></ac:structured-macro>
-<p>Restart postgres</p><ac:structured-macro ac:macro-id="eab8d6d2-4560-4976-912f-9a42fd0c8075" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo service postgresql restart]]></ac:plain-text-body></ac:structured-macro>
-<p>&nbsp;</p>
-<h4>2.2.2 Run DDL files and new database scripts</h4>
-<p>Run this either as super user of hedgehog database (e.g. postgres) if using peer authentication, or otherwise by additionally specifying a password on the command line</p><ac:structured-macro ac:macro-id="1fd6adbc-b4b9-48cb-bb0d-4d2adeebfc6d" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u <super-user> /usr/lib/hedgehog/DDL_updates/000010_ddl_python -U <super-user>]]></ac:plain-text-body></ac:structured-macro>
-<p>Run the following 5 commands as the DB write user (e.g. hedgehog). The geoip update can take a while:&nbsp;</p><ac:structured-macro ac:macro-id="37066b5f-189b-40da-9a62-20d8174bc75d" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u <DB_OWNER> /usr/lib/hedgehog/DDL_updates/000011_ddl_new_graphs
-sudo -u <DB_OWNER> /usr/lib/hedgehog/DDL_updates/000012_ddl_lower_key_index
-sudo -u <DB_OWNER> /usr/bin/hedgehogctl database_update_geoip
-sudo -u <DB_OWNER> /usr/bin/hedgehogctl database_update_tlds
-sudo -u <DB_OWNER> /usr/bin/hedgehogctl database_update_tlds_from_zone 2>/dev/null]]></ac:plain-text-body></ac:structured-macro>
-<p>Run the manage partitions script for the current month:</p><ac:structured-macro ac:macro-id="7cb03c49-58e7-4d39-a177-d1e6129671e9" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u <DB_OWNER> /usr/bin/hedgehogctl database_manage_partitions -m <YYYY-MM>]]></ac:plain-text-body></ac:structured-macro>
+<li>Refer to section 2.1 of the 'Hedgehog Installation Guide' to install the required packages.&nbsp;</li></ul>
 <h3>2.3 Cater for different directory structure</h3>
 <p>Installing from a package places some files in a different directory structure compared to installing from code.</p>
 <ul>
 <li><strong>Data</strong>&nbsp;- if it is desired to retain existing data (XML files, cached plots and RSSAC reports) then the existing&nbsp;<em>&lt;prefix&gt;/var/hedgehog</em>&nbsp;directory should be copied or linked (e.g. symbolically or via re-mounting) to the new location shown below
 <ul>
-<li>If this is not required then simply run the&nbsp;<em>/usr/bin/hedgehogctl database_update_nodes</em>&nbsp;script again to create the directory structure for upload of XML data in the new location AFTER completing all of step 2<br />&nbsp;</li></ul></li>
-<li><strong>Configuration</strong>&nbsp;- the format of some configuration files has changed in 2.1.&nbsp;<span>It is recommended to manually update the files in&nbsp;</span><em>/etc/hedgehog</em><span>&nbsp;based on the previously used configuration files and the 2.1 samples available in&nbsp;</span><em>/usr/share/doc/hedgehog/examples. </em>Note:
+<li>If this is not required then simply run the&nbsp;<em>/usr/bin/hedgehogctl database_update_nodes</em>&nbsp;script again to create the directory structure for upload of XML data in the new location AFTER completing step 2.1<br />&nbsp;</li></ul></li></ul>
 <ul>
-<li><em>hedgehog_gui.yam</em>l (<em>default_node_grouping</em>&nbsp;,&nbsp;<em>support_url </em>and<em> default_server&nbsp;</em>&nbsp;parameters added in 2.1)</li>
-<li>
-<p><em>nodes.csv</em>&nbsp;(format extended)</p></li></ul></li></ul><ac:structured-macro ac:macro-id="b354fe7a-c210-4f26-b30d-e2393f55e791" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
-<p><span>The format of the nodes.csv file has been and extended in 2.1 to support several additional fields to for additional grouping options for nodes and also IP addresses to be used when collecting zone related RSSAC statistics. </span><span>&nbsp;</span></p></ac:rich-text-body></ac:structured-macro>
+<li><strong>Tools and scripts - </strong>those&nbsp;installed via source under&nbsp;<em>&lt;prefix&gt;</em>&nbsp;in&nbsp;<em>bin</em>&nbsp;and&nbsp;<em>libexec/hedgehog</em>&nbsp;are installed by the packages under&nbsp;<em>/usr/</em>&nbsp;as shown below. Update any cron jobs or scripts accordingly.&nbsp;</li></ul>
 <p>&nbsp;</p>
-<ul>
-<li><strong>Tools and scripts - </strong>those&nbsp;installed in 2.0 under&nbsp;<em>&lt;prefix&gt;</em>&nbsp;in&nbsp;<em>bin</em>&nbsp;and&nbsp;<em>libexec/hedgehog</em>&nbsp;are installed in 2.1 by the packages under&nbsp;<em>/usr/</em>&nbsp;as shown below. Update any cron jobs or scripts accordingly.&nbsp;</li></ul>
 <table>
 <tbody>
 <tr>
-<th>2.0 location</th>
-<th>2.1 location</th>
+<th>Source location</th>
+<th>Package location</th>
 <th colspan="1">Contents</th></tr>
 <tr>
 <td>&lt;prefix&gt;/etc/hedgehog/</td>
@@ -85,18 +64,16 @@ sudo -u <DB_OWNER> /usr/bin/hedgehogctl database_update_tlds_from_zone 2>/dev/nu
 <td colspan="1">&lt;prefix&gt;/libexec/hedgehog/</td>
 <td colspan="1">/usr/lib/hedgehog/</td>
 <td colspan="1">Hedgehog tools scripts and DDL updates</td></tr></tbody></table>
-<p>&nbsp;</p>
-<h2>3. Post-install</h2>
-<h3>3.1 Test web front end</h3>
+<h2>3. Upgrade of Packages</h2><ac:structured-macro ac:macro-id="4b63d758-f1de-456d-adf6-7a76caeca497" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo apt-get update
+sudo apt-get upgrade]]></ac:plain-text-body></ac:structured-macro>
+<h2>4. Post-install</h2>
+<h3>4.1 Test web front end</h3>
 <p>Re-enable and test the web front end. Make sure to restart apache.</p><ac:structured-macro ac:macro-id="add1086e-e973-4e29-b437-dfbd969e203a" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[sudo service apache2 reload]]></ac:plain-text-body></ac:structured-macro>
-<h3>3.2 Re-enable cron jobs&nbsp;</h3>
-<p><span>Note that 2 new optional cron jobs are suggested for 2.1 for updating the TLD and geoIP databases. Refer to the Installation Guide for a full list of suggested cron jobs.&nbsp;</span></p><ac:structured-macro ac:macro-id="29fa3a11-7cb7-447f-8242-11ab26f5bd1e" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
-<p>Remember to use the new script names and syntax when re-enabling the cron jobs</p></ac:rich-text-body></ac:structured-macro>
+<h3>4.2 Re-enable cron jobs&nbsp;</h3><ac:structured-macro ac:macro-id="29fa3a11-7cb7-447f-8242-11ab26f5bd1e" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
+<p>Remember to use the new script locations when re-enabling the cron jobs when upgrading from source.</p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <p>Restart refile and grok cron job running:</p><ac:structured-macro ac:macro-id="f6849b42-4b08-4fe5-81ed-86ee9f4f597c" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u hedgehog crontab -e
 # Import XML data every 15 mins
-00,15,30,45 * * * * /usr/bin/hedgehog/bin/refile_and_grok -c >> /var/log/hedgehog/refile_and_grok_xml_to_db.log 2>&1]]></ac:plain-text-body></ac:structured-macro>
+00,15,30,45 * * * * /usr/bin/refile_and_grok -c >> /var/log/hedgehog/refile_and_grok_xml_to_db.log 2>&1]]></ac:plain-text-body></ac:structured-macro>
 <p>Re-enable any other jobs that were disabled for the upgrade.&nbsp;</p>
-<h3>3.3 Configure rssacd</h3>
-<p>Refer to section 4.3 of the Installation from Packages Guide for how to configure the <em>rssacd</em> demon to collect RSSAC zone-size and load-time statistics.</p>
 <p>&nbsp;</p>
