@@ -76,9 +76,9 @@ else
     IFS='_' read -a YM <<< "$NOW"
     YEAR=${YM[0]}
     MONTH=${YM[1]}
-    NEXT="${YEAR}_$(( MONTH + 1))"
+    NEXT="${YEAR}_$(( ${MONTH#0} + 1))"
 
-    if [ $MONTH -eq 12 ] ; then
+    if [ ${MONTH#0} -eq 12 ] ; then
         NEXT=$((YEAR + 1))"_01"
     fi
 fi
