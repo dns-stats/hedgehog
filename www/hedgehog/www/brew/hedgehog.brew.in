@@ -271,6 +271,23 @@ generatePlot <- function(){
 	start				<- GET$start
 	stop				<- GET$stop
 	
+	# Check the parameters
+	if (!(prepStmnt("getsrvrid_display_name", dsccon))) {
+		return(FALSE)
+	}
+	serverlist <- dbGetDataFrame(dbdrv, dsccon, dbconstr, "EXECUTE getsrvrid_display_name;")
+	if (is.null(serverlist)) {
+		return(FALSE)
+	}
+	check <- grep(svrnm,serverlist$display_name)
+	if (length(check) == 0) {
+		return(FALSE)
+	}
+	sid <- serverlist$id[check]
+	if (sid != svrid){
+		return(FALSE)
+	}
+		
 	# Initialise plot parameters
 	initPlotOptions()
 	
@@ -317,7 +334,7 @@ generatePlot <- function(){
 		if (gvis == '1') {
 			%><div id="plot">
 				<hr />
-				<iframe scrolling="no" width="100%" height=600px" frameborder="0" id="plotframe" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
+				<iframe scrolling="no" width="100%" height="600px" frameborder="0" id="plotframe" src="<%=plot_file%>?nocache=<%=now%>"></iframe>
 			</div><%
 		}
 		else if (pltnm %in% log_option) {

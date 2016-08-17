@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-KNOWN ISSUES/LIMITATIONS: Hedgehog 2.0.0b2
------------------------------
+KNOWN ISSUES/LIMITATIONS:
+-------------------------
 
 * The full list of possible plots are displayed via the drop down menu in the
   GUI, regardless of whether there is data in the database for the plot
