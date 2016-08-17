@@ -1,3 +1,17 @@
+hedgehog (2.1.1-1) trusty; urgency=medium
+
+  [ John Dickinson ]
+  * Fix for octal bug
+  * Added check that the server name exists and matches the server id passed in the GET
+  * Fixed a couple of bugs
+  * check length() not value
+
+  [ Sara Dickinson ]
+  * Prep for 2.1.1 release
+  * Minor correction to install doc
+
+ -- Sara Dickinson <sara@sinodun.com>  Wed, 17 Aug 2016 12:53:19 +0000
+
 hedgehog (2.1.0-1) trusty; urgency=medium
 
   [ John Dickinson ]
