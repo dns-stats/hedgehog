@@ -219,13 +219,14 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
   if (hh_debug) {
     system('logger -p user.notice Hedgehog: In stackedBarPlot')
   }
-  
+  # write.table(df, file='/tmp/df')
     if(gvis == 1){
       title <- sub("\n", " ", title)
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
       if(vertical == 1){
           if (gbar_width == 0) {
+            # write.table(de, file='/tmp/de1')
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
                                    options=list(isStacked=TRUE, title=title, height=600, width=940,
                                                 vAxis=paste("{title:'", ylabel,"', format: 'short'}", sep=""), 
@@ -233,6 +234,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
                                                 legend=paste("{textStyle:{fontSize:'12'}}", sep=""),
                                                 chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
           } else {
+            # write.table(de, file='/tmp/de2')
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
                                    options=list(isStacked=TRUE, title=title, height=600, width=940,
                                                 vAxis=paste("{title:'", ylabel,"', format: 'short'}", sep=""), 
@@ -253,6 +255,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
             de <-arrange(de, desc(de[[2]]));
           }
           # p <- gvisTable(de)
+          # write.table(de, file='/tmp/de3')
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
                             options=list(isStacked=TRUE, title=title, height=600, width=940,
                                          vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""),
@@ -276,7 +279,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
 
       nKeys <- length(unique(df$key))
       png(f, width = W, height = H)
-
+      # write.table(df, file='/tmp/df1')
       p <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
                   geom_bar(stat="identity") + 
                   labs(title=title, x=xlabel, y=ylabel) + 
@@ -797,7 +800,7 @@ initPlotOptions <- function() {
   geo                     <<- c("geomap", "geochart")
   
   formatother             <<- c(formatother, rssac, geo)
-  formatother             <<- c(formatother, "client_addr_vs_rcode_accum_asn", "client_addr_vs_rcode_accum_bgpprefix", "client_subnet2_accum_asn", "client_subnet2_accum_bgpprefix")
+  formatother             <<- c(formatother, "client_addr_vs_rcode_accum_asn", "client_addr_vs_rcode_accum_bgpprefix", "client_subnet2_accum_asn", "client_subnet2_accum_bgpprefix", "dnskey_vs_asn")
 
   unknown_graphs          <<- c("client_subnet_count", "idn_vs_tld", "ipv6_rsn_abusers_count")
 
@@ -805,7 +808,7 @@ initPlotOptions <- function() {
   passplotname            <<- c(f1lookupcodes, f1lookupcodesnoquery)
   avgoverwindow           <<- c(format3, format3_bgpprefix, format3_asn, 'qtype_vs_tld', 'qtype_vs_legacygtld', 'qtype_vs_cctld', 'qtype_vs_newgtld', 'qtype_vs_othertld',
                                 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype', 'client_addr_vs_rcode_accum_asn', 'client_addr_vs_rcode_accum_bgpprefix',
-                                "client_subnet2_accum_asn", "client_subnet2_accum_bgpprefix", "client_subnet_vs_tld")
+                                "client_subnet2_accum_asn", "client_subnet2_accum_bgpprefix", "client_subnet_vs_tld", "dnskey_vs_asn")
   lineplots               <<- c(format1, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr")
   facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
   facetedlineplots        <<- c("traffic_volume")
@@ -927,6 +930,8 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
   else if (pltnm == 'client_addr_vs_rcode_accum_bgpprefix') {stackedBarPlot(df, plot_file, mytitle, "Subnet as seen in BGP", "Average Query Rate (q/sec)", gvis, pltnm)}
   else if (pltnm == 'client_subnet2_accum_asn')       {stackedBarPlot(df, plot_file, mytitle, "Subnet by ASN", "Average Query Rate (q/sec)", gvis, pltnm)}
   else if (pltnm == 'client_subnet2_accum_bgpprefix')       {stackedBarPlot(df, plot_file, mytitle, "Subnet as seen in BGP", "Average Query Rate (q/sec)", gvis, pltnm)}
+
+  else if (pltnm == 'dnskey_vs_asn')                  {stackedBarPlot(df, plot_file, mytitle, "Count of DNSKEY Queries by ASN", "Average Query Rate (q/sec)", gvis, pltnm)}
     
   else if (pltnm == 'qtype_vs_qnamelen')              {stackedBarPlot(df, plot_file, mytitle, "QNAME Length (bytes)",       "Count",                      gvis, pltnm, scalex="continuous", vertical=1)}
 
