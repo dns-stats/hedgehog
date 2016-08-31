@@ -14,6 +14,15 @@
 # limitations under the License.
 #
 
+Hedgehog 2.1.1 - 2016-08-16
+-----------------------------
+* Fix issue with database_manage_partitions script where generating tables for
+  -09 and -10 months didn't work
+* Add additional check on input parameters
+* Modify instructions due to issue with latest build of rcpp
+* Migrate to install from packages only from 2.1.1
+
+
 Hedgehog 2.1.0 - 2016-06-20
 ------------------------------
 * Production release of 'Daurian'

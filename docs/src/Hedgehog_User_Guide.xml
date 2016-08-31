@@ -21,7 +21,9 @@
 <p>In 2.1 packages for Ubuntu are provided for Hedgehog. It is recommended to use this method for new installs and that existing installs migrate to this method in 2.1 (see the Installation and Upgrade Guides for details).</p>
 <h3>Install from Source Code</h3>
 <p>2.1 can also be installed directly from source code if desired.</p>
-<h1>Datasets</h1>
+<h1>Datasets</h1><ac:structured-macro ac:macro-id="1dccef1c-27f8-4b28-84b4-ca7010c69dc6" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<p>Hedgehog is currently tested against the output of the original DSC collector. It has not been tested against the recently released DSC 2.0.</p></ac:rich-text-body></ac:structured-macro>
+<p>&nbsp;</p>
 <p>An example dsc.conf file for the data sets that Hedgehog supports is given below:</p><ac:structured-macro ac:macro-id="4b93a047-e94d-4b6b-a945-fb6e5ec2414a" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# Basic data sets
 dataset qtype dns All:null Qtype:qtype queries-only;
 dataset rcode dns All:null Rcode:rcode replies-only;
