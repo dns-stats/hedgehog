@@ -33,6 +33,7 @@ eval $a
 
 
 LOG_FILE="dsc-extractor-xml-db.out"
+FILE_DIR="incoming"
 NODE_NAME=""
 SERVER_NAME=""
 FORMAT_STRING="-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
@@ -75,7 +76,8 @@ else
 fi
 
 echo $FORMAT_STRING
-echo " Server  $FORMAT_SEP Node       $FORMAT_SEP Last import started $FORMAT_SEP Last file processed at $FORMAT_SEP Files found $FORMAT_SEP Files remaining $FORMAT_SEP Failures $FORMAT_SEP Last file processed                          $FORMAT_SEP Error found in last 20 lines of file" 
+echo " Server   $FORMAT_SEP Node      $FORMAT_SEP Last import started $FORMAT_SEP Last file processed $FORMAT_SEP Last file processed  $FORMAT_SEP Time taken for $FORMAT_SEP Files found $FORMAT_SEP Outstanding $FORMAT_SEP Import   $FORMAT_SEP Error found in last 20 lines of file" 
+echo "          $FORMAT_SEP           $FORMAT_SEP                     $FORMAT_SEP at                  $FORMAT_SEP                      $FORMAT_SEP last file (s)  $FORMAT_SEP by import   $FORMAT_SEP files       $FORMAT_SEP failures $FORMAT_SEP Error found in last 20 lines of file" 
 echo $FORMAT_STRING
 
 for SERVER in $SERVER_NAMES ; do
@@ -98,9 +100,11 @@ for SERVER in $SERVER_NAMES ; do
 		
 		# Get the last date that import started:
 		IMPORT_START_TIME=$(tac ${FILE_NAME} | grep -e '--' -m1 | awk '{print $2, $3}' | sed -e 's/^ *//' -e 's/ *$//')
-		IMPORT_LATEST_TIME=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $1, $2}' | sed -e 's/^ *//' -e 's/ *$//')
+		IMPORT_STARTING_TIME=$(tac ${FILE_NAME} | grep -e 'Starting'  -m 1 | awk '{print $1, $2}' | sed -e 's/^ *//' -e 's/ *$//')
+		IMPORT_COMPLETED_TIME=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $1, $2}' | sed -e 's/^ *//' -e 's/ *$//')
+		DURATION=$(( (  $(date -ud "${IMPORT_COMPLETED_TIME}" +'%s') -  $(date -ud "${IMPORT_STARTING_TIME}" +'%s') ) ))
 		if [[ "${IMPORT_LATEST_TIME}" =~ ^[a-zA-Z] ]] ; then
-			IMPORT_LATEST_TIME="Old format"
+			IMPORT_COMPLETED_TIME="Old format"
 			FOUND_FILES=""
 			FILES_REMAINING_NUMBER=""
 			FILES_FAILED=""
@@ -113,11 +117,17 @@ for SERVER in $SERVER_NAMES ; do
 				FILES_FAILED=""
 				LAST_FILE=""
 			fi	
-			FILES_REMAINING=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $6, $8, $9}' | sed -e 's/^ *//' -e 's/ *$//')
-			FILES_REMAINING_NUMBER=$(echo $FILES_REMAINING | awk '{print $1}' | sed -e 's/^ *//' -e 's/ *$//')
+			#FILES_REMAINING=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $6, $8, $9}' | sed -e 's/^ *//' -e 's/ *$//')
+			#FILES_REMAINING_NUMBER=$(echo $FILES_REMAINING | awk '{print $1}' | sed -e 's/^ *//' -e 's/ *$//')
+			if [[ $(find $DATADIR/$SERVER/$NAME/$FILE_DIR/ -maxdepth 2 -name "*.xml") ]] ; then
+				FILES_REMAINING_NUMBER=$(ls -l $DATADIR/$SERVER/$NAME/$FILE_DIR/*/*.xml | wc -l)
+			else
+				FILES_REMAINING_NUMBER=0
+			fi
 			FILES_FAILED=$(echo $FILES_REMAINING | sed 's/(//'  | awk '{print $2}' | sed -e 's/^ *//' -e 's/ *$//')
 			LAST_FILE=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $5}' | sed -e 's/^ *//' -e 's/ *$//')
-			(( TOTAL_FILES_REMAINING = TOTAL_FILES_REMAINING + FILES_REMAINING_NUMBER ))		
+			LAST_FILE_TIME=$(echo ${LAST_FILE##*/} | sed -e 's/.dscdata.xml//' | date +%F%t%X)
+			(( TOTAL_FILES_REMAINING = TOTAL_FILES_REMAINING + FILES_REMAINING_NUMBER ))
 		fi
 		
 		tail ${FILE_NAME} -n 20 | grep -q -e 'Error' -i -c
@@ -126,7 +136,7 @@ for SERVER in $SERVER_NAMES ; do
 		else
 			ERROR_STR="NO"
 		fi
-		printf '%-9s %-1s %-9s %-1s %-19s %-1s %-22s %-1s %-11s %-1s %-15s %-1s %-8s %-1s %-44s %-1s %-15s\n'  "$SERVER" $FORMAT_SEP  "$NAME" $FORMAT_SEP "${IMPORT_START_TIME}" $FORMAT_SEP "$IMPORT_LATEST_TIME" $FORMAT_SEP "$FOUND_FILES" $FORMAT_SEP "$FILES_REMAINING_NUMBER" $FORMAT_SEP  "$FILES_FAILED" $FORMAT_SEP "$LAST_FILE" $FORMAT_SEP "${ERROR_STR}"
+		printf '%-9s %-1s %-9s %-1s %-19s %-1s %-19s %-1s %-18s %-1s %-14s %-1s %-11s %-1s %-11s %-1s %-8s %-1s  %-15s\n'  "$SERVER" $FORMAT_SEP  "$NAME" $FORMAT_SEP "${IMPORT_COMPLETED_TIME}" $FORMAT_SEP "$IMPORT_LATEST_TIME" $FORMAT_SEP "$LAST_FILE_TIME" $FORMAT_SEP "$DURATION" $FORMAT_SEP "$FOUND_FILES" $FORMAT_SEP "$FILES_REMAINING_NUMBER" $FORMAT_SEP "$FILES_FAILED" $FORMAT_SEP "${ERROR_STR}"
 	done
 done
 echo $FORMAT_STRING
