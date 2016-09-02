@@ -219,14 +219,14 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
   if (hh_debug) {
     system('logger -p user.notice Hedgehog: In stackedBarPlot')
   }
-  # write.table(df, file='/tmp/df')
+
     if(gvis == 1){
       title <- sub("\n", " ", title)
       de <- cast(df, x ~ key, value='y', fun.aggregate=sum)
       y_var <- tail(colnames(de),-1)
       if(vertical == 1){
           if (gbar_width == 0) {
-            # write.table(de, file='/tmp/de1')
+
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
                                    options=list(isStacked=TRUE, title=title, height=600, width=940,
                                                 vAxis=paste("{title:'", ylabel,"', format: 'short'}", sep=""), 
@@ -234,7 +234,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
                                                 legend=paste("{textStyle:{fontSize:'12'}}", sep=""),
                                                 chartArea="{left:80,top:50,width:\"75%\",height:\"80%\"}"))
           } else {
-            # write.table(de, file='/tmp/de2')
+
               p <- gvisColumnChart(de, xvar='x', yvar=y_var,
                                    options=list(isStacked=TRUE, title=title, height=600, width=940,
                                                 vAxis=paste("{title:'", ylabel,"', format: 'short'}", sep=""), 
@@ -245,7 +245,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
           }
       }else{
           # Need to order the table before passing it to gviz
-          # write.table(de, file="/tmp/de.out")
+
           # Dont include the IP ddress in the sum!
           if (ncol(de) > 2) { 
             de$total <- rowSums(de[,-1], na.rm=TRUE);
@@ -255,7 +255,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
             de <-arrange(de, desc(de[[2]]));
           }
           # p <- gvisTable(de)
-          # write.table(de, file='/tmp/de3')
+
           p <- gvisBarChart(de, xvar='x', yvar=y_var,
                             options=list(isStacked=TRUE, title=title, height=600, width=940,
                                          vAxis=paste("{title:'",xlabel,"',textStyle:{fontSize:'10'}}", sep=""),
@@ -279,7 +279,7 @@ stackedBarPlot <- function(df, f, title, xlabel, ylabel, gvis, pltnm, scalex="di
 
       nKeys <- length(unique(df$key))
       png(f, width = W, height = H)
-      # write.table(df, file='/tmp/df1')
+
       p <- ggplot(data=df, aes(x=x, y=y, fill=key, order=key)) + 
                   geom_bar(stat="identity") + 
                   labs(title=title, x=xlabel, y=ylabel) + 
