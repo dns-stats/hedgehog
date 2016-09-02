@@ -1,3 +1,15 @@
+hedgehog (2.2.0-1) trusty; urgency=medium
+
+  [ John Dickinson ]
+  * Added new dataset and plot dnskey_vs_asn
+  * removed debug lines
+  * removed blank lines
+
+  [ Sara Dickinson ]
+  * Update docs for 2.2 release
+
+ -- Sara Dickinson <sara@sinodun.com>  Fri, 02 Sep 2016 14:37:13 +0000
+
 hedgehog (2.1.1-1) trusty; urgency=medium
 
   [ John Dickinson ]
