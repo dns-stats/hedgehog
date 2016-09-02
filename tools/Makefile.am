@@ -23,6 +23,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000010_ddl_python \
                          hedgehog/DDL_updates/000011_ddl_new_graphs \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
+                         hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn \
                          hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
                          hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
@@ -125,6 +126,10 @@ hedgehog/DDL_updates/000012_ddl_lower_key_index: $(srcdir)/hedgehog/DDL_updates/
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000012_ddl_lower_key_index.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000012_ddl_lower_key_index
 
+hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn: $(srcdir)/hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn.in  | $(subst_DB_VERSION) > hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn
+	
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
              database_init.in \
