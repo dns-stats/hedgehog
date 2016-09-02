@@ -593,6 +593,31 @@ prepStmnt <- function(statementNm, dsccon){
            sql=gsub("\n"," ",sql_joined)
            rs <- try(dbSendQuery(dsccon, sql))},
 
+           dnskey_vs_asn = {
+             sql_joined <- paste("PREPARE", statementNm, select_nodes_prep,
+               "SELECT ip2asn(xx) AS x, key, sum(y) as y FROM
+                 (SELECT key2::ipaddress AS xx, key1 AS key, sum(value)/$1 AS y
+                  FROM dsc.data 
+                  WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
+                  select_nodes_sql,
+                  "AND key2", skipped_sql, "AND key1='48'",
+                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+           
+           dnskey_vs_asn_all_nodes = {
+             sql_joined <- paste("PREPARE", statementNm, all_nodes_prep,
+               "SELECT ip2asn(xx) AS x, key, sum(y) as y FROM
+                 (SELECT key2::ipaddress AS xx, key1 AS key, sum(value)/$1 AS y
+                  FROM dsc.data 
+                  WHERE server_id=$2 AND plot_id=$3 AND starttime>=$4 AND starttime<=$5",
+                  "AND key2", skipped_sql, "AND key1='48'",
+                  "GROUP BY xx, key ORDER BY y DESC LIMIT 40) AS sq
+                group by x, key order by y desc;", sep=" ")
+           sql=gsub("\n"," ",sql_joined)
+           rs <- try(dbSendQuery(dsccon, sql))},
+
 
         )
 

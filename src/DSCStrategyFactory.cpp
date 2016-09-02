@@ -210,6 +210,12 @@ DSCStrategyFactory::createStrategy(const string &server, const string &name, boo
         return_v.push_back( strat );
         return return_v;
         
+    } else if (name.compare("qtype_vs_client_subnet") == 0) {
+        string keys[1] = {"dummy"};
+        Format4DSCStrategy* strat = new Format4DSCStrategy(server,"qtype_vs_client_subnet",keys,0);
+        return_v.push_back( strat );
+        return return_v;
+        
     } else if (name.compare("qtype_vs_qnamelen") == 0) {
         string keys[1] = {"dummy"};
         Format4DSCStrategy* strat = new Format4DSCStrategy(server, name,keys,0);

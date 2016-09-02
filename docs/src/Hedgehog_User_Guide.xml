@@ -18,9 +18,9 @@
 <p>Alternatively the DB may be on a remote server and the Data Manager and Web front-end may be on different servers as shown below.</p>
 <p><ac:image ac:height="400"><ri:attachment ri:filename="Hedgehog_component_view_split.jpg" /></ac:image></p>
 <h3>Install from Packages (Ubuntu)</h3>
-<p>In 2.1 packages for Ubuntu are provided for Hedgehog. It is recommended to use this method for new installs and that existing installs migrate to this method in 2.1 (see the Installation and Upgrade Guides for details).</p>
+<p>In 2.2 packages for Ubuntu are provided for Hedgehog. It is recommended to use this method for new installs and that existing installs migrate to this method in 2.1 (see the Installation and Upgrade Guides for details).</p>
 <h3>Install from Source Code</h3>
-<p>2.1 can also be installed directly from source code if desired.</p>
+<p>2.2 can also be installed directly from source code if desired - note: this is not a supported method.</p>
 <h1>Datasets</h1><ac:structured-macro ac:macro-id="1dccef1c-27f8-4b28-84b4-ca7010c69dc6" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
 <p>Hedgehog is currently tested against the output of the original DSC collector. It has not been tested against the recently released DSC 2.0.</p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
@@ -49,7 +49,9 @@ dataset traffic_volume_queries dns Transport:transport IPVersion:dns_ip_version 
 dataset traffic_volume_responses dns Transport:transport IPVersion:dns_ip_version replies-only; 
 dataset traffic_sizes_queries dns Transport:transport MsgLen:msglen queries-only; 
 dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-only; ]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="4eaba3e3-a548-4198-89ac-4dfc069be91f" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# New in 2.1
-dataset server_addr dns All:null ServerAddr:server queries-only;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="26a887fa-d2f8-4988-9415-ab76c5e22739" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+dataset server_addr dns All:null ServerAddr:server queries-only;
+# New in 2.2.0
+dataset qtype_vs_client_subnet dns Qtype:qtype ClientSubnet:cip4_net queries-only max-cells=200;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="26a887fa-d2f8-4988-9415-ab76c5e22739" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
 <p>Data collection for the server_addr dataset is not yet supported in the official release of DSC, but is available using the latest code from the DSC github repo. Also, note this dataset will contain the source addresses of all responses (QR = 1) seen on the collection node even if they do not originate from the local_address specified in the dsc.conf (i.e. if another server sends a response to the collection node for some reason).</p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <h1>Plots</h1>
@@ -415,7 +417,20 @@ dataset server_addr dns All:null ServerAddr:server queries-only;]]></ac:plain-te
 <td colspan="1">Busiest client locations by country&nbsp;</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Busiest client locations by city</td></tr></tbody></table><ac:structured-macro ac:macro-id="f7a8bc07-2c7e-482e-850b-ad49fc4eae75" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<td colspan="1">Busiest client locations by city</td></tr></tbody></table>
+<p>The following plots are new in 2.2</p>
+<table>
+<tbody>
+<tr>
+<th>Hedgehog plot category</th>
+<th>Hedgehog plot display name</th></tr>
+<tr>
+<td><strong>Client Subnet Statistics</strong></td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<p>DNSKEY Queries by ASN</p></td></tr></tbody></table><ac:structured-macro ac:macro-id="f7a8bc07-2c7e-482e-850b-ad49fc4eae75" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
 <ul>
 <li><strong>RSSAC: Zone size and Zone propagation time graphs.</strong> In order for data to be available for these graphs, an instance of the <em>rssacd</em><span>&nbsp;demon&nbsp;must be run to collect the data (it is not provided by the DSC collector).</span></li>
 <li><strong>GEO: Busiest client location by country.</strong> Both client locations and collection node locations can be displayed on this graph. For node locations to be displayed the nodes must have a city specified via the nodes.csv file.</li></ul></ac:rich-text-body></ac:structured-macro>
