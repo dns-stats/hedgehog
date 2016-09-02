@@ -1,2 +1,2 @@
 <ac:structured-macro ac:macro-id="ebbacdf6-f54f-4f4a-b46f-4276888db4a2" ac:name="warning" ac:schema-version="1"><ac:rich-text-body>
-<p>Installation from source is no longer officially supported in 2.1.1. Please see the 'Hedgehog Upgrade Guide (to Packages)' for how to upgrade from a 2.1.0 source install to 2.1.1.</p></ac:rich-text-body></ac:structured-macro>
+<p>Installation from source is no longer officially supported.</p></ac:rich-text-body></ac:structured-macro>
