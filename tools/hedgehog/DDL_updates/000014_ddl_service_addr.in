@@ -62,6 +62,8 @@ echo "Starting"
 psql $CONN_STRING <<EOF
 BEGIN;
 CREATE TABLE $DSC_SCHEMA.server_addr (id SERIAL PRIMARY KEY, server_id INTEGER REFERENCES $DSC_SCHEMA.server (id), address IPADDRESS NOT NULL, UNIQUE (server_id, address));
+UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
+INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added service address table', now() );
 COMMIT;
 EOF
 
