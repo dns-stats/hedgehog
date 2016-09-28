@@ -133,7 +133,7 @@ hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn: $(srcdir)/hedgehog/DDL_updates/00
 
 hedgehog/DDL_updates/000014_ddl_service_addr: $(srcdir)/hedgehog/DDL_updates/000014_ddl_service_addr.in  Makefile
 	mkdir -p hedgehog/DDL_updates
-	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_service_addr | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_service_addr
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_service_addr.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_service_addr
 	
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
