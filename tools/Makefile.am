@@ -10,6 +10,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/database_manage_partitions \
                          hedgehog/database_update_geoip \
                          hedgehog/database_update_nodes \
+                         hedgehog/database_update_service_addr \
                          hedgehog/database_update_tlds \
                          hedgehog/database_update_tlds_from_zone \
                          hedgehog/datafiles_create_summary \
@@ -74,6 +75,10 @@ hedgehog/database_update_geoip: $(srcdir)/hedgehog/database_update_geoip.in Make
 hedgehog/database_update_nodes: $(srcdir)/hedgehog/database_update_nodes.in Makefile
 	mkdir -p hedgehog
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_nodes.in > hedgehog/database_update_nodes
+
+hedgehog/database_update_service_addr: $(srcdir)/hedgehog/database_update_service_addr.in Makefile
+	mkdir -p hedgehog
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_service_addr.in > hedgehog/database_update_service_addr
 
 hedgehog/database_update_tlds: $(srcdir)/hedgehog/database_update_tlds.in Makefile
 	mkdir -p hedgehog

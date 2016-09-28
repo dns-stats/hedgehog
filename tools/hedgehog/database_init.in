@@ -143,6 +143,7 @@ echo "Populate servers and nodes"
 @LIBEXEC@/database_update_tlds
 @LIBEXEC@/database_update_geoip
 @LIBEXEC@/database_update_nodes
+@LIBEXEC@/database_update_service_addr
 ###########################################################
 
 #############  PARTITION DATA TABLES  #####################

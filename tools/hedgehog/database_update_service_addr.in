@@ -23,6 +23,13 @@
 # File:   database_update_server_addr
 #
 
+eval $(@LIBEXEC@/conf_read)
+SERVICE_ADDR_FILE="${hhconfig_directories_conf}/server_addr.csv"
+if [ ! -e $SERVICE_ADDR_FILE ] ; then
+	echo "Error attempting to find service_addr.csv. Tried: $SERVICE_ADDR_FILE"
+	exit 1
+fi
+
 # We need a write user
 a=$(@LIBEXEC@/check_user_perms -wc)
 if [ $? -ne 0 ] ; then
@@ -73,6 +80,6 @@ insert into server_addr (server_id, address) select id, '$ADDRESS' from server w
 COMMIT;
 EOF
     junk=""
-done < ${SERVER_ADDR_FILE}
+done < ${SERVICE_ADDR_FILE}
 
 echo "$(date): $0 COMPLETED"
