@@ -1,0 +1,68 @@
+#!/bin/bash
+#
+# Copyright 2015, 2016 Internet Corporation for Assigned Names and Numbers.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   000014_ddl_service_addr
+#
+
+
+NEW_DDL_SERIAL=14
+REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
+NEW_API_VERSION=11
+REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 1 ))
+
+DSC_SCHEMA="dsc"
+
+usage () {
+    echo
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+    exit 1
+}
+
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage ;;
+        \? ) usage ;;
+    esac
+done
+
+# Need a write user to update DB
+echo "`date`: $0 COMMENCED"
+a=$(@LIBEXEC@/check_user_perms -w -C $REQUIRED_API_VERSION -s $REQUIRED_DDL_SERIAL)
+if [ $? -ne 0 ] ; then
+  echo $a
+  exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+echo "Starting"
+psql $CONN_STRING <<EOF
+BEGIN;
+CREATE TABLE $DSC_SCHEMA.server_addr (id SERIAL PRIMARY KEY, server_id INTEGER REFERENCES $DSC_SCHEMA.server (id), address IPADDRESS NOT NULL, UNIQUE (server_id, address));
+COMMIT;
+EOF
+
+echo "`date`: $0 COMPLETED"

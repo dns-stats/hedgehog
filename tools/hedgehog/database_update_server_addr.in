@@ -1,0 +1,78 @@
+#!/bin/bash
+# 
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   database_update_server_addr
+#
+
+# We need a write user
+a=$(@LIBEXEC@/check_user_perms -wc)
+if [ $? -ne 0 ] ; then
+	echo $a
+	exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+usage () {
+	echo
+	echo "Update the Server service addreses list in the database. This reads input from ${TMP_DIR}"
+	echo 
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage
+             exit 1 ;;
+        \? ) usage
+             exit 1 ;;
+    esac
+done
+
+echo "$(date): $0 COMMENCED"
+
+while read line || [[ -n "$line" ]]; do
+    i=$(($i+1))
+    trimmed_line=$(echo $line | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+
+    if [[ -z ${trimmed_line} ]] || [[ "${trimmed_line}" =~ ^# ]] ; then
+            continue
+    fi
+    IFS=, read -r SERVER_NAME ADDRESS junk <<< "$trimmed_line"
+    if [[ -n $junk ]] ; then
+            echo "***ERROR***:  Line $i, Too many fields. This line will be ignored."
+            ((NODES_ERRORS++))
+            continue
+    fi
+    echo $SERVER_NAME -- $ADDRESS
+psql $CONN_STRING << EOF
+BEGIN;
+insert into server_addr (server_id, address) select id, '$ADDRESS' from server where display_name = '$SERVER_NAME';
+COMMIT;
+EOF
+    junk=""
+done < ${SERVER_ADDR_FILE}
+
+echo "$(date): $0 COMPLETED"
