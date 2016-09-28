@@ -24,7 +24,7 @@
 #
 
 eval $(@LIBEXEC@/conf_read)
-SERVICE_ADDR_FILE="${hhconfig_directories_conf}/server_addr.csv"
+SERVICE_ADDR_FILE="${hhconfig_directories_conf}/service_addr.csv"
 if [ ! -e $SERVICE_ADDR_FILE ] ; then
 	echo "Error attempting to find service_addr.csv. Tried: $SERVICE_ADDR_FILE"
 	exit 1
