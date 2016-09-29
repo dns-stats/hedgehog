@@ -1,6 +1,6 @@
 ######################### SERVICE ADDRESS CONFIGURATION FILE ###################
-# Format is:     server-name, address (IPv4 and IPv6)
+# Format is:     server-name, address (IPv4 or IPv6)
 #
-L-Root,2001:500:9f::42
-L-Root,199.7.83.42
-L-Root,2001:500:3::42
+# L-Root,2001:500:9f::42
+# L-Root,199.7.83.42
+# L-Root,2001:500:3::42

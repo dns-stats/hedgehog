@@ -20,7 +20,7 @@
 #
 
 # 
-# File:   database_update_server_addr
+# File:   database_update_service_addr
 #
 
 eval $(@LIBEXEC@/conf_read)
@@ -39,18 +39,22 @@ fi
 eval $a
 export PGPASSWORD=$PGPASSWORD
 
+DELETE=0
+
 usage () {
 	echo
-	echo "Update the Server service addreses list in the database. This reads input from ${TMP_DIR}"
+	echo "Update the Server service addreses list in the database."
 	echo 
     echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
+	echo "  -d Delete all existing entries in the service_addr table"
     echo "  -h Show this help."
 }
 
-while getopts ":h" opt; do
+while getopts ":dh" opt; do
     case $opt in
+        d  ) DELETE=1 ;;
         h  ) usage
              exit 1 ;;
         \? ) usage
@@ -59,7 +63,13 @@ while getopts ":h" opt; do
 done
 
 echo "$(date): $0 COMMENCED"
+if [ ${DELETE} -eq 1 ] ; then
+    psql $CONN_STRING << EOF
+DELETE FROM service_addr;
+EOF
+fi
 
+i=0
 while read line || [[ -n "$line" ]]; do
     i=$(($i+1))
     trimmed_line=$(echo $line | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
@@ -70,13 +80,12 @@ while read line || [[ -n "$line" ]]; do
     IFS=, read -r SERVER_NAME ADDRESS junk <<< "$trimmed_line"
     if [[ -n $junk ]] ; then
             echo "***ERROR***:  Line $i, Too many fields. This line will be ignored."
-            ((NODES_ERRORS++))
             continue
     fi
     echo $SERVER_NAME -- $ADDRESS
 psql $CONN_STRING << EOF
 BEGIN;
-insert into server_addr (server_id, address) select id, '$ADDRESS' from server where display_name = '$SERVER_NAME';
+insert into service_addr (server_id, address) select id, '$ADDRESS' from server where display_name = '$SERVER_NAME';
 COMMIT;
 EOF
     junk=""

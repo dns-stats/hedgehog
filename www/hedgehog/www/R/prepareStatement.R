@@ -332,7 +332,7 @@ prepStmnt <- function(statementNm, dsccon){
                    WHERE d.server_id=$1
                     AND d.plot_id=$2 AND d.starttime>=$3 AND d.starttime<=$4
                     AND d.node_id = ANY (string_to_array($5, ',')::integer[])
-                    AND d.key1::ipaddress IN (SELECT address FROM server_addr WHERE server_id=$1)
+                    AND (d.key1::ipaddress IN (SELECT address FROM server_addr WHERE server_id=$1) OR (SELECT count(*) FROM server_addr WHERE server_id=$1) = 0)
                    GROUP BY sx, skey) as sq
                 GROUP BY x, key;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
@@ -350,7 +350,7 @@ prepStmnt <- function(statementNm, dsccon){
                 FROM dsc.data d
                 WHERE d.server_id=$1 AND d.plot_id=$2
                   AND d.starttime>=$3 AND d.starttime<=$4
-                  AND d.key1::ipaddress IN (SELECT address FROM server_addr WHERE server_id=$1)
+                  AND (d.key1::ipaddress IN (SELECT address FROM server_addr WHERE server_id=$1) OR (SELECT count(*) FROM server_addr WHERE server_id=$1) = 0)
                 GROUP BY sx, skey) as sq
               GROUP BY x, key;", sep=" ")
            sql=gsub("\n"," ",sql_joined)
