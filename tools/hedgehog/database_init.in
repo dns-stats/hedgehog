@@ -133,6 +133,8 @@ echo "Running DDL scripts"
 @LIBEXEC@/DDL_updates/000012_ddl_lower_key_index -s
 # Add a dataset/plot  for dnskey_vs_asn
 @LIBEXEC@/DDL_updates/000013_ddl_dnskey_vs_asn
+# Add by_region
+@LIBEXEC@/DDL_updates/000015_ddl_byregion
 ###########################################################
 
 ###################  POPULATE TABLES  #####################
