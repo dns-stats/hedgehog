@@ -52,7 +52,7 @@ function initNodeHtml(nodes_raw) {
     $('#srvr_select').append("<input type='radio'          id='ng_country'  name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_country'  >Country </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_city'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_city'     >City </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_instance' name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_instance' >Instance </label>");
-    $('#srvr_select').append("<input type='radio'          id='ng_none'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_none'     >No grouping </label>");
+    $('#srvr_select').append("<input type='radio'          id='ng_none'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_none'     >Node </label>");
 
     // Check for no servers is made earlier, so just check for nodes here
     // if (nodes_raw = "[]") {

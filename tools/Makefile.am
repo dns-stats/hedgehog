@@ -136,10 +136,17 @@ hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn: $(srcdir)/hedgehog/DDL_updates/00
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn.in  | $(subst_DB_VERSION) > hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn
 
+<<<<<<< HEAD
 hedgehog/DDL_updates/000014_ddl_service_addr: $(srcdir)/hedgehog/DDL_updates/000014_ddl_service_addr.in  Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_service_addr.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_service_addr
 	
+=======
+hedgehog/DDL_updates/000014_ddl_byregion: $(srcdir)/hedgehog/DDL_updates/000014_ddl_byregion.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_byregion.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_byregion
+
+>>>>>>> 7e4929e... Added by region and changed grouping
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
              database_init.in \
