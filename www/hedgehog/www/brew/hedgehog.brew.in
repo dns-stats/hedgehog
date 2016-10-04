@@ -191,8 +191,8 @@ getDefaultPlotId <- function() {
 		return(FALSE)
 	}
 	
-	# TODO: retrieve from conf file
-	defaultpltnm <- "'by_node'"
+	
+	defaultpltnm <- %><%=gui_config$www$default_plot%><%
 	defaultpltid <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getdefaultpltid(", defaultpltnm, ");", sep=""))	
 	
 	if (is.null(defaultpltid) || nrow(defaultpltid) == 0) {
