@@ -42,13 +42,22 @@ export PGPASSWORD=$PGPASSWORD
 DELETE=0
 
 usage () {
-	echo
-	echo "Update the Server service addreses list in the database."
-	echo 
+    echo
+    echo "Update the Server service addreses list in the database."
+    echo "This list is only used to filter which addresses are displayed in the"
+    echo "'By server IP address' plot. If there are any addresses in the list"
+    echo "then only these addresses are displayed. If there are no entries "
+    echo "in the list then all the addresses for which there is data are displayed."
+    echo "By default this script reads the $SERVICE_ADDR_FILE file and adds"
+    echo "the addresses found there."
+    echo "After running this script it is advisable to remove any cached plots"
+    echo "for the 'By server IP address' plot by using the plotcache_rm_cached_plots"
+    echo "script."
+    echo 
     echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
-	echo "  -d Delete all existing entries in the service_addr table"
+    echo "  -d Delete all existing entries in the server service address list"
     echo "  -h Show this help."
 }
 
@@ -67,6 +76,8 @@ if [ ${DELETE} -eq 1 ] ; then
     psql $CONN_STRING << EOF
 DELETE FROM service_addr;
 EOF
+echo "$(date): $0 COMPLETED"
+exit 0
 fi
 
 i=0
