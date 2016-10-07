@@ -10,6 +10,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/database_manage_partitions \
                          hedgehog/database_update_geoip \
                          hedgehog/database_update_nodes \
+                         hedgehog/database_update_service_addr \
                          hedgehog/database_update_tlds \
                          hedgehog/database_update_tlds_from_zone \
                          hedgehog/datafiles_create_summary \
@@ -24,6 +25,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000011_ddl_new_graphs \
                          hedgehog/DDL_updates/000012_ddl_lower_key_index \
                          hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn \
+                         hedgehog/DDL_updates/000014_ddl_service_addr \
                          hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
                          hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
@@ -73,6 +75,10 @@ hedgehog/database_update_geoip: $(srcdir)/hedgehog/database_update_geoip.in Make
 hedgehog/database_update_nodes: $(srcdir)/hedgehog/database_update_nodes.in Makefile
 	mkdir -p hedgehog
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_nodes.in > hedgehog/database_update_nodes
+
+hedgehog/database_update_service_addr: $(srcdir)/hedgehog/database_update_service_addr.in Makefile
+	mkdir -p hedgehog
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/database_update_service_addr.in > hedgehog/database_update_service_addr
 
 hedgehog/database_update_tlds: $(srcdir)/hedgehog/database_update_tlds.in Makefile
 	mkdir -p hedgehog
@@ -129,6 +135,10 @@ hedgehog/DDL_updates/000012_ddl_lower_key_index: $(srcdir)/hedgehog/DDL_updates/
 hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn: $(srcdir)/hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn.in  | $(subst_DB_VERSION) > hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn
+
+hedgehog/DDL_updates/000014_ddl_service_addr: $(srcdir)/hedgehog/DDL_updates/000014_ddl_service_addr.in  Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000014_ddl_service_addr.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000014_ddl_service_addr
 	
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \

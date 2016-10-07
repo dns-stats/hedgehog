@@ -12,6 +12,7 @@ ALL_TOOLS=( database_init \
         database_rm_old_rssac_data \
         database_update_geoip \
         database_update_nodes \
+        database_update_service_addr \
         database_update_tlds \
         database_update_tlds_from_zone \
         datafiles_create_summary \
