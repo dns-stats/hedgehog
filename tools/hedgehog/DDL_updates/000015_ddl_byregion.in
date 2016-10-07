@@ -66,11 +66,8 @@ WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
     VALUES ('by_region','1.Node Statistics','By region','Queries by region') 
     RETURNING id
-), rows2 AS (
-  INSERT INTO dataset (name) VALUES ('qtype')
-    RETURNING id as dataset_id
 )
-INSERT INTO dataset_visible_plot SELECT id, dataset_id FROM rows, rows2;
+INSERT INTO dataset_visible_plot SELECT id, (SELECT id from dataset WHERE name='qtype') FROM rows;
 
 UPDATE $DSC_SCHEMA.version SET version = $NEW_API_VERSION;
 INSERT INTO $DSC_SCHEMA.internal_version ( serial, script, description, applied ) VALUES ( $NEW_DDL_SERIAL, '$0', 'Added new by region graph', now() );

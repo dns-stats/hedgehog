@@ -156,7 +156,7 @@ initNodeData <- function() {
                     }
                 }
                 for (n in 1:nrow(nodes_df)) {
-                    # Query fills in blank fields so we don't need to check here
+                    # Query fills in blank fields so we dont need to check here
                     nd_id      = nodes_df[n,1]
                     nd_nm      = nodes_df[n,2]
                     nd_country = nodes_df[n,3]
@@ -191,9 +191,12 @@ getDefaultPlotId <- function() {
 		return(FALSE)
 	}
 	
-	
-	defaultpltnm <- %><%=gui_config$www$default_plot%><%
-	defaultpltid <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getdefaultpltid(", defaultpltnm, ");", sep=""))	
+	defaultpltnm <- gui_config$www$default_plot_name
+	if (is.null(defaultpltnm)) {
+		system('logger -p user.warning Hedgehog: Missing Default Plot name in config file. Using By region.')
+		defaultpltnm <- "by_region"
+	}
+	defaultpltid <- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getdefaultpltid('", defaultpltnm, "');", sep=""))	
 	
 	if (is.null(defaultpltid) || nrow(defaultpltid) == 0) {
 		return(FALSE)

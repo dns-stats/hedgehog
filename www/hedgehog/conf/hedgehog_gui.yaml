@@ -40,6 +40,6 @@ www:
   support_url                   :             # configurable target for "Support" external link on Homepage.
   default_server                :             # Optionally specify the default server to use in the server
                                               # drop-down (default is first alphabetically)
-  default_plot                  : by_region   # default plot name
+  default_plot_name             : by_region   # default plot name (See Hedgehog internal plot name in the user guide)
 
 ...
