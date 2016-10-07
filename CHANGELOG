@@ -14,6 +14,18 @@
 # limitations under the License.
 #
 
+Hedgehog 2.3.0 - 2016-09-09
+----------------------------
+* Add ability to filter the server addresses displayed in the 'By server IP
+  address' plot. Controlled by the database_update_service_addr script.
+* Add new 'By region' graph which is now the default. This graph always groups
+  the results by Region. The 'By node' graph now always displays a line per node
+  regardless of the node selection (previously it grouped by Region when all
+  nodes were selected).
+* Default plot is now a configuration option. To specify a plot use the 'Hedgehog
+  internal plot name' as listed in the User Guide.
+
+
 Hedgehog 2.2.0 - 2016-08-31
 -----------------------------
 * Added new dataset and plot dnskey_vs_asn
