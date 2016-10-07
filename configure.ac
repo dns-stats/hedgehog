@@ -18,13 +18,13 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(Hedgehog, 2.2.0,  dns-stats-users@dns-stats.org)
+AC_INIT(Hedgehog, 2.3.0a1,  dns-stats-users@dns-stats.org)
 AC_CONFIG_SRCDIR([tools/hedgehogctl.in])
 AC_CONFIG_HEADER([config.h])
 
-AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[10],[Database version])
-AC_SUBST([DB_SCHEMA_VERSION],[10])
-AC_SUBST([VERSION_NAME],[Daurian])
+AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[11],[Database version])
+AC_SUBST([DB_SCHEMA_VERSION],[11])
+AC_SUBST([VERSION_NAME],[Four-toed])
 
 AC_CONFIG_MACRO_DIR([m4])
 
