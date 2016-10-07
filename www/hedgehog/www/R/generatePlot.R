@@ -666,7 +666,7 @@ generateYaml <- function(dsccon) {
   }
 
   # Now process the data from the data frame into yaml format
-    yaml_out <- list(service=server_service, 'start-period'=paste(GET$start, ":00Z", sep=""), 'end-period'=paste(GET$stop, ":59Z", sep=""), metric=metric)
+    yaml_out <- list('version'='rssac002v3', service=server_service, 'start-period'=paste(GET$start, ":00Z", sep=""), metric=metric)
 
     if (metric_data$statistics_type == "buckets") {
         de <- as.data.frame(cast(df, x ~ key, value='y', fun.aggregate=sum))  

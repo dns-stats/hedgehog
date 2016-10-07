@@ -23,20 +23,27 @@
 # File:   datafiles_create_summary
 #
 
-# We need user with access to the data directory
-a=$(@LIBEXEC@/check_user_perms -fnc)
+# We need user with access to the database
+a=$(@LIBEXEC@/check_user_perms -c)
 if [ $? -ne 0 ] ; then
 	echo $a
 	exit 1
 fi
 eval $a
-
-
+export PGPASSWORD=$PGPASSWORD
+RED='\033[0;31m'
 LOG_FILE="dsc-extractor-xml-db.out"
 NODE_NAME=""
 SERVER_NAME=""
-FORMAT_STRING="-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
+FORMAT_STRING="----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
 FORMAT_SEP="|"
+
+print_header () {
+	echo $FORMAT_STRING
+	echo " Server    $FORMAT_SEP Node      $FORMAT_SEP Last import started $FORMAT_SEP Last file processed $FORMAT_SEP Files found $FORMAT_SEP Files remaining $FORMAT_SEP Failures $FORMAT_SEP Last file processed                          $FORMAT_SEP Time      $FORMAT_SEP Error found in last"
+	echo "           $FORMAT_SEP           $FORMAT_SEP                     $FORMAT_SEP at                  $FORMAT_SEP in incoming $FORMAT_SEP in import job   $FORMAT_SEP          $FORMAT_SEP                                              $FORMAT_SEP taken (s) $FORMAT_SEP 20 lines of file"
+	echo $FORMAT_STRING
+}
 
 usage () {
 	echo
@@ -56,7 +63,7 @@ while getopts ":s:n:cdh" opt; do
     case $opt in
 		n  ) NODE_NAME=$OPTARG ;;
 		s  ) SERVER_NAME=$OPTARG ;;
-    d  ) set -x ;;
+		d  ) set -x ;;
 		c  ) FORMAT_STRING=""
 		     FORMAT_SEP=',';;
         h  ) usage
@@ -66,69 +73,107 @@ while getopts ":s:n:cdh" opt; do
     esac
 done
 
-TOTAL_FILES_REMAINING=0
+TOTAL_IN_PROGRESS=0
 
 if [ -z "${SERVER_NAME}" ] ; then
-	SERVER_NAMES=$(ls -1 ${DATADIR})
+	SERVER_NAMES=$(psql $CONN_STRING -tc "select display_name from dsc.server")
 else 
 	SERVER_NAMES=$SERVER_NAME
 fi
 
-echo $FORMAT_STRING
-echo " Server  $FORMAT_SEP Node       $FORMAT_SEP Last import started $FORMAT_SEP Last file processed at $FORMAT_SEP Files found $FORMAT_SEP Files remaining $FORMAT_SEP Failures $FORMAT_SEP Last file processed                          $FORMAT_SEP Error found in last 20 lines of file" 
-echo $FORMAT_STRING
+print_header
+
+MIDNIGHT=$(date --date="00:00 today" +%s)
+
+declare -a PROCESSING_NODES
 
 for SERVER in $SERVER_NAMES ; do
 
 	test -L $DATADIR/$SERVER && continue;
 	test -d $DATADIR/$SERVER || continue;
 
+	SERVER_ID=$(psql $CONN_STRING -tc "select id from dsc.server where display_name='${SERVER}'")
+
 	if [ -z "${NODE_NAME}" ] ; then
-		NODE_NAMES=$(ls -1 $DATADIR/$SERVER)
-	else 
+		NODE_NAMES=$(psql $CONN_STRING -tc "select name from dsc.node where server_id=$SERVER_ID")
+	else
 		NODE_NAMES=$NODE_NAME
 	fi
-	
+	COUNTER=0
 	for NAME in $NODE_NAMES  ; do
 
 		FILE_NAME=$DATADIR/$SERVER/$NAME/$LOG_FILE
 		if [ ! -f "${FILE_NAME}" ] ; then
 			continue
 		fi
-		
+
+		if [ ! -d "$DATADIR/$SERVER/$NAME/incoming/" ] ; then
+			continue
+		fi
+
+		if [ ! "$(ls -A $DATADIR/$SERVER/$NAME/incoming/)" ] ; then
+			continue
+		fi
+
+		COUNTER=$(( COUNTER + 1 ))
 		# Get the last date that import started:
-		IMPORT_START_TIME=$(tac ${FILE_NAME} | grep -e '--' -m1 | awk '{print $2, $3}' | sed -e 's/^ *//' -e 's/ *$//')
-		IMPORT_LATEST_TIME=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $1, $2}' | sed -e 's/^ *//' -e 's/ *$//')
-		if [[ "${IMPORT_LATEST_TIME}" =~ ^[a-zA-Z] ]] ; then
-			IMPORT_LATEST_TIME="Old format"
-			FOUND_FILES=""
-			FILES_REMAINING_NUMBER=""
-			FILES_FAILED=""
+		IMPORT_START_TIME=$(tac ${FILE_NAME} | grep -e 'UTC ----------------------$' -m1 | awk '{print $2, $3}')
+		COMPLETED_LINE=$(tac ${FILE_NAME} | grep -e 'Completed' -m1 | awk '{print $1, $2, $5, $6, $8, $9}')
+		IMPORT_LATEST_TIME=$(echo $COMPLETED_LINE | awk '{print $1, $2}')
+
+		FOUND_FILES=$(find ${DATADIR}/${SERVER}/${NAME}/incoming/*/ -name \*.xml | wc -l)
+		FILES_REMAINING_NUMBER=$(echo $COMPLETED_LINE | awk '{print $4}')
+		FILES_FOUND_NUMBER=$(echo $FOUND_FILES | awk '{print $1}' )
+		FILES_FAILED=$(echo $COMPLETED_LINE | sed 's/(//'  | awk '{print $5}')
+
+		LAST_FILE_PATH=$(echo $COMPLETED_LINE | awk '{print $3}')
+		LAST_FILE_NAME=$(basename "$LAST_FILE_PATH")
+		LAST_FILE_UNIX_TIME="${LAST_FILE_NAME%.*.*}"
+		if [ -z $LAST_FILE_UNIX_TIME ] ; then
 			LAST_FILE=""
 		else
-			FOUND_FILES=$(tac ${FILE_NAME} | grep -e 'Found' -m 1 | awk '{print $3}')
-			if [[ "${FOUND_FILES}" =~ ^\. ]] ; then
-				FOUND_FILES="Old format"
-				FILES_REMAINING_NUMBER=""
-				FILES_FAILED=""
-				LAST_FILE=""
-			fi	
-			FILES_REMAINING=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $6, $8, $9}' | sed -e 's/^ *//' -e 's/ *$//')
-			FILES_REMAINING_NUMBER=$(echo $FILES_REMAINING | awk '{print $1}' | sed -e 's/^ *//' -e 's/ *$//')
-			FILES_FAILED=$(echo $FILES_REMAINING | sed 's/(//'  | awk '{print $2}' | sed -e 's/^ *//' -e 's/ *$//')
-			LAST_FILE=$(tac ${FILE_NAME} | grep -e 'Completed'  -m 1 | awk '{print $5}' | sed -e 's/^ *//' -e 's/ *$//')
-			(( TOTAL_FILES_REMAINING = TOTAL_FILES_REMAINING + FILES_REMAINING_NUMBER ))		
+			LAST_FILE=$(date -d @${LAST_FILE_UNIX_TIME} "+%Y-%m-%d %H:%M:%S")
+		        LAST_FILE_START_TIME=$(tac ${FILE_NAME} |  grep -e "Starting:  ${LAST_FILE_PATH}"  -m 1 | awk '{print $1 " " $2}')
+			LAST_FILE_FINISH_TIME=$(echo $COMPLETED_LINE | awk '{print $1 " " $2}')
+			LAST_FILE_START_UNIX_TIME=$(date --date="${LAST_FILE_START_TIME}" +"%s")
+			LAST_FILE_FINISH_UNIX_TIME=$(date --date="${LAST_FILE_FINISH_TIME}" +"%s")
+			DURATION=$(( LAST_FILE_FINISH_UNIX_TIME - LAST_FILE_START_UNIX_TIME))
 		fi
-		
-		tail ${FILE_NAME} -n 20 | grep -q -e 'Error' -i -c
-		if [ $? -eq 0 ] ; then
+		(( TOTAL_FILES_FOUND = TOTAL_FILES_FOUND + FILES_FOUND_NUMBER ))
+
+		ERR_COUNT=$(tail ${FILE_NAME} -n 20 | grep  -i -e 'Error' | grep  -v 'lock pid file' | wc -l)
+		if [ $ERR_COUNT -ne 0 ] ; then
 			ERROR_STR="YES"
 		else
 			ERROR_STR="NO"
 		fi
-		printf '%-9s %-1s %-9s %-1s %-19s %-1s %-22s %-1s %-11s %-1s %-15s %-1s %-8s %-1s %-44s %-1s %-15s\n'  "$SERVER" $FORMAT_SEP  "$NAME" $FORMAT_SEP "${IMPORT_START_TIME}" $FORMAT_SEP "$IMPORT_LATEST_TIME" $FORMAT_SEP "$FOUND_FILES" $FORMAT_SEP "$FILES_REMAINING_NUMBER" $FORMAT_SEP  "$FILES_FAILED" $FORMAT_SEP "$LAST_FILE" $FORMAT_SEP "${ERROR_STR}"
+
+		if [ $FILES_REMAINING_NUMBER -gt 0 ] && [ $ERROR_STR == "NO" ] ; then
+			(( TOTAL_IN_PROGRESS = TOTAL_IN_PROGRESS + 1 ))
+			(( TOTAL_PROCESSING_TIME = TOTAL_PROCESSING_TIME + DURATION ))
+			PROCESSING_NODES+=" "${SERVER}/${NAME}
+		fi
+		
+		if [ $LAST_FILE_UNIX_TIME -lt $MIDNIGHT ] ; then
+			# color red
+			printf '\033[0;31m%-10s %-1s %-9s %-1s %-16s %-1s %-19s %-1s %-11s %-1s %-15s %-1s %-8s %-1s %-19s %-22s %-1s %-9s %-1s %-15s\033[0m\n'  "$SERVER" $FORMAT_SEP  "$NAME" $FORMAT_SEP "${IMPORT_START_TIME}" $FORMAT_SEP "$IMPORT_LATEST_TIME" $FORMAT_SEP "$FOUND_FILES" $FORMAT_SEP "$FILES_REMAINING_NUMBER" $FORMAT_SEP  "$FILES_FAILED" $FORMAT_SEP "$LAST_FILE" "($LAST_FILE_NAME)" $FORMAT_SEP "$DURATION" $FORMAT_SEP "${ERROR_STR}"
+		elif [ $FOUND_FILES -gt 720 ] ; then
+			# color yellow
+			printf '\033[0;33m%-10s %-1s %-9s %-1s %-16s %-1s %-19s %-1s %-11s %-1s %-15s %-1s %-8s %-1s %-19s %-22s %-1s %-9s %-1s %-15s\033[0m\n'  "$SERVER" $FORMAT_SEP  "$NAME" $FORMAT_SEP "${IMPORT_START_TIME}" $FORMAT_SEP "$IMPORT_LATEST_TIME" $FORMAT_SEP "$FOUND_FILES" $FORMAT_SEP "$FILES_REMAINING_NUMBER" $FORMAT_SEP  "$FILES_FAILED" $FORMAT_SEP "$LAST_FILE" "($LAST_FILE_NAME)" $FORMAT_SEP "$DURATION" $FORMAT_SEP "${ERROR_STR}"
+		else
+			# no color
+			printf '%-10s %-1s %-9s %-1s %-16s %-1s %-19s %-1s %-11s %-1s %-15s %-1s %-8s %-1s %-19s %-22s %-1s %-9s %-1s %-15s\n'  "$SERVER" $FORMAT_SEP  "$NAME" $FORMAT_SEP "${IMPORT_START_TIME}" $FORMAT_SEP "$IMPORT_LATEST_TIME" $FORMAT_SEP "$FOUND_FILES" $FORMAT_SEP "$FILES_REMAINING_NUMBER" $FORMAT_SEP  "$FILES_FAILED" $FORMAT_SEP "$LAST_FILE" "($LAST_FILE_NAME)" $FORMAT_SEP "$DURATION" $FORMAT_SEP "${ERROR_STR}"
+		fi
+
+		if [ $COUNTER -eq 21 ] ; then
+			print_header
+			COUNTER=0
+		fi
 	done
 done
-echo $FORMAT_STRING
-echo "Total files remaining to import: " $TOTAL_FILES_REMAINING
+print_header
 
+echo "Time: " $(date "+%Y-%m-%d %H:%M:%S") " Total files remaining to import: " $TOTAL_FILES_FOUND
+PERF=$(( TOTAL_PROCESSING_TIME / TOTAL_IN_PROGRESS ))
+echo "Time: " $(date "+%Y-%m-%d %H:%M:%S") " Processors in progress: " ${TOTAL_IN_PROGRESS} " at approx " ${PERF} " seconds per datafile"
+echo "List of nodes currently processing: $PROCESSING_NODES"
