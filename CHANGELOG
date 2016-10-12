@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-Hedgehog 2.3.0 - 2016-09-09
+Hedgehog 2.3.0 - 2016-09-12
 ----------------------------
 * Add ability to filter the server addresses displayed in the 'By server IP
   address' plot. Controlled by the database_update_service_addr script.
