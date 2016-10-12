@@ -1,7 +1,7 @@
 Source: hedgehog
 Section: net
 Priority: optional
-Maintainer: Ondřej Surý <ondrej@debian.org>
+Maintainer: Sara Dickinson <sara@sinodun.com>
 Build-Depends: apache2-dev (>= 2.4),
                autotools-dev,
                debhelper (>= 9),
