@@ -52,7 +52,7 @@ dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-on
 dataset server_addr dns All:null ServerAddr:server queries-only;
 # New in 2.2.0
 dataset qtype_vs_client_subnet dns Qtype:qtype ClientSubnet:cip4_net queries-only max-cells=200;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="26a887fa-d2f8-4988-9415-ab76c5e22739" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
-<p>Data collection for the server_addr dataset is not yet supported in the official release of DSC, but is available using the latest code from the DSC github repo. Also, note this dataset will contain the source addresses of all responses (QR = 1) seen on the collection node even if they do not originate from the local_address specified in the dsc.conf (i.e. if another server sends a response to the collection node for some reason).</p></ac:rich-text-body></ac:structured-macro>
+<p>Data collection for the server_addr dataset is not yet supported in the official release of version 1 of DSC, but is available using the latest code from the DSC github repo. Also, note this dataset will contain the source addresses of all responses (QR = 1) seen on the collection node even if they do not originate from the local_address specified in the dsc.conf (i.e. if another server sends a response to the collection node for some reason).</p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <h1>Plots</h1>
 <p>The relationship between the Hedgehog plots and those produced by the DSC Presenter are listed here for convenience.</p>
@@ -61,7 +61,7 @@ dataset qtype_vs_client_subnet dns Qtype:qtype ClientSubnet:cip4_net queries-onl
 <tr>
 <th>Hedgehog plot category</th>
 <th colspan="1">Hedgehog plot display name</th>
-<th>DSC plot id</th>
+<th>DSC (and Hedgehog internal) plot id</th>
 <th>DSC display name</th></tr>
 <tr>
 <td colspan="1"><strong>Node Statistics</strong></td>
@@ -313,124 +313,184 @@ dataset qtype_vs_client_subnet dns Qtype:qtype ClientSubnet:cip4_net queries-onl
 <tbody>
 <tr>
 <th>Hedgehog plot category</th>
-<th>Hedgehog plot display name</th></tr>
+<th>Hedgehog plot display name</th>
+<th colspan="1"><span>Hedgehog internal plot id</span></th></tr>
 <tr>
 <td><strong>RSSAC</strong></td>
-<td>&nbsp;</td></tr>
+<td>&nbsp;</td>
+<td colspan="1">&nbsp;</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1"><span>RCODE volume</span></td></tr>
+<td colspan="1"><span>RCODE volume</span></td>
+<td colspan="1">rcode_volume</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Traffic sizes</td></tr>
+<td colspan="1">Traffic sizes</td>
+<td colspan="1">traffic_sizes</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Traffic volume</td></tr>
+<td colspan="1">Traffic volume</td>
+<td colspan="1">traffic_volume</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Traffic volume differences</td></tr>
+<td colspan="1">Traffic volume differences</td>
+<td colspan="1">traffic_volume_differences</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Unique sources</td></tr>
+<td colspan="1">Unique sources</td>
+<td colspan="1">unique_sources</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Zone size</td></tr>
+<td colspan="1">Zone size</td>
+<td colspan="1">zones_size</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Zone propagation time</td></tr></tbody></table>
+<td colspan="1">Zone propagation time</td>
+<td colspan="1">load_time</td></tr></tbody></table>
 <p>The following plots are new in 2.1</p>
 <table>
 <tbody>
 <tr>
 <th>Hedgehog plot category</th>
-<th>Hedgehog plot display name</th></tr>
+<th>Hedgehog plot display name</th>
+<th colspan="1"><span>Hedgehog internal plot id</span></th></tr>
 <tr>
 <td><strong>Node Statistics</strong></td>
-<td>&nbsp;</td></tr>
+<td>&nbsp;</td>
+<td colspan="1">&nbsp;</td></tr>
 <tr>
 <td>&nbsp;</td>
 <td>
-<p>By instance</p></td></tr>
+<p>By instance</p></td>
+<td colspan="1">by_instance</td></tr>
 <tr>
 <td>&nbsp;</td>
-<td>By server IP address</td></tr>
+<td>By server IP address</td>
+<td colspan="1">server_addr</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">By city</td></tr>
+<td colspan="1">By city</td>
+<td colspan="1">by_city</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">By country</td></tr>
+<td colspan="1">By country</td>
+<td colspan="1">by_country</td></tr>
 <tr>
 <td colspan="1"><strong>QTYPE vs TLS</strong></td>
+<td colspan="1">&nbsp;</td>
 <td colspan="1">&nbsp;</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">QTYPE for most popular Undelegated TLDs</td></tr>
+<td colspan="1">QTYPE for most popular Undelegated TLDs</td>
+<td colspan="1">qtype_vs_othertld</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">QTYPE for most popular ccTLDs</td></tr>
+<td colspan="1">QTYPE for most popular ccTLDs</td>
+<td colspan="1"><span>qtype_vs_cctld</span></td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">QTYPE for most popular Legacy TLDs</td></tr>
+<td colspan="1">QTYPE for most popular Legacy TLDs</td>
+<td colspan="1"><span>qtype_vs_legacytld</span></td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">QTYPE for most popular New TLDs</td></tr>
+<td colspan="1">QTYPE for most popular New TLDs</td>
+<td colspan="1"><span>qtype_vs_newtld</span></td></tr>
 <tr>
 <td colspan="1"><strong>Client Subnet Statistics</strong></td>
+<td colspan="1">&nbsp;</td>
 <td colspan="1">&nbsp;</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Busiest client ASNs &nbsp;</td></tr>
+<td colspan="1">Busiest client ASNs &nbsp;</td>
+<td colspan="1">asn</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Busiest client BGP prefix</td></tr>
+<td colspan="1">Busiest client BGP prefix</td>
+<td colspan="1">bgpprefix</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">RCODE by client ASNs &nbsp;</td></tr>
+<td colspan="1">RCODE by client ASNs &nbsp;</td>
+<td colspan="1">
+<p class="p1"><span class="s1">client_addr_vs_rcode_accum_asn</span></p></td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">RCODE by clients by BGP prefix&nbsp;</td></tr>
+<td colspan="1">RCODE by clients by BGP prefix&nbsp;</td>
+<td colspan="1">
+<p class="p1"><span class="s1">client_addr_vs_rcode_accum_bgpprefix</span></p></td></tr>
 <tr>
 <td colspan="1"><strong>Classification</strong></td>
+<td colspan="1">&nbsp;</td>
 <td colspan="1">&nbsp;</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Query classification by clients by BGP prefix</td></tr>
+<td colspan="1">Query classification by clients by BGP prefix</td>
+<td colspan="1">
+<p class="p1"><span class="s1">client_subnet2_accum_bgpprefix&nbsp;</span></p></td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Query classification by client ASNs</td></tr>
+<td colspan="1">Query classification by client ASNs</td>
+<td colspan="1">
+<p class="p1"><span class="s1">client_subnet2_accum_asn</span></p></td></tr>
 <tr>
 <td colspan="1"><strong>RSSAC</strong></td>
+<td colspan="1">&nbsp;</td>
 <td colspan="1">&nbsp;</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
 <td colspan="1">
-<p>Zone size</p></td></tr>
+<p>Zone size</p></td>
+<td colspan="1">zone_size</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Zone propagation time</td></tr>
+<td colspan="1">Zone propagation time</td>
+<td colspan="1">load_time</td></tr>
 <tr>
 <td colspan="1"><strong>GEO</strong></td>
+<td colspan="1">&nbsp;</td>
 <td colspan="1">&nbsp;</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Busiest client locations by country&nbsp;</td></tr>
+<td colspan="1">Busiest client locations by country&nbsp;</td>
+<td colspan="1">geochart</td></tr>
 <tr>
 <td colspan="1">&nbsp;</td>
-<td colspan="1">Busiest client locations by city</td></tr></tbody></table>
+<td colspan="1">Busiest client locations by city</td>
+<td colspan="1">geomap</td></tr></tbody></table>
 <p>The following plots are new in 2.2</p>
 <table>
 <tbody>
 <tr>
 <th>Hedgehog plot category</th>
-<th>Hedgehog plot display name</th></tr>
+<th>Hedgehog plot display name</th>
+<th colspan="1"><span>Hedgehog internal plot id</span></th></tr>
 <tr>
 <td><strong>Client Subnet Statistics</strong></td>
-<td>&nbsp;</td></tr>
+<td>&nbsp;</td>
+<td colspan="1">&nbsp;</td></tr>
 <tr>
 <td>&nbsp;</td>
 <td>
-<p>DNSKEY Queries by ASN</p></td></tr></tbody></table><ac:structured-macro ac:macro-id="f7a8bc07-2c7e-482e-850b-ad49fc4eae75" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p>DNSKEY Queries by ASN</p></td>
+<td colspan="1">
+<p class="p1"><span class="s1">dnskey_vs_asn</span></p></td></tr></tbody></table>
+<p>The following plots are new in 2.3</p>
+<table>
+<tbody>
+<tr>
+<th>Hedgehog plot category</th>
+<th>Hedgehog plot display name</th>
+<th colspan="1">Hedgehog internal plot id</th></tr>
+<tr>
+<td><strong>Node Statistics</strong></td>
+<td>&nbsp;</td>
+<td colspan="1">&nbsp;</td></tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<p>By region</p></td>
+<td colspan="1">
+<p class="p1"><span class="s1">by_region</span></p>
+<div><span class="s1"><br /></span></div></td></tr></tbody></table><ac:structured-macro ac:macro-id="f7a8bc07-2c7e-482e-850b-ad49fc4eae75" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
 <ul>
 <li><strong>RSSAC: Zone size and Zone propagation time graphs.</strong> In order for data to be available for these graphs, an instance of the <em>rssacd</em><span>&nbsp;demon&nbsp;must be run to collect the data (it is not provided by the DSC collector).</span></li>
 <li><strong>GEO: Busiest client location by country.</strong> Both client locations and collection node locations can be displayed on this graph. For node locations to be displayed the nodes must have a city specified via the nodes.csv file.</li></ul></ac:rich-text-body></ac:structured-macro>
