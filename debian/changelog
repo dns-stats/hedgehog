@@ -1,3 +1,43 @@
+hedgehog (2.3.0-1) trusty; urgency=medium
+
+  [ John Dickinson ]
+  * DSC-286 Alter the server address plot to only show the real server addresses
+  * DSC-286 corrected script name
+  * DSC-286add to database init
+  * DSC-286 fix file name
+  * DSC-286 updated api number in db.
+  * DSC-286 added service address update script
+  * DSC-286 fixed filename.
+  * DSC-286 increased version number and added the service address script to the control script
+  * DSC-286 explicit cast and new name for release
+  * DSC-286 Tidy up after code review.
+  * DSC-286 missed a couple
+  * DSC-286 typo
+
+  [ Sara Dickinson ]
+  * Improve help text and make delete do only a delete
+
+  [ John Dickinson ]
+  * Added by region and changed grouping
+
+  [ Sara Dickinson ]
+  * Fix DDL script number
+  * Fix a few bugs with the by region plot.
+
+  [ John Dickinson ]
+  * rssac v3 changes
+
+  [ Sara Dickinson ]
+  * Update rssac header to match v3 specs
+  * Minor enhancement to the datafiles_create_summary script
+  * Update maintainer info
+  * Add the new service_addr.csv file to the install
+  * Fix script name
+  * Update docs for 2.3.0 release
+  * Fix version error in docs
+
+ -- Sara Dickinson <sara@sinodun.com>  Thu, 13 Oct 2016 10:54:05 +0000
+
 hedgehog (2.2.0-1) trusty; urgency=medium
 
   [ John Dickinson ]
