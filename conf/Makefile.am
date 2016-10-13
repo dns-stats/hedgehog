@@ -22,4 +22,6 @@ install-data-hook:
 	${INSTALL_DATA} -m 644 hedgehog.yaml ${DESTDIR}${sysconfdir}/hedgehog.yaml.sample
 	test -f ${DESTDIR}${sysconfdir}/nodes.csv || \
 		${INSTALL_DATA} -m 644 $(srcdir)/nodes.csv ${DESTDIR}${sysconfdir}
+	test -f ${DESTDIR}${sysconfdir}/service_addr.csv || \
+		${INSTALL_DATA} -m 644 $(srcdir)/service_addr.csv ${DESTDIR}${sysconfdir}
 	${INSTALL_DATA} -m 644 $(srcdir)/nodes.csv ${DESTDIR}${sysconfdir}/nodes.csv.sample

@@ -666,7 +666,7 @@ generateYaml <- function(dsccon) {
   }
 
   # Now process the data from the data frame into yaml format
-    yaml_out <- list(service=server_service, 'start-period'=paste(GET$start, ":00Z", sep=""), 'end-period'=paste(GET$stop, ":59Z", sep=""), metric=metric)
+    yaml_out <- list('version'='rssac002v3', service=server_service, 'start-period'=paste(GET$start, ":00Z", sep=""), metric=metric)
 
     if (metric_data$statistics_type == "buckets") {
         de <- as.data.frame(cast(df, x ~ key, value='y', fun.aggregate=sum))  
@@ -788,7 +788,7 @@ initPlotOptions <- function() {
 
   formatother             <<- c("qtype_vs_tld", "qtype_vs_legacygtld", "qtype_vs_cctld", "qtype_vs_newgtld", "qtype_vs_othertld", "client_addr_vs_rcode_accum", "qtype_vs_qnamelen", 
                                 "rcode_vs_replylen", "rcode_vs_replylen_big", "client_subnet2_accum", "dns_ip_version_vs_qtype", "by_node", "by_instance", "by_city", "by_country",
-                                "load_time", "zone_size", "server_addr", "client_subnet_vs_tld")
+                                "load_time", "zone_size", "server_addr", "client_subnet_vs_tld", "by_region")
 
   rssac                   <<- c("traffic_volume", "traffic_sizes_small","traffic_sizes_big", "rcode_volume", "unique_sources", "traffic_volume_difference")
   
@@ -804,11 +804,11 @@ initPlotOptions <- function() {
   avgoverwindow           <<- c(format3, format3_bgpprefix, format3_asn, 'qtype_vs_tld', 'qtype_vs_legacygtld', 'qtype_vs_cctld', 'qtype_vs_newgtld', 'qtype_vs_othertld',
                                 'client_addr_vs_rcode_accum', 'client_subnet2_accum', 'dns_ip_version_vs_qtype', 'client_addr_vs_rcode_accum_asn', 'client_addr_vs_rcode_accum_bgpprefix',
                                 "client_subnet2_accum_asn", "client_subnet2_accum_bgpprefix", "client_subnet_vs_tld", "dnskey_vs_asn")
-  lineplots               <<- c(format1, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr")
+  lineplots               <<- c(format1, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr", "by_region")
   facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
   facetedlineplots        <<- c("traffic_volume")
   faceteddifflineplots    <<- c("traffic_volume_difference")
-  log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr")
+  log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr", "by_region")
 }
 
 # create plot file if not cached
