@@ -89,6 +89,26 @@ Usage: /usr/local/bin/hedgehog_database_update_nodes options
 Supported options:
   -d debug mode (set -x).
   -h Show this help.]]></ac:plain-text-body></ac:structured-macro>
+<h4>database_update_service_addr</h4>
+<ul>
+<li>Run this script to control which server addresses are displayed in the 'By server IP address' plot. This can be useful to filter to just the server service addresses since DSC does not have such a fitler.&nbsp;</li></ul><ac:structured-macro ac:macro-id="e88fc06e-c141-4890-89cb-321223aa31d4" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Update the Server service addreses list in the database.
+
+This list is only used to filter which addresses are displayed in the
+'By server IP address' plot. If there are any addresses in the list
+then only these addresses are displayed. If there are no entries 
+in the list then all the addresses for which there is data are displayed.
+By default this script reads the /opt/hedgehog/etc/hedgehog/service_addr.csv file and adds
+the addresses found there.
+After running this script it is advisable to remove any cached plots
+for the 'By server IP address' plot by using the plotcache_rm_cached_plots
+script.
+
+Usage: database_update_service_addr options
+
+Supported options:
+  -d Delete all existing entries in the server service address list
+  -h Show this help.]]></ac:plain-text-body></ac:structured-macro>
+<p>&nbsp;</p>
 <h4>database_update_tlds_from_zone</h4>
 <ul>
 <li>Run this script to update the categorisation of TLDs in the database from the root zone held in the IANA database.</li></ul><ac:structured-macro ac:macro-id="7ef95ada-9bd4-46b3-b66a-ba2cfbd01256" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[Update the TLD list in the database. This reads input from IANA ftp site

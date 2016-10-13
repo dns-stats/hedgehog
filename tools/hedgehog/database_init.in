@@ -133,6 +133,10 @@ echo "Running DDL scripts"
 @LIBEXEC@/DDL_updates/000012_ddl_lower_key_index -s
 # Add a dataset/plot  for dnskey_vs_asn
 @LIBEXEC@/DDL_updates/000013_ddl_dnskey_vs_asn
+# Add a service address table
+@LIBEXEC@/DDL_updates/000014_ddl_service_addr
+# Add by region
+@LIBEXEC@/DDL_updates/000015_ddl_byregion
 ###########################################################
 
 ###################  POPULATE TABLES  #####################
@@ -141,6 +145,7 @@ echo "Populate servers and nodes"
 @LIBEXEC@/database_update_tlds
 @LIBEXEC@/database_update_geoip
 @LIBEXEC@/database_update_nodes
+@LIBEXEC@/database_update_service_addr
 ###########################################################
 
 #############  PARTITION DATA TABLES  #####################
