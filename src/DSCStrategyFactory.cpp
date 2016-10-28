@@ -108,6 +108,12 @@ DSCStrategyFactory::createStrategy(const string &server, const string &name, boo
     //  End Format 1
 
     //  Format 2
+    } else if (name.compare("server_addr_vs_trans") == 0) {
+        string keys[3] = {"dummy"};
+        Format2DSCStrategy* strat = new Format2DSCStrategy(server, name,keys,0);
+        return_v.push_back( strat );
+        return return_v; 
+    
     } else if (name.compare("certain_qnames_vs_qtype") == 0) {
         string keys[11] = {"1", "2", "5", "6", "12", "15", "28", "33",
                                 "38", "255", "else"};
