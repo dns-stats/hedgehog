@@ -69,7 +69,7 @@ BEGIN;
 
 WITH rows AS (
   INSERT INTO visible_plot (name, display_category, display_name, title) 
-    VALUES ('server_addr_vs_trans','11.Server IP','server IP address by transport','Server IP address by transport') 
+    VALUES ('server_addr_vs_trans','11.Server IP','By server IP address and transport','Server IP address by transport') 
     RETURNING id
 ), rows2 AS (
   INSERT INTO dataset (name) VALUES ('server_addr_vs_trans')
