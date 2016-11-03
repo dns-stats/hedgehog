@@ -27,6 +27,7 @@ nobase_libexec_SCRIPTS = hedgehog/conf_read \
                          hedgehog/DDL_updates/000013_ddl_dnskey_vs_asn \
                          hedgehog/DDL_updates/000014_ddl_service_addr \
                          hedgehog/DDL_updates/000015_ddl_byregion \
+                         hedgehog/DDL_updates/000016_ddl_server_addr_vs_trans \
                          hedgehog/utility_prepare_GeoLite2-City-Blocks-IPvX \
                          hedgehog/utility_prepare_GeoLite2-City-Locations-en
 
@@ -144,6 +145,10 @@ hedgehog/DDL_updates/000014_ddl_service_addr: $(srcdir)/hedgehog/DDL_updates/000
 hedgehog/DDL_updates/000015_ddl_byregion: $(srcdir)/hedgehog/DDL_updates/000015_ddl_byregion.in Makefile
 	mkdir -p hedgehog/DDL_updates
 	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000015_ddl_byregion.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000015_ddl_byregion
+
+hedgehog/DDL_updates/000016_ddl_server_addr_vs_trans: $(srcdir)/hedgehog/DDL_updates/000016_ddl_server_addr_vs_trans.in Makefile
+	mkdir -p hedgehog/DDL_updates
+	$(subst_LIBEXECDATA) < $(srcdir)/hedgehog/DDL_updates/000016_ddl_server_addr_vs_trans.in | $(subst_DB_VERSION) > hedgehog/DDL_updates/000016_ddl_server_addr_vs_trans
 
 EXTRA_DIST = refile_and_grok.in \
              conf_read.in \
