@@ -26,9 +26,13 @@ USER GUIDE
 Read the User_Guide.pdf in the docs directory for the lastest version or look
 online: https://github.com/dns-stats/hedgehog/wiki/Documentation
 
-MANUAL INSTALLATION
+PACKAGES
+---------
+The latest Hedgehog packages are available from ppa:dns-stats/presenter
+
+SOURCE INSTALLATION
 ------------
-Read the Installation_Guide.pdf in the docs directory of the INSTALL file.
+This is no longer officially supported.
 
 VAGRANT INSTALLATION
 ------------
