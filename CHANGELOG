@@ -9,7 +9,7 @@
 Hedgehog 2.4.0rc1 - 2016-11-02
 ----------------------------
 * Add new graph for Server IP address vs transport (UDP/TCP)
-
+* Changed license to MPL
 
 Hedgehog 2.3.0 - 2016-09-12
 ----------------------------
