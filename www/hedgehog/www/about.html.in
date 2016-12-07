@@ -54,7 +54,7 @@ Developed by Sinodun IT (www.sinodun.com)
                     <a href="hedgehog.html">DNS-STATS:Hedgehog</a> is a visualisation tool for DNS statistics that consumes data acquired with the 
                     <a href="http://dns.measurement-factory.com/tools/dsc/">DSC</a> collector. <br/> Hedgehog was initially developed for 
                     <a href="http://www.icann.org/">ICANN</a> by <a href="http://sinodun.com/">Sinodun IT</a> and is now released open 
-                    source under the Apache License, version 2.0. For more information on the development and support of DNS-STATS:Hedgehog see 
+                    source under the Mozilla Public License, version 2.0. For more information on the development and support of DNS-STATS:Hedgehog see 
                     the <a href="http://dns-stats.org/">dns-stats</a> website.<br>
                     The DNS-STATS:Hedgehog software releases are named after <a href="https://en.wikipedia.org/wiki/Hedgehog#Genera_and_species">subspecies</a> of hedgehogs.
                 <hr />
