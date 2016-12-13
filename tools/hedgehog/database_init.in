@@ -130,6 +130,8 @@ echo "Running DDL scripts"
 @LIBEXEC@/DDL_updates/000015_ddl_byregion
 # Add server_addr_vs_transport
 @LIBEXEC@/DDL_updates/000016_ddl_server_addr_vs_trans
+# Remove node from web interface
+@LIBEXEC@/DDL_updates/000017_ddl_node_stats
 ###########################################################
 
 ###################  POPULATE TABLES  #####################

@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+# Copyright 2015, 2016 Internet Corporation for Assigned Names and Numbers.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, you can obtain one at https://mozilla.org/MPL/2.0/.
+
+#
+# Developed by Sinodun IT (www.sinodun.com)
+#
+
+# 
+# File:   000017_ddl_node_stats
+#
+
+
+NEW_DDL_SERIAL=17
+REQUIRED_DDL_SERIAL=$(( $NEW_DDL_SERIAL - 1 ))
+NEW_API_VERSION=14
+REQUIRED_API_VERSION=$(( $NEW_API_VERSION - 1 ))
+
+DSC_SCHEMA="dsc"
+
+usage () {
+    echo
+    echo "Usage: $(basename $0) options"
+    echo
+    echo "Supported options:"
+    echo "  -h Show this help."
+    exit 1
+}
+
+
+while getopts ":h" opt; do
+    case $opt in
+        h  ) usage ;;
+        \? ) usage ;;
+    esac
+done
+
+# Need a write user to update DB
+echo "`date`: $0 COMMENCED"
+a=$(@LIBEXEC@/check_user_perms -w -C $REQUIRED_API_VERSION -s $REQUIRED_DDL_SERIAL)
+if [ $? -ne 0 ] ; then
+  echo $a
+  exit 1
+fi
+eval $a
+export PGPASSWORD=$PGPASSWORD
+
+echo "Starting"
+psql $CONN_STRING <<EOF
+BEGIN;
+UPDATE visible_plot set display_category='1.Query Statistics' 
+  WHERE display_category='1.Node Statistics';
+COMMIT;
+EOF
+
+echo "`date`: $0 COMPLETED"
