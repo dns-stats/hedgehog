@@ -29,10 +29,16 @@
 # node-ip       - The management IP address of the node (IPv4 or IPv6)
 #                 It is optional and if not specified is left blank. This is 
 #                 required if RSSAC load-time/zone-size data is to be collected.
+# old-name      - This field indicates that there is either a new name for this
+#                 node in the node-name field or if old-name == delete then
+#                 it indicates that this node and all associated data should be
+#                 deleted. If old-name == node-name or if old-name is not 
+#                 present no action related to name change or deletion is taken.
+#                 
 #
 # Example input: (uncomment the following)
 #
-#Server-A,Node-1,Region-1,Country-1,City-1,Instance-1,10.0.0.2
+#Server-A,Node-1,Region-1,Country-1,City-1,Instance-1,10.0.0.2,Node-a
 #Server-A,Node-2,Region-1,Country-1,City-2,Instance-2,
 #Server-A,Node-3,Region-1,Country-2,City-3,Instance-3,
 #Server-A,Node-4,Region-1,Country-2,City-3,Instance-3,
