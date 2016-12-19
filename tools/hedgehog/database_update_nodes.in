@@ -209,9 +209,15 @@ while read line || [[ -n "$line" ]]; do
 		NODE_ID=$(psql $CONN_STRING -tc "select id from dsc.node where server_id=$SERVER_ID and name='${aNODES["old_name"]}'")
 		if [ "${aNODES["old_name"]}" == "delete" ] ; then
 			NODE_ID=$(psql $CONN_STRING -tc "select id from dsc.node where server_id=$SERVER_ID and name='${aNODES["node_name"]}'")
-			psql $CONN_STRING -c "BEGIN; DELETE FROM dsc.data where node_id = ${NODE_ID}; DELETE FROM node where id = ${NODE_ID}; COMMIT;"
-			((NODES_DELETED++))
-			continue
+			if [ -n "$NODE_ID" ] ; then
+				psql $CONN_STRING -c "BEGIN; DELETE FROM dsc.data where node_id = ${NODE_ID}; DELETE FROM node where id = ${NODE_ID}; COMMIT;"
+				((NODES_DELETED++))
+				continue
+			else
+				echo "***ERROR***:  Line $i, The node called ${aNODES["node_name"]} could not be found"
+				((NODES_ERRORS++))
+				continue
+			fi
 		elif [ -z "$NODE_ID" ] ; then
 			echo "***ERROR***:  Line $i, The node called ${aNODES["old_name"]} could not be found"
 			((NODES_ERRORS++))
