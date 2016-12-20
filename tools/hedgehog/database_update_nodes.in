@@ -31,17 +31,17 @@ eval $a
 export PGPASSWORD=$PGPASSWORD
 
 usage () {
-        echo
-        echo "Add/update the servers and nodes in the database. This reads input from file"
-        echo "called nodes.csv in the $hhconfig_directories_conf directory."
-        echo " - An example nodes.csv file is installed if one does not exist."
-        echo " - See the comments in that file for details of the format."
-        echo " - No action is taken on servers/nodes that are in the database but are not in the input files."
-        echo 
+    echo
+    echo "Add/update the servers and nodes in the database. This reads input from file"
+    echo "called nodes.csv in the $hhconfig_directories_conf directory."
+    echo " - An example nodes.csv file is installed if one does not exist."
+    echo " - See the comments in that file for details of the format."
+    echo " - No action is taken on servers/nodes that are in the database but are not in the input files."
+    echo 
     echo "Usage: $(basename $0) options"
     echo
     echo "Supported options:"
-    echo "  -r rename or remove flag. This enables processing of the old-name field in nodes.csv"
+    echo "  -r rename or remove flag. This enables processing of the rename_or_remove field in nodes.csv"
     echo "  -d debug mode (set -x)."
     echo "  -h Show this help."
 }
@@ -110,7 +110,7 @@ NODES_UPDATED=0
 NODES_ADDED=0
 NODES_ERRORS=0
 NODES_RENAMED=0
-NODES_DELETED=0
+NODES_REMOVED=0
 echo
 echo "PROCESSING:   SERVER, NODE, GROUP, COUNTRY, CITY, INSTANCE, IP ADDRESS, OLD NAME"
 # Read nodes.csv
@@ -172,19 +172,19 @@ while read line || [[ -n "$line" ]]; do
 		continue
 	fi
 	set +f
-	if [ -n "${aNODES["old_name"]}" ] ; then
-		if [ ${aNODES["node_ip"]} == "null" ] ; then
-			echo "PROCESSING:   ${aNODES["server_name"]}, ${aNODES["node_name"]}, ${aNODES["node_region"]}, ${aNODES["node_country"]}, ${aNODES["node_city"]}, ${aNODES["node_subgroup"]},, ${aNODES["old_name"]}"
-		else
-			echo "PROCESSING:   ${aNODES["server_name"]}, ${aNODES["node_name"]}, ${aNODES["node_region"]}, ${aNODES["node_country"]}, ${aNODES["node_city"]}, ${aNODES["node_subgroup"]}, ${aNODES["node_ip"]}, ${aNODES["old_name"]}"
-		fi
+	
+	echo -n "PROCESSING:   ${aNODES["server_name"]}, ${aNODES["node_name"]}, ${aNODES["node_region"]}, ${aNODES["node_country"]}, ${aNODES["node_city"]}, ${aNODES["node_subgroup"]}"
+	if [ ${aNODES["node_ip"]} != "null" ] ; then
+		echo -n ", ${aNODES["node_ip"]}"
 	else
-		if [ ${aNODES["node_ip"]} == "null" ] ; then
-			echo "PROCESSING:   ${aNODES["server_name"]}, ${aNODES["node_name"]}, ${aNODES["node_region"]}, ${aNODES["node_country"]}, ${aNODES["node_city"]}, ${aNODES["node_subgroup"]},"
-		else
-			echo "PROCESSING:   ${aNODES["server_name"]}, ${aNODES["node_name"]}, ${aNODES["node_region"]}, ${aNODES["node_country"]}, ${aNODES["node_city"]}, ${aNODES["node_subgroup"]}, ${aNODES["node_ip"]}"
-		fi
+		echo -n ","
 	fi
+	if [ -n "${aNODES["old_name"]}" ] ; then
+		echo ", ${aNODES["old_name"]}"
+	else
+		echo ","
+	fi
+	
 	SERVER_ID=$(psql $CONN_STRING -tc "select id from server where display_name='${aNODES["server_name"]}'")
 	if [ -z "$SERVER_ID" ]; then
 		# lower case
@@ -205,13 +205,14 @@ while read line || [[ -n "$line" ]]; do
 		echo "ADDED SERVER: ${aNODES["server_name"]}"
 		((NEW_SERVER++))
 	fi
+	
 	if [ $RENAME -eq 1 ] && [ -n "${aNODES["old_name"]}" ] ; then
 		NODE_ID=$(psql $CONN_STRING -tc "select id from dsc.node where server_id=$SERVER_ID and name='${aNODES["old_name"]}'")
-		if [ "${aNODES["old_name"]}" == "delete" ] ; then
+		if [ "${aNODES["old_name"]}" == "remove" ] ; then
 			NODE_ID=$(psql $CONN_STRING -tc "select id from dsc.node where server_id=$SERVER_ID and name='${aNODES["node_name"]}'")
 			if [ -n "$NODE_ID" ] ; then
 				psql $CONN_STRING -c "BEGIN; DELETE FROM dsc.data where node_id = ${NODE_ID}; DELETE FROM node where id = ${NODE_ID}; COMMIT;"
-				((NODES_DELETED++))
+				((NODES_REMOVED++))
 				continue
 			else
 				echo "***ERROR***:  Line $i, The node called ${aNODES["node_name"]} could not be found"
@@ -254,7 +255,7 @@ done < ${NODES_FILE}
 	echo " - Nodes added      : $NODES_ADDED"
 	echo " - Nodes updated    : $NODES_UPDATED"
 	echo " - Nodes renamed    : $NODES_RENAMED"
-	echo " - Nodes deleted    : $NODES_DELETED"
+	echo " - Nodes removed    : $NODES_REMOVED"
 	echo " - Nodes with errors: $NODES_ERRORS"
 	echo
 
