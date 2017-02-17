@@ -245,7 +245,11 @@ while read line || [[ -n "$line" ]]; do
 		((NODES_UPDATED++))
 	fi
 	if [ $RENAME -eq 1 ] && [ -n "${aNODES["old_name"]}" ] ; then
-		mv $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]} $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}
+		if [ ! -d $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]} ]; then
+			echo "Error: Unable to rename $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]}."
+		else
+			mv $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]} $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}
+		fi
 	else
 		mkdir -p $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}/incoming
 		chmod 775 $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}/incoming
