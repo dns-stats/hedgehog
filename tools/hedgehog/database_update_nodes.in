@@ -42,6 +42,10 @@ usage () {
     echo
     echo "Supported options:"
     echo "  -r rename or remove flag. This enables processing of the rename_or_remove field in nodes.csv"
+	echo "                            Renaming will update the database and move the data directory to "
+	echo "                            the new name. If you are using remove then it will delete all"
+	echo "                            associated data in the database. Removing could take a long time"
+	echo "                            if you have a lot of data."
     echo "  -d debug mode (set -x)."
     echo "  -h Show this help."
 }
@@ -244,11 +248,25 @@ while read line || [[ -n "$line" ]]; do
 		echo "UPDATED NODE: ${aNODES["server_name"]}, ${aNODES["node_name"]}"
 		((NODES_UPDATED++))
 	fi
-	if [ $RENAME -eq 1 ] && [ -n "${aNODES["old_name"]}" ] ; then
-		if [ ! -d $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]} ]; then
-			echo "Error: Unable to rename $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]}."
+	if [ $RENAME -eq 1 ] && [ -n "${aNODES["old_name"]}" ] && [ "${aNODES["old_name"]}" != "remove" ] ; then
+		if [ ! -d $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]} ] ; then
+			echo "Error: Unable to find $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]}."
+			((NODES_ERRORS++))
+			error="yes"
+			break
+		elif [ -d $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]} ] ; then
+			echo "Error: New directory $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]} already exists."
+			((NODES_ERRORS++))
+			error="yes"
+			break
 		else
-			mv $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]} $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}
+			mv -vT $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]} $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}
+			if [ $? -ne 0 ] ; then
+				echo "Error: Failed to move $DATA_DIR/${aNODES["server_name"]}/${aNODES["old_name"]}."
+				((NODES_ERRORS++))
+				error="yes"
+				break
+			fi
 		fi
 	else
 		mkdir -p $DATA_DIR/${aNODES["server_name"]}/${aNODES["node_name"]}/incoming
