@@ -64,6 +64,13 @@ initPlotDDHtml <- function() {
 		optgroup_html <- sub(".*\\.","",df[i,1])
 		%><optgroup label="<%=optgroup_html%>"><%
 		for (i in 1:nrow(df2)) {
+                if (! is.null(gui_config$www$enable_node_selection)) {
+                        if ((gui_config$www$enable_node_selection == 0) && (df2[i,2] == "By node")) {
+                                next
+                        }
+                } else {
+                        system('logger -p user.warning Hedgehog: Missing enable_node_selection in config file. Using 1 enabled.')
+                }
 			%><option value="<%=df2[i,1]%>"><%=df2[i,2]%></option><%
 		}
 		%></optgroup><%
@@ -195,6 +202,18 @@ getDefaultPlotId <- function() {
 	%><%=as.integer(defaultpltid[1])%><%
 }
 
+getEnableNodeSelection <- function() {
+        if (hh_debug) {
+            system('logger -p user.notice Hedgehog: In getEnableNodeSelection')
+        }
+        ens <- gui_config$www$enable_node_selection
+        if (is.null(ens)) {
+                system('logger -p user.warning Hedgehog: Missing enable_node_selection in config file. Using 1 enabled.')
+                ens <- 1
+        }
+        %><%=ens%><%
+}
+
 getDefaultGrouping <- function() {
 	
 	if (hh_debug) {
@@ -213,8 +232,8 @@ getDefaultGrouping <- function() {
 	else if (grouping == "country")  {%>country<%} 
 	else if (grouping == "none")     {%>none<%}
 	else {
-		system('logger -p user.warning Hedgehog: Unsupported Node Grouping present in config file. Using None.')
-		%>none<%
+		system('logger -p user.warning Hedgehog: Unsupported Node Grouping present in config file. Using Instance.')
+		%>instance<%
 	}
 	return(TRUE)
 }
@@ -441,7 +460,8 @@ if (class(dsccon) != "try-error") {
 		getDefaultGrouping = {getDefaultGrouping()},
 		getSupportURL      = {getSupportURL()},
 		generatePlot       = {generatePlot()},
-		generateYaml       = {generateYaml(dsccon)}
+		generateYaml       = {generateYaml(dsccon)},
+                getEnableNodeSelection = {getEnableNodeSelection()}
 	)
 	dbDisconnect(dsccon)
 } else {

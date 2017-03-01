@@ -29,5 +29,5 @@ www:
   default_server                :             # Optionally specify the default server to use in the server
                                               # drop-down (default is first alphabetically)
   default_plot_name             : by_region   # default plot name (See Hedgehog internal plot name in the user guide)
-
+  enable_node_selection         : 1           # Show or hide the node radio button in the "Group nodes by" sectin of the web interface
 ...

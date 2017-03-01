@@ -38,7 +38,7 @@ $(document).ready(function() {
     // , brew("initnodeslist"),
     $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), 
            brew("getDefaultServer"), brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), 
-           brew("getSupportURL")).done(function(db,rp, pt, ss, ds, nd, dg, dp, su){
+           brew("getSupportURL"), brew("getEnableNodeSelection")).done(function(db,rp, pt, ss, ds, nd, dg, dp, su, ns){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -83,7 +83,7 @@ $(document).ready(function() {
         }
 
         // initialise node tabs and grouping
-        initNodeHtml(nd[0]);
+        initNodeHtml(nd[0], ns[0]);
         $('#ng_' + dg[0]).prop('checked', true);
 
         setServersGroups();
