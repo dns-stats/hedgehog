@@ -38,3 +38,7 @@ KNOWN ISSUES/LIMITATIONS:
 * Server, node and group and instance names may only contain alphanumeric 
   characters, full stops (.) and hyphens (-). Country and city names can
   only contain alphanumeric characters, spaces and hyphens (-)
+  
+* The Busiest client locations by city plot does't support passing the required
+  API key to the script element - see
+  https://developers.google.com/maps/documentation/javascript/error-messages#missing-key-map-error
