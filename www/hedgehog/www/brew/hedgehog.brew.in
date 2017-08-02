@@ -461,7 +461,7 @@ if (class(dsccon) != "try-error") {
 		getSupportURL      = {getSupportURL()},
 		generatePlot       = {generatePlot()},
 		generateYaml       = {generateYaml(dsccon)},
-                getEnableNodeSelection = {getEnableNodeSelection()}
+		getEnableNodeSelection = {getEnableNodeSelection()}
 	)
 	dbDisconnect(dsccon)
 } else {
