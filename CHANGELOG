@@ -8,6 +8,7 @@
 
 Hedgehog 2.4.0rc3 - 2016-11-02
 ----------------------------
+* Improved error handling when trying to insert invalid data into db 
 * renamed Node Statistics to Query Statistics in plot dropdown
 * new configuration option to hide node selection on web interface
 * Add new graph for Server IP address vs transport (UDP/TCP)
