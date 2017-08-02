@@ -173,7 +173,7 @@ Format4DSCStrategy::write_db(const DSCUMap &old_dscdata, string dtime[], int ser
         catch( runtime_error & e )
         {
             cerr << "Format 4 write_db Runtime error: " << e.what() << endl;
-            exit( EXIT_FAILURE );
+            return 1;
         }
         catch( std::exception & e )
         {
@@ -347,7 +347,7 @@ Format4DSCStrategy::write_db(const DSCUMap &old_dscdata, string dtime[], int ser
             catch( runtime_error & e )
             {
                 cerr << "Format 4 write_db Runtime error: " << e.what() << endl;
-                exit( EXIT_FAILURE );
+                return 1;
             }
             catch( std::exception & e )
             {

@@ -151,7 +151,7 @@ Format3bDSCStrategy::write_db(const DSCUMap &old_dscdata, string dtime[], int se
         catch( runtime_error & e )
         {
             cerr << "Format 3b write_db runtime error: " << e.what() << endl;
-            exit( EXIT_FAILURE );
+            return 1;
         }
         catch( std::exception & e )
         {

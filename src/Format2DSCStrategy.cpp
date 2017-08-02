@@ -189,7 +189,7 @@ Format2DSCStrategy::write_db(const DSCUMap &my_dscdata, string dtime[], int serv
     catch( runtime_error & e )
     {
         cerr << "Format 2 runtime error: " << e.what() << endl;
-        exit( EXIT_FAILURE );
+        return 1;
     }
     catch( std::exception & e )
     {

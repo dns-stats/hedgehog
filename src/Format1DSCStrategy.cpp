@@ -161,7 +161,7 @@ Format1DSCStrategy::write_db(const DSCUMap &my_dscdata, string dtime[], int serv
     catch( runtime_error & e )
     {
         cerr << "Format 1 runtime error: " << e.what() << endl;
-        exit( EXIT_FAILURE );
+        return 1;
     }
     catch( std::exception & e )
     {
