@@ -29,14 +29,15 @@
 # node-ip       - The management IP address of the node (IPv4 or IPv6)
 #                 It is optional and if not specified is left blank. This is 
 #                 required if RSSAC load-time/zone-size data is to be collected.
-# rename_or_remove - This field is used to either rename or remove a node. It 
+# rename-or-remove - This field is used to either rename or remove a node. It 
 #                    is optional. It is only honored if the -r flag is set and
-#                    must be empty if the -r flag is not used. If this field 
-#                    contains the name of an existing node and the node_name 
-#                    contains a different name then the node is renamed. If this
-#                    field contains "remove" then the node and all associated 
-#                    data is removed from the database.
-#                 
+#                    must be empty if the -r flag is not used. 
+#                    If this field contains the name of an existing node and the
+#                    node-name contains a different name then the node is
+#                    renamed. 
+#                    If this field contains "remove" then the node and all 
+#                    associated data is removed from the database. Data on disk
+#                    is not touched.
 #
 # Example input: (uncomment the following)
 #
@@ -45,7 +46,7 @@
 #Server-A,Node-3,Region-1,Country-2,City-3,Instance-3,
 #Server-A,Node-4,Region-1,Country-2,City-3,Instance-3,
 #Server-A,Node-5,Region-2,Country-3,City-4,Instance-4,
-#Server-A,Node-6,Region-2,Country-3,City-4,Instance-4,
+#Server-A,Node-6,Region-2,Country-3,City-4,Instance-4,, remove
 #Server-A,Node-7,Region-3,Country-3,City-4,Instance-5,10.0.0.3
 #Server-B,Node-1,Region-1,Country-4,,,
 #Server-B,Node-2,Region-2,,,Instance-6,
