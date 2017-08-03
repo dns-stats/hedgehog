@@ -6,15 +6,16 @@
 # file, you can obtain one at https://mozilla.org/MPL/2.0/.
 #
 
-Hedgehog 2.4.0rc3 - 2016-11-02
+Hedgehog 2.4.0 - 2017-08-4
 ----------------------------
 * Improved error handling when trying to insert invalid data into db 
-* renamed Node Statistics to Query Statistics in plot dropdown
-* new configuration option to hide node selection on web interface
+* Renamed Node Statistics to Query Statistics in plot dropdown
+* New configuration option to hide 'node' selection on web interface
 * Add new graph for Server IP address vs transport (UDP/TCP)
 * Changed license to MPL
 * Added ability to re-name and remove nodes
 * Tested with Postgesql-9.6
+
 
 Hedgehog 2.3.0 - 2016-09-12
 ----------------------------
