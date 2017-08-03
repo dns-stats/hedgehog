@@ -1,32 +1,38 @@
 
-<p>&nbsp;</p>
+<p><br /></p>
 <p>This document describes how to upgrade a server from release 2.3.0 to release 2.4.0 of Hedgehog via packages.&nbsp;</p>
-<p>&nbsp;</p>
-<p><ac:structured-macro ac:macro-id="84a2de1f-81fa-4598-a6ba-e2a7a9ab554b" ac:name="toc" ac:schema-version="1"><ac:parameter ac:name="style">none</ac:parameter></ac:structured-macro></p>
-<p>&nbsp;</p>
+<p><br /></p>
+<p><ac:structured-macro ac:name="toc" ac:schema-version="1" ac:macro-id="84a2de1f-81fa-4598-a6ba-e2a7a9ab554b"><ac:parameter ac:name="style">none</ac:parameter></ac:structured-macro></p>
+<p><br /></p>
 <p><strong><span style="line-height: 1.5625;">Back up the old installation</span></strong></p>
 <p><span style="line-height: 1.5625;">If desired, back up the existing installation (the directory structure in the User Guide is a useful reference) and database.&nbsp;</span></p>
 <h2><span style="line-height: 1.5625;">1. Pre-installation</span></h2>
 <h3>1.2 Cron jobs</h3>
-<p>Stop refile and grok cron job running:</p><ac:structured-macro ac:macro-id="08a576ef-79c7-41f7-aa6b-ac1e1d695865" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u hedgeghog crontab -e
+<p>Stop refile and grok cron job running:</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="08a576ef-79c7-41f7-aa6b-ac1e1d695865"><ac:plain-text-body><![CDATA[sudo -u hedgehog crontab -e
 # Import XML data every 15 mins
 # 00,15,30,45 * * * * <prefix>/bin/refile_and_grok.sh -c >> /var/log/hedgehog/refile_and_grok_xml_to_db.sh.log 2>&1]]></ac:plain-text-body></ac:structured-macro>
 <p>Comment out any other jobs that are about to run. If the dsc-extractor process is running wait for it to finish before continuing.</p>
 <h3>1.3 Disable web front end</h3>
 <p>It is recommended to disable the web front end during upgrade e.g by enabling a holding page.</p>
-<h2>2. Upgrade of Packages</h2><ac:structured-macro ac:macro-id="4b63d758-f1de-456d-adf6-7a76caeca497" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo apt-get update
+<h2>2. Upgrade of Packages</h2><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="4b63d758-f1de-456d-adf6-7a76caeca497"><ac:plain-text-body><![CDATA[sudo apt-get update
 sudo apt-get upgrade]]></ac:plain-text-body></ac:structured-macro>
 <h3><br />2.2 Run DDL scripts</h3>
-<p>Manually run the following script:</p><ac:structured-macro ac:macro-id="18ecd7c1-7bde-49e1-a123-44f003ec8e50" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u hedgehog /usr/lib/hedgehog/DDL_updates/000016_ddl_server_addr_vs_trans]]></ac:plain-text-body></ac:structured-macro>
+<p>Manually run the following script:</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="18ecd7c1-7bde-49e1-a123-44f003ec8e50"><ac:plain-text-body><![CDATA[sudo -u hedgehog /usr/lib/hedgehog/DDL_updates/000016_ddl_server_addr_vs_trans
+sudo -u hedgehog /usr/lib/hedgehog/DDL_updates/000017_ddl_node_stats]]></ac:plain-text-body></ac:structured-macro>
 <h3>2.3 Run the manage_partitions script for this month and next month</h3>
-<p><span style="color: rgb(0,0,0);">Setup the database partitions for the new dataset. Do this for the current month and for next month.&nbsp;</span></p><ac:structured-macro ac:macro-id="23a95852-d22c-4364-9655-299ee04dab2b" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u hedgehog hedgehogctl database_manage_partitions -m <YYY-MM>]]></ac:plain-text-body></ac:structured-macro>
-<p>Once this script has been run then add the new dataset to the dsc.conf file if desired:</p><ac:structured-macro ac:macro-id="05362c67-5316-422e-9adb-2c614dc6c7dd" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[dataset server_addr_vs_trans dns Transport:transport ServerAddr:server queries-only;]]></ac:plain-text-body></ac:structured-macro>
-<h2><br />3. Post-install</h2>
+<p><span style="color: rgb(0,0,0);">Setup the database partitions for the new dataset. Do this for the current month and for next month.&nbsp;</span></p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="23a95852-d22c-4364-9655-299ee04dab2b"><ac:plain-text-body><![CDATA[sudo -u hedgehog hedgehogctl database_manage_partitions -m <YYYY-MM>]]></ac:plain-text-body></ac:structured-macro>
+<p>Once this script has been run then add the new dataset to the dsc.conf file if desired:</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="05362c67-5316-422e-9adb-2c614dc6c7dd"><ac:plain-text-body><![CDATA[dataset server_addr_vs_trans dns Transport:transport ServerAddr:server queries-only;]]></ac:plain-text-body></ac:structured-macro>
+<h3>2.4 Review hedgehog_gui.yaml</h3>
+<p>There is a new configuration option available in the hedgehog_gui.yaml file in 2.4</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="2ee659f6-198a-4dd7-96b5-e767a9148ef0"><ac:plain-text-body><![CDATA[  enable_node_selection         : 1           # '1' -> true, Show the node radio button
+                                              # '0' -> false, hide the node radio button]]></ac:plain-text-body></ac:structured-macro>
+<h3>2.5 Update to nodes.csv</h3>
+<p>In 2.4 there is a new (optional) field introduced into nodes.csv 'rename-or-remove'. This enables nodes to either be renamed (also updating the data directory on disk) or removed from the database (data on disk is left untouched). For more information see the usage of the <em>database_update_nodes</em> script and the latest <em>nodes.csv</em> file.</p>
+<h2>3. Post-install</h2>
 <h3>4.1 Test web front end</h3>
-<p>Re-enable and test the web front end. Make sure to restart apache.</p><ac:structured-macro ac:macro-id="add1086e-e973-4e29-b437-dfbd969e203a" ac:name="code" ac:schema-version="1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[sudo service apache2 reload]]></ac:plain-text-body></ac:structured-macro>
+<p>Re-enable and test the web front end. Make sure to restart apache.</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="add1086e-e973-4e29-b437-dfbd969e203a"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[sudo service apache2 reload]]></ac:plain-text-body></ac:structured-macro>
 <h3>3.2 Re-enable cron jobs&nbsp;</h3>
-<p>Restart refile and grok cron job running:</p><ac:structured-macro ac:macro-id="f6849b42-4b08-4fe5-81ed-86ee9f4f597c" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[sudo -u hedgehog crontab -e
+<p>Restart refile and grok cron job running:</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="f6849b42-4b08-4fe5-81ed-86ee9f4f597c"><ac:plain-text-body><![CDATA[sudo -u hedgehog crontab -e
 # Import XML data every 15 mins
 00,15,30,45 * * * * /usr/bin/refile_and_grok -c >> /var/log/hedgehog/refile_and_grok_xml_to_db.log 2>&1]]></ac:plain-text-body></ac:structured-macro>
 <p>Re-enable any other jobs that were disabled for the upgrade.&nbsp;</p>
-<p>&nbsp;</p>
+<p><br /></p>
