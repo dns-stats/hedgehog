@@ -6,7 +6,7 @@
 # file, you can obtain one at https://mozilla.org/MPL/2.0/.
 #
 
-Hedgehog 2.4.0 - 2017-08-4
+Hedgehog 2.4.0 - 2017-08-21
 ----------------------------
 * Improved error handling when trying to insert invalid data into db 
 * Renamed Node Statistics to Query Statistics in plot dropdown
