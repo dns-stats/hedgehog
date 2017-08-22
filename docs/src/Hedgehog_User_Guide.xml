@@ -1,8 +1,8 @@
 
-<p><ac:structured-macro ac:macro-id="a93a02e9-93ad-4b13-b26a-5c1cb6b996ce" ac:name="toc" ac:schema-version="1" /></p>
+<p><ac:structured-macro ac:name="toc" ac:schema-version="1" ac:macro-id="a93a02e9-93ad-4b13-b26a-5c1cb6b996ce" /></p>
 <h1>Overview of Hedgehog</h1>
 <p>Hedgehog is a visualisation tool for DNS statistics that consumes data&nbsp;acquired with the DSC collector.</p>
-<p>Hedgehog was initially developed for ICANN by Sinodun IT and is now released&nbsp;open source under the Apache License, version 2.0. For more information on the development and support of Hedgehog see the <a href="http://www.dns-stats.org">http://www.dns-stats.org</a>&nbsp;website.</p>
+<p>Hedgehog was initially developed for ICANN by Sinodun IT and is now released&nbsp;open source under the MPL License. For more information on the development and support of Hedgehog see the <a href="http://www.dns-stats.org">http://www.dns-stats.org</a>&nbsp;website.</p>
 <h1>Components</h1>
 <p>Hedgehog comprises 3 components which can be run on the same or different machines:</p>
 <ul>
@@ -21,10 +21,10 @@
 <p>From 2.2 packages for Ubuntu are provided for Hedgehog. It is recommended to use this method for new installs.</p>
 <h3>Install from Source Code</h3>
 <p>Hedgehog can also be installed directly from source code if desired - note: this is not a supported method.</p>
-<h1>Datasets</h1><ac:structured-macro ac:macro-id="1dccef1c-27f8-4b28-84b4-ca7010c69dc6" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<h1>Datasets</h1><ac:structured-macro ac:name="info" ac:schema-version="1" ac:macro-id="1dccef1c-27f8-4b28-84b4-ca7010c69dc6"><ac:rich-text-body>
 <p>Hedgehog is currently tested against the output of the original DSC collector. It has not been tested against the recently released DSC 2.0.</p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
-<p>An example dsc.conf file for the data sets that Hedgehog supports is given below:</p><ac:structured-macro ac:macro-id="4b93a047-e94d-4b6b-a945-fb6e5ec2414a" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# Basic data sets
+<p>An example dsc.conf file for the data sets that Hedgehog supports is given below:</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="4b93a047-e94d-4b6b-a945-fb6e5ec2414a"><ac:plain-text-body><![CDATA[# Basic data sets
 dataset qtype dns All:null Qtype:qtype queries-only;
 dataset rcode dns All:null Rcode:rcode replies-only;
 dataset opcode dns All:null Opcode:opcode queries-only;
@@ -43,16 +43,20 @@ dataset rd_bit dns All:null RD:rd_bit queries-only;
 dataset ipv6_rsn_abusers dns All:null ClientAddr:client queries-only,aaaa-or-a6-only,root-servers-net-only max-cells=50;
 dataset transport_vs_qtype dns Transport:transport Qtype:qtype queries-only;
 dataset direction_vs_ipproto ip Direction:ip_direction IPProto:ip_proto any;
-dataset dns_ip_version_vs_qtype dns IPVersion:dns_ip_version Qtype:qtype queries-only;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="eb6a3061-2017-49ee-aad8-6b96ad729e08" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# Additional data sets for RSSAC
+dataset dns_ip_version_vs_qtype dns IPVersion:dns_ip_version Qtype:qtype queries-only;]]></ac:plain-text-body></ac:structured-macro>
+<p class="auto-cursor-target"><br /></p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="eb6a3061-2017-49ee-aad8-6b96ad729e08"><ac:plain-text-body><![CDATA[# Additional data sets for RSSAC
 dataset unique_sources dns IPVersion:dns_ip_version ClientAddr:client queries-only; 
 dataset traffic_volume_queries dns Transport:transport IPVersion:dns_ip_version queries-only; 
 dataset traffic_volume_responses dns Transport:transport IPVersion:dns_ip_version replies-only; 
 dataset traffic_sizes_queries dns Transport:transport MsgLen:msglen queries-only; 
-dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-only; ]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="4eaba3e3-a548-4198-89ac-4dfc069be91f" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# New in 2.1
+dataset traffic_sizes_responses dns Transport:transport MsgLen:msglen replies-only; ]]></ac:plain-text-body></ac:structured-macro>
+<p class="auto-cursor-target"><br /></p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="4eaba3e3-a548-4198-89ac-4dfc069be91f"><ac:plain-text-body><![CDATA[# New in 2.1
 dataset server_addr dns All:null ServerAddr:server queries-only;
 # New in 2.2.0
-dataset qtype_vs_client_subnet dns Qtype:qtype ClientSubnet:cip4_net queries-only max-cells=200;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="7fd11eb1-b417-4b2a-8095-555c12a64e33" ac:name="code" ac:schema-version="1"><ac:plain-text-body><![CDATA[# New in 2.4.0
-dataset server_addr_vs_trans dns Transport:transport ServerAddr:server queries-only;]]></ac:plain-text-body></ac:structured-macro><ac:structured-macro ac:macro-id="26a887fa-d2f8-4988-9415-ab76c5e22739" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+dataset qtype_vs_client_subnet dns Qtype:qtype ClientSubnet:cip4_net queries-only max-cells=200;]]></ac:plain-text-body></ac:structured-macro>
+<p class="auto-cursor-target"><br /></p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="7fd11eb1-b417-4b2a-8095-555c12a64e33"><ac:plain-text-body><![CDATA[# New in 2.4.0
+dataset server_addr_vs_trans dns Transport:transport ServerAddr:server queries-only;]]></ac:plain-text-body></ac:structured-macro>
+<p class="auto-cursor-target"><br /></p><ac:structured-macro ac:name="note" ac:schema-version="1" ac:macro-id="26a887fa-d2f8-4988-9415-ab76c5e22739"><ac:rich-text-body>
 <p>Data collection for the server_addr dataset is not yet supported in the official release of version 1 of DSC, but is available using the latest code from the DSC github repo. Also, note this dataset will contain the source addresses of all responses (QR = 1) seen on the collection node even if they do not originate from the local_address specified in the dsc.conf (i.e. if another server sends a response to the collection node for some reason).</p></ac:rich-text-body></ac:structured-macro>
 <p>&nbsp;</p>
 <h1>Plots</h1>
@@ -508,7 +512,8 @@ dataset server_addr_vs_trans dns Transport:transport ServerAddr:server queries-o
 <td>
 <p>By server IP address and transport</p></td>
 <td colspan="1">
-<p class="p1">server_addr_vs_trans</p></td></tr></tbody></table><ac:structured-macro ac:macro-id="f7a8bc07-2c7e-482e-850b-ad49fc4eae75" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<p class="p1">server_addr_vs_trans</p></td></tr></tbody></table>
+<p class="auto-cursor-target"><br /></p><ac:structured-macro ac:name="note" ac:schema-version="1" ac:macro-id="f7a8bc07-2c7e-482e-850b-ad49fc4eae75"><ac:rich-text-body>
 <ul>
 <li><strong>RSSAC: Zone size and Zone propagation time graphs.</strong> In order for data to be available for these graphs, an instance of the <em>rssacd</em><span>&nbsp;demon&nbsp;must be run to collect the data (it is not provided by the DSC collector).</span></li>
 <li><strong>GEO: Busiest client location by country.</strong> Both client locations and collection node locations can be displayed on this graph. For node locations to be displayed the nodes must have a city specified via the nodes.csv file.</li></ul></ac:rich-text-body></ac:structured-macro>
@@ -570,7 +575,7 @@ dataset server_addr_vs_trans dns Transport:transport ServerAddr:server queries-o
 <p>If new servers or nodes need to be added to the system then the user should:</p>
 <ul>
 <li>update the <em>/etc/hedgehog/nodes.csv</em> files as required to include the new servers/nodes<br />&nbsp;</li>
-<li>run the&nbsp;<em>/bin/hedgehogctl database_update_nodes</em>&nbsp;script which will update the data in the database and create any required directory structures</li></ul><ac:structured-macro ac:macro-id="049c0d31-3cdd-4ef8-ac3c-ef5ad4e0e487" ac:name="note" ac:schema-version="1"><ac:rich-text-body>
+<li>run the&nbsp;<em>/bin/hedgehogctl database_update_nodes</em>&nbsp;script which will update the data in the database and create any required directory structures</li></ul><ac:structured-macro ac:name="note" ac:schema-version="1" ac:macro-id="049c0d31-3cdd-4ef8-ac3c-ef5ad4e0e487"><ac:rich-text-body>
 <p>In the event of adding new servers the user&nbsp;<strong>must</strong>&nbsp;also then run the&nbsp;<em>/bin/hedgehogctl database_manage_partition</em> scripts to create the required database tables so that data can be imported for the new server.&nbsp;</p></ac:rich-text-body></ac:structured-macro>
 <h1>Web front-end</h1>
 <h2>Plot caching</h2>
@@ -599,7 +604,7 @@ dataset server_addr_vs_trans dns Transport:transport ServerAddr:server queries-o
 <li><span>the&nbsp;</span><em>&lt;prefix&gt;/bin/hedgehogctl database_process_rssac_data</em><span>&nbsp;script via the Database tools component</span></li>
 <li>the <em>&lt;prefix&gt;/bin/hedgehogctl rssac_generate_reports</em>&nbsp;script on the Web front-end component that will store and display the results&nbsp;</li></ol></li>
 <li><span>The resulting yaml files (along with matching plot files) are stored in the directory listed in the&nbsp;</span><em>&lt;prefix&gt;/etc/hedgehog/hedgehog.yaml</em><span>&nbsp;file in the directories section for '</span><em>rssac</em><span>' (this path is auto-generated in 2.0 and should not be changed by the user).&nbsp;</span></li>
-<li>The generated files are served by the Hedgehog front end and can be found by clicking on the &quot;RSSAC reports&quot; link at the bottom left of the Hedgehog webpage.&nbsp;</li></ul><ac:structured-macro ac:macro-id="515cb692-5b1f-4ad1-8da2-56862ef2a46f" ac:name="info" ac:schema-version="1"><ac:rich-text-body>
+<li>The generated files are served by the Hedgehog front end and can be found by clicking on the &quot;RSSAC reports&quot; link at the bottom left of the Hedgehog webpage.&nbsp;</li></ul><ac:structured-macro ac:name="info" ac:schema-version="1" ac:macro-id="515cb692-5b1f-4ad1-8da2-56862ef2a46f"><ac:rich-text-body>
 <p>Note that RSSAC reports can be run for any server, however the name of the server affects the value in the service field of the generated yaml: &nbsp;</p>
 <p>If the server name is of the pattern &quot;*-root&quot; where * is a letter, then the service will be &quot;*.<a href="http://root-servers.org">root-servers.org</a>&quot;. For all other server names the service will simply be the server name.&nbsp;</p></ac:rich-text-body></ac:structured-macro>
 <p>The script&nbsp;can either be run manually, or via a cron job as described in the Maintenance section of the installation guide.</p>
