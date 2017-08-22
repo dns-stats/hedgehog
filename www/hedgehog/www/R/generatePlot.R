@@ -1,18 +1,9 @@
 # 
 # Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-# http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, you can obtain one at https://mozilla.org/MPL/2.0/.
 
 #
 # Developed by Sinodun IT (www.sinodun.com)
@@ -439,6 +430,47 @@ facetedLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
     }
 }
 
+facetedLinePlot2 <- function(df, f, title, xlabel, ylabel, gvis) {
+
+  if (hh_debug) {
+    system('logger -p user.notice Hedgehog: In facetedLinePlot2')
+  }
+
+    if(gvis == 1){
+        linePlot(df, f, title, xlabel, ylabel, gvis)
+    }else{
+        nKeys <- length(unique(df$key))
+        png(f, width = W, height = H)
+        df$x <- as.POSIXct(df$x)
+        df$facet1 <- sub(".*:tcp", "tcp", df$key)
+        df$facet2 <- sub(".*:udp", "udp", df$facet1)
+		write.table(df, file="/tmp/df.out")
+
+        p <- ggplot(data=df, aes(x=x, y=y, group=key, colour=key)) +
+                    geom_jitter(position=position_jitter(width=2)) +
+                    geom_line() +
+                    labs(title=title, x=xlabel, y=ylabel) +
+                    facet_grid(facet2 ~ ., scales="free") +
+                    scale_x_datetime(expand=c(0.01,0)) +
+                    scale_y_continuous(expand=c(0.01,0), labels=comma) +
+                    theme_bw() +
+                    theme(panel.grid.major = element_line(colour = GRIDGREY), 
+                          panel.grid.minor = element_line(colour = GRIDGREY, linetype = "dotted")) +
+                    guides(col = guide_legend(nrow = 20, byrow = TRUE, override.aes=list(size=3)))
+
+        nKeys = length(unique(df$key))
+        if (nKeys <= NMINICBPALETTE) {
+            p <- p + scale_colour_manual(values=MINICBPALETTE)
+        }
+        else if (nKeys <= NCBPALETTE) {
+          p <- p + scale_colour_manual(values=CBPALETTE)
+        }
+
+        print(p)
+        dev.off()
+    }
+}
+
 facetedDiffLinePlot <- function(df, f, title, xlabel, ylabel, gvis) {
 
     if (hh_debug) {
@@ -778,6 +810,7 @@ initPlotOptions <- function() {
   f2mergekeys             <<- c("direction_vs_ipproto")
   f2mergekeys_lookup      <<- c("certain_qnames_vs_qtype")
   f2mergekeys_lookup_key1 <<- c("chaos_types_and_names")
+  f2other                 <<- c("server_addr_vs_trans")
   f2sumkey2values         <<- c("pcap_stats", "transport_vs_qtype", "dns_ip_version")
   format2                 <<- c(f2mergekeys, f2mergekeys_lookup, f2mergekeys_lookup_key1, f2sumkey2values)
     
@@ -807,6 +840,7 @@ initPlotOptions <- function() {
   lineplots               <<- c(format1, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr", "by_region")
   facetedbarplots         <<- c("traffic_sizes_small","traffic_sizes_big")
   facetedlineplots        <<- c("traffic_volume")
+  facetedlineplots2       <<- c("server_addr_vs_trans")
   faceteddifflineplots    <<- c("traffic_volume_difference")
   log_option              <<- c(f1, f1lookupcodes, f1lookupcodesnoquery, f1noclr, f1nonormal, format2, "by_node", "by_instance", "by_city", "by_country", "rcode_volume", "server_addr", "by_region")
 }
@@ -848,6 +882,7 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
   else if (pltnm %in% f2mergekeys_lookup)         {prepStmntNm <- "f2mergekeys_lookup"}
   else if (pltnm %in% f2mergekeys_lookup_key1)    {prepStmntNm <- "f2mergekeys_lookup_key1"}
   else if (pltnm %in% f2sumkey2values)            {prepStmntNm <- "f2sumkey2values"}
+  else if (pltnm %in% f2other)                    {prepStmntNm <- "f2mergekeys"}
   else if (pltnm %in% format3 )                   {prepStmntNm <- "format3"}
   else if (pltnm %in% format3_bgpprefix )         {prepStmntNm <- "format3_bgpprefix"}
   else if (pltnm %in% format3_asn )               {prepStmntNm <- "format3_asn"}  
@@ -908,6 +943,7 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
   else if (pltnm %in% f1count)                        {stackedAreaPlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
   else if (pltnm %in% lineplots)                      {linePlot            (df, plot_file, mytitle, xlab, ylab, gvis)}
   else if (pltnm %in% facetedlineplots)               {facetedLinePlot     (df, plot_file, mytitle, xlab, ylab, gvis)}
+  else if (pltnm %in% facetedlineplots2)              {facetedLinePlot2    (df, plot_file, mytitle, xlab, ylab, gvis)}
   else if (pltnm %in% faceteddifflineplots)           {facetedDiffLinePlot (df, plot_file, mytitle, xlab, ylab, gvis)}
   else if (pltnm %in% facetedbarplots)                {facetedBarPlot      (df, plot_file, mytitle, xlab, ylab, gvis, 14)} # width hardcoded to 14
   else if (pltnm %in% format3 ||

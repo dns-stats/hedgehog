@@ -1,17 +1,9 @@
 ///
-/// Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+/// Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 ///
-/// Licensed under the Apache License, Version 2.0 (the "License");
-/// you may not use this file except in compliance with the License.
-/// You may obtain a copy of the License at
-///
-/// http://www.apache.org/licenses/LICENSE-2.0
-///
-/// Unless required by applicable law or agreed to in writing, software
-/// distributed under the License is distributed on an "AS IS" BASIS,
-/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-/// See the License for the specific language governing permissions and
-/// limitations under the License.
+/// This Source Code Form is subject to the terms of the Mozilla Public
+/// License, v. 2.0. If a copy of the MPL was not distributed with this
+/// file, you can obtain one at https://mozilla.org/MPL/2.0/.
 ///
 /// Developed by Sinodun IT (www.sinodun.com)
 ///
@@ -46,7 +38,7 @@ $(document).ready(function() {
     // , brew("initnodeslist"),
     $.when(brew("validateDBVersion"),brew("initPltType"), brew("initPlotDDHtml"), brew("initServerDDHtml"), 
            brew("getDefaultServer"), brew("initNodeData"), brew("getDefaultGrouping"), brew("getDefaultPlotId"), 
-           brew("getSupportURL")).done(function(db,rp, pt, ss, ds, nd, dg, dp, su){
+           brew("getSupportURL"), brew("getEnableNodeSelection")).done(function(db,rp, pt, ss, ds, nd, dg, dp, su, ns){
 
         if(db[0].indexOf("Error: Database version mismatch.") > -1) {
             setDbVersionlMsg(true);
@@ -91,7 +83,7 @@ $(document).ready(function() {
         }
 
         // initialise node tabs and grouping
-        initNodeHtml(nd[0]);
+        initNodeHtml(nd[0], ns[0]);
         $('#ng_' + dg[0]).prop('checked', true);
 
         setServersGroups();

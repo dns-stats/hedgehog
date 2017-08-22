@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
+# 
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, you can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Developed by Sinodun IT (www.sinodun.com)
 
 # Wrapper script to run the other tools
 # The other tools will be installed in libexecdir
