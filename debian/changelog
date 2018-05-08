@@ -1,3 +1,51 @@
+hedgehog (2.4.1-1) trusty; urgency=medium
+
+  [ John Dickinson ]
+  * new dataset and plot www stuff still to do
+  * updated db version
+
+  [ Sara Dickinson ]
+  * Add plotting logic
+  * Update docs for 2.4.0
+
+  [ John Dickinson ]
+  * Changed license to MPL
+  * missed a few Copyright statements
+  * more missing copyright.
+  * updated license mentions
+  * changelog
+  * remove some mentions of node from the web interface
+  * forgot  to set versions
+  * added node renaming and deletion
+  * fixed second attempt to delete
+  * addressed some of Sara’s comments
+  * moved the data directories updated changelog
+  * Added check on old data directory
+  * Improved usage and errors.
+  * inc. rc version
+  * removed docs relating to build from source code
+  * and the doc source
+  * for some reason the debian packaging needs a blank line at the end of this file now...
+  * updated changelog
+  * Added enable_node_selection option.
+  * Added a known issue for #180
+  * added not about hide nodes
+  * added not about hide nodes
+  * fixed Sara's comments
+  * Improved error handling when trying to insert invalid data into db
+
+  [ Sara Dickinson ]
+  * Update usage and comments for update_nodes
+  * Update the documentation
+  * Update changeling
+  * Correct the changelog
+  * Correct license description in the user guide (should say MPL)
+  * Prep for 2.4.1 release.
+  * minor fix to documentation
+  * Change postgresql packages to suggests.
+
+ -- Sara Dickinson <sara@sinodun.com>  Tue, 08 May 2018 14:17:42 +0000
+
 hedgehog (2.3.0-1) trusty; urgency=medium
 
   [ John Dickinson ]
