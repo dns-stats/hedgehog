@@ -27,12 +27,12 @@ Package: hedgehog-database
 Architecture: all
 Depends: ${misc:Depends},
          ${python:Depends},
-         postgresql-9.3-ip4r,
-         postgresql-plpython-9.3,
          python-ipy,
          libgetdns1,
          python-getdns
-Suggests: hedgehog-doc,
+Suggests: postgresql-9.3-ip4r,
+          postgresql-plpython-9.3,
+          hedgehog-doc,
           unbound,
           pgtune
 Description: visualisation tool for DNS [Database setup file]
