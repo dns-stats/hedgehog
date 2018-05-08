@@ -61,7 +61,7 @@ dataset server_addr_vs_trans dns Transport:transport ServerAddr:server queries-o
 <p>&nbsp;</p>
 <h1>Plots</h1>
 <p>The relationship between the Hedgehog plots and those produced by the DSC Presenter are listed here for convenience.</p>
-<table>
+<table><colgroup><col /><col /><col /><col /></colgroup>
 <tbody>
 <tr>
 <th>Hedgehog plot category</th>

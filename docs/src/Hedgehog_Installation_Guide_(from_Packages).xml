@@ -6,7 +6,7 @@
 <h2>Platform support</h2>
 <p>Hedgehog is currently only supported on Ubuntu 14.04 LTS Server.</p>
 <h2>Database support</h2>
-<p>Hedgehog has been tested with PostgreSQL 9.3.X and 9.6.X. The installation of the database is not covered in detail since it may or may not be co-located with the other hedgehog components. If not already installed, it will be installed as a dependancy of the hedgehog-database package.</p><ac:structured-macro ac:name="warning" ac:schema-version="1" ac:macro-id="d352c3b5-d0f4-4f56-93a5-e788432f549f"><ac:rich-text-body>
+<p>Hedgehog has been tested with PostgreSQL 9.3.X and 9.6.X. The installation of the database is not covered in detail since it may or may not be co-located with the other hedgehog components. If not already installed, 9.3 will be suggested by the hedgehog-database package.</p><ac:structured-macro ac:name="warning" ac:schema-version="1" ac:macro-id="d352c3b5-d0f4-4f56-93a5-e788432f549f"><ac:rich-text-body>
 <p>The Hedgehog servers and PostgreSQL must both be configured to use UTC!</p></ac:rich-text-body></ac:structured-macro>
 <h2>General</h2>
 <h3>Home directory permissions</h3>
