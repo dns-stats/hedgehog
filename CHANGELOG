@@ -6,6 +6,13 @@
 # file, you can obtain one at https://mozilla.org/MPL/2.0/.
 #
 
+Hedgehog 2.4.1 - 2018-05-08
+----------------------------
+* The only change is an update to the packaging that switches the postgres 9.3
+  packages from 'depends' to 'suggests' to allow the user to choose the DB 
+  version.
+
+
 Hedgehog 2.4.0 - 2017-08-21
 ----------------------------
 * Improved error handling when trying to insert invalid data into db 
