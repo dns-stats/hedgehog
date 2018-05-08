@@ -1,30 +1,22 @@
 # 
 # Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 # 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-# http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, you can obtain one at https://mozilla.org/MPL/2.0/.
 #
 
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(Hedgehog, 2.3.0,  dns-stats-users@dns-stats.org)
+AC_INIT(Hedgehog, 2.4.1,  dns-stats-users@dns-stats.org)
 AC_CONFIG_SRCDIR([tools/hedgehogctl.in])
 AC_CONFIG_HEADER([config.h])
 
-AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[12],[Database version])
-AC_SUBST([DB_SCHEMA_VERSION],[12])
-AC_SUBST([VERSION_NAME],[Four-toed])
+AC_DEFINE_UNQUOTED([DB_SCHEMA_VERSION],[14],[Database version])
+AC_SUBST([DB_SCHEMA_VERSION],[14])
+AC_SUBST([VERSION_NAME],[Bare-bellied])
 
 AC_CONFIG_MACRO_DIR([m4])
 

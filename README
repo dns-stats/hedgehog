@@ -6,9 +6,12 @@ Hedgehog is a visualisation tool for DNS statistics that consumes data
 acquired with the DSC collector.
 
 Hedgehog was initially developed for ICANN by Sinodun IT and is now released
-open source under the Apache License, version 2.0. For more information on
-the development and support of Hedgehog see the http://www.dns-stats.org
-website.
+open source. This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, you can obtain one at https://mozilla.org/MPL/2.0/.
+
+For more information on the development and support of Hedgehog see the
+http://www.dns-stats.org website.
 
 REGISTRATION
 -------------
@@ -26,9 +29,13 @@ USER GUIDE
 Read the User_Guide.pdf in the docs directory for the lastest version or look
 online: https://github.com/dns-stats/hedgehog/wiki/Documentation
 
-MANUAL INSTALLATION
+PACKAGES
+---------
+The latest Hedgehog packages are available from ppa:dns-stats/presenter
+
+SOURCE INSTALLATION
 ------------
-Read the Installation_Guide.pdf in the docs directory of the INSTALL file.
+This is no longer officially supported.
 
 VAGRANT INSTALLATION
 ------------

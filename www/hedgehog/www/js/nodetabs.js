@@ -1,17 +1,9 @@
 ///
-/// Copyright 2014 Internet Corporation for Assigned Names and Numbers.
+/// Copyright 2014, 2015, 2016 Internet Corporation for Assigned Names and Numbers.
 ///
-/// Licensed under the Apache License, Version 2.0 (the "License");
-/// you may not use this file except in compliance with the License.
-/// You may obtain a copy of the License at
-///
-/// http://www.apache.org/licenses/LICENSE-2.0
-///
-/// Unless required by applicable law or agreed to in writing, software
-/// distributed under the License is distributed on an "AS IS" BASIS,
-/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-/// See the License for the specific language governing permissions and
-/// limitations under the License.
+/// This Source Code Form is subject to the terms of the Mozilla Public
+/// License, v. 2.0. If a copy of the MPL was not distributed with this
+/// file, you can obtain one at https://mozilla.org/MPL/2.0/.
 ///
 /// Developed by Sinodun IT (www.sinodun.com)
 ///
@@ -31,7 +23,7 @@ function parse_name( myid ) {
     return myid.replace( /\./g, "£" );
 }
 
-function initNodeHtml(nodes_raw) {
+function initNodeHtml(nodes_raw, enable_node_selection) {
 
     // Example data format
     // var nodes = [
@@ -48,11 +40,11 @@ function initNodeHtml(nodes_raw) {
     $('#nodetabs').append("<div class='sixteen columns' id='groupcontent'></div>");
     $('#nodetabs').append("<br class='clear'>");
     $('#nodetabs').append("<div class='sixteen columns' id='nodecontent'>");
-    $('#srvr_select').append("<a style='font-weight:bold; font-size:80%; text-decoration: none; padding-left: 20px; padding-right: 5px;'>Group nodes by:</a>");
+    $('#srvr_select').append("<a style='font-weight:bold; font-size:80%; text-decoration: none; padding-left: 20px; padding-right: 5px;'>Group by:</a>");
     $('#srvr_select').append("<input type='radio'          id='ng_country'  name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_country'  >Country </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_city'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_city'     >City </label>");
     $('#srvr_select').append("<input type='radio'          id='ng_instance' name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_instance' >Instance </label>");
-    $('#srvr_select').append("<input type='radio'          id='ng_none'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_none'     >Node </label>");
+    if (enable_node_selection == 1) {$('#srvr_select').append("<input type='radio'          id='ng_none'     name='node_grouping' onclick='ngChanged()' ><label style='font-weight:bold;' for='ng_none'     >Node </label>");}
 
     // Check for no servers is made earlier, so just check for nodes here
     // if (nodes_raw = "[]") {
