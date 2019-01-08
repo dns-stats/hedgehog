@@ -862,9 +862,7 @@ generatePlotFile <- function(plttitle, pltnm, ddpltid, plot_file, simple_start, 
   }    
     
   mytitle <- paste(plttitle, "\nfrom ", simple_start, " UTC to ", simple_stop," UTC ", sep="")
-  posix_start <- as.POSIXct(simple_start, format='%Y-%m-%d %H:%M')
-  posix_stop <- as.POSIXct(simple_stop, format='%Y-%m-%d %H:%M')
-  time_window <- difftime(posix_stop, posix_start, units="secs")
+  time_window <- difftime(simple_stop, simple_start, units="secs")
       
   if (time_window > 86340 && pltnm %in% lineplots) {
     mytitle <- paste(mytitle, " (smoothed)", sep="")
