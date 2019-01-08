@@ -265,7 +265,7 @@ generatePlot <- function(){
 		return(FALSE)
 	}
 
-	dd_pltid			<- GET$pltid
+	dd_pltid			<- strtoi(GET$pltid)
 	pltdetails			<- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getpltdetails(", dd_pltid, ");", sep=""))	
 	
 	if (is.null(pltdetails)) {
