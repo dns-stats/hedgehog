@@ -1,3 +1,14 @@
+hedgehog (2.4.2-1) trusty; urgency=medium
+
+  [ Jim Hague ]
+  * generatePlot() parameters: sanitise plot ID into a number.
+  * generatePlot() parameters: sanitise timestamps into POSIXct values.
+
+  [ Sara Dickinson ]
+  * prep for 2.4.2 release
+
+ -- Sara Dickinson <sara@sinodun.com>  Tue, 08 Jan 2019 15:37:09 +0000
+
 hedgehog (2.4.1-1) trusty; urgency=medium
 
   [ John Dickinson ]
