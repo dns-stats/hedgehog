@@ -265,7 +265,7 @@ generatePlot <- function(){
 		return(FALSE)
 	}
 
-	dd_pltid			<- GET$pltid
+	dd_pltid			<- strtoi(GET$pltid)
 	pltdetails			<- dbGetDataFrame(dbdrv, dsccon, dbconstr, paste("EXECUTE getpltdetails(", dd_pltid, ");", sep=""))	
 	
 	if (is.null(pltdetails)) {
@@ -321,9 +321,9 @@ generatePlot <- function(){
 		}
 	}
 
-	# convert the times to POSIX
-	simple_start   <- sub("T", " ", start)
-	simple_stop    <- sub("T", " ", stop)
+	# convert the times to POSIX string
+	simple_start   <- as.POSIXct(start, format='%Y-%m-%dT%H:%M')
+	simple_stop    <- as.POSIXct(stop, format='%Y-%m-%dT%H:%M')
 
 	cache       <- FALSE # Create new plot_file
 	if (file.exists(plot_file) && gui_config$www$use_plot_caching == 1) {

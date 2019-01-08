@@ -1,10 +1,6 @@
 
 <p><br /></p>
-<p>This document describes how to upgrade a server from release 2.4.0 to release 2.4.1 of Hedgehog via packages.&nbsp;</p>
-<h2>Release 2.4.1</h2>
+<p>This document describes how to upgrade a server from release 2.4.1 to release 2.4.2 of Hedgehog via packages.&nbsp;</p>
+<h2>Release 2.4.2</h2>
 <p>There are no Hedgehog actions required for this upgrade.</p>
-<p>This release only removes the explicit dependancy on PostgreSQL 9.3. It's purpose is simply to make it easier for users in the following cases:</p>
-<ul>
-<li>Perform a clean install with a version of PostgeSQL&nbsp;!= 9.3</li>
-<li>Perform an upgrade of PostgreSQL where the PostgreSQL 9.3 packages are going to be removed</li></ul>
 <p><br /></p>
