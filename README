@@ -2,6 +2,11 @@ Hedgehog
 
 DESCRIPTION
 -----------
+*Please note that Hedgehog is no longer actively developed.* 
+The DNS-STATS project is now focussing on
+a newer data collection (dns-stats-compactor) and presentation solution - see the
+http://www.dns-stats.org website.
+
 Hedgehog is a visualisation tool for DNS statistics that consumes data
 acquired with the DSC collector.
 
@@ -10,8 +15,6 @@ open source. This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, you can obtain one at https://mozilla.org/MPL/2.0/.
 
-For more information on the development and support of Hedgehog see the
-http://www.dns-stats.org website.
 
 REGISTRATION
 -------------
