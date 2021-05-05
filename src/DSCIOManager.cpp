@@ -214,9 +214,11 @@ DSCIOManager::dsc_import_input_from_source() {
     
     string node = bfs::initial_path().filename().generic_string();
     string server = bfs::initial_path().parent_path().filename().generic_string();
+    //fix potential sql injection
+    replace(node.begin(), node.end(), '\'', '_');
+    replace(server.begin(), server.end(), '\'', '_');
     //transform to 'internal' name
     replace(server.begin(), server.end(), '-', '_');
-    replace(server.begin(), server.end(), '\'', '_');
     replace_string(server, ".", "__");
     transform(server.begin(), server.end(), server.begin(), ::tolower);
     
