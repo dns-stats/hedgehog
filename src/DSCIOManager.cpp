@@ -216,6 +216,7 @@ DSCIOManager::dsc_import_input_from_source() {
     string server = bfs::initial_path().parent_path().filename().generic_string();
     //transform to 'internal' name
     replace(server.begin(), server.end(), '-', '_');
+    replace(server.begin(), server.end(), '\'', '_');
     replace_string(server, ".", "__");
     transform(server.begin(), server.end(), server.begin(), ::tolower);
     
